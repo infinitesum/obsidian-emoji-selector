@@ -24,36 +24,44 @@ export class EmojiManager {
         // Set the cache manager in the parser
         OwoFileParser.setCacheManager(this.cacheManager);
 
-        // Initialize cache asynchronously
+        // Initialize cache asynchronously (non-blocking)
         this.initializeCache();
+
+        // Start background cache warming for configured URLs
+        this.startBackgroundCacheWarming();
     }
 
     /**
-     * Initialize the cache manager
+     * Initialize the cache manager (non-blocking)
      */
-    private async initializeCache(): Promise<void> {
+    private initializeCache(): void {
         if (this.cacheInitialized || this.cacheInitPromise) {
-            return this.cacheInitPromise || Promise.resolve();
+            return;
         }
 
         this.cacheInitPromise = (async () => {
             try {
                 await this.cacheManager.initialize();
                 this.cacheInitialized = true;
+                console.log('Emoji cache initialization completed');
             } catch (error) {
                 console.error('Failed to initialize emoji cache:', error);
+                this.cacheInitialized = true; // Mark as initialized even on error for graceful degradation
             }
         })();
 
-        return this.cacheInitPromise;
+        // Don't await - let it run in background
+        this.cacheInitPromise.catch(error => {
+            console.error('Cache initialization promise failed:', error);
+        });
     }
 
     /**
      * Ensure cache is initialized before using it
      */
     private async ensureCacheInitialized(): Promise<void> {
-        if (!this.cacheInitialized) {
-            await this.initializeCache();
+        if (!this.cacheInitialized && this.cacheInitPromise) {
+            await this.cacheInitPromise;
         }
     }
 
@@ -69,6 +77,9 @@ export class EmojiManager {
             this.cleanupCache().catch(error => {
                 console.error('Failed to cleanup emoji cache:', error);
             });
+
+            // Start background warming for new URLs
+            this.startBackgroundCacheWarming();
         }
     }
 
@@ -82,8 +93,12 @@ export class EmojiManager {
             return;
         }
 
-        // Ensure cache is initialized before proceeding
-        await this.ensureCacheInitialized();
+        // Try to ensure cache is initialized, but don't block if it fails
+        try {
+            await this.ensureCacheInitialized();
+        } catch (error) {
+            console.warn('Cache initialization failed, proceeding without cache:', error);
+        }
 
         // Check if we have recent data (simple caching)
         const now = Date.now();
@@ -101,10 +116,11 @@ export class EmojiManager {
             const urls = this.parseUrls(this.settings.owoJsonUrls);
 
             if (urls.length === 0) {
+                console.warn('No emoji URLs configured');
                 return;
             }
 
-            // Load collections from URLs
+            // Load collections from URLs with proper error handling
             const collections = await OwoFileParser.loadFromUrls(urls);
 
             // Add collections to storage
@@ -113,10 +129,12 @@ export class EmojiManager {
             }
 
             this.lastLoadTime = now;
+            console.log(`Loaded ${collections.length} emoji collections with ${this.storage.getTotalEmojiCount()} total emojis`);
 
         } catch (error) {
             console.error('Failed to load emoji collections:', error);
-            throw error;
+            // Don't throw error - allow graceful degradation
+            // The UI can show an error message or empty state
         } finally {
             this.isLoading = false;
         }
@@ -168,12 +186,20 @@ export class EmojiManager {
      * Force reload of emoji collections (clears cache and fetches fresh data)
      */
     async forceReload(): Promise<void> {
-        // Ensure cache is initialized before proceeding
-        await this.ensureCacheInitialized();
+        // Try to ensure cache is initialized, but don't block if it fails
+        try {
+            await this.ensureCacheInitialized();
+        } catch (error) {
+            console.warn('Cache initialization failed during force reload, proceeding without cache:', error);
+        }
 
         // Clear the cache to force fresh fetches
-        if (this.cacheManager) {
-            await this.cacheManager.clearAll();
+        try {
+            if (this.cacheManager) {
+                await this.cacheManager.clearAll();
+            }
+        } catch (error) {
+            console.warn('Failed to clear cache during force reload:', error);
         }
 
         this.lastLoadTime = 0;
@@ -185,6 +211,7 @@ export class EmojiManager {
         const urls = this.parseUrls(this.settings.owoJsonUrls);
 
         if (urls.length === 0) {
+            console.warn('No emoji URLs configured for force reload');
             return;
         }
 
@@ -198,10 +225,11 @@ export class EmojiManager {
             }
 
             this.lastLoadTime = Date.now();
+            console.log(`Force reloaded ${collections.length} emoji collections with ${this.storage.getTotalEmojiCount()} total emojis`);
 
         } catch (error) {
             console.error('Failed to force reload emoji collections:', error);
-            throw error;
+            // Don't throw error - allow graceful degradation
         }
     }
 
@@ -227,9 +255,14 @@ export class EmojiManager {
             return;
         }
 
-        await this.ensureCacheInitialized();
-        const activeUrls = this.parseUrls(this.settings.owoJsonUrls);
-        await this.cacheManager.cleanupUnusedCache(activeUrls);
+        try {
+            await this.ensureCacheInitialized();
+            const activeUrls = this.parseUrls(this.settings.owoJsonUrls);
+            await this.cacheManager.cleanupUnusedCache(activeUrls);
+        } catch (error) {
+            console.error('Failed to cleanup cache:', error);
+            // Don't throw error - graceful degradation
+        }
     }
 
     /**
@@ -244,5 +277,40 @@ export class EmojiManager {
             .split(',')
             .map(url => url.trim())
             .filter(url => url.length > 0);
+    }
+
+    /**
+     * Start background cache warming for configured URLs
+     */
+    private startBackgroundCacheWarming(): void {
+        // Use setTimeout to defer this until after constructor completes
+        setTimeout(async () => {
+            try {
+                // Wait for cache to be initialized first
+                await this.ensureCacheInitialized();
+
+                const urls = this.parseUrls(this.settings.owoJsonUrls);
+                if (urls.length > 0) {
+                    console.log(`Starting background cache warming for ${urls.length} URLs`);
+                    await this.cacheManager.startBackgroundWarming(urls);
+                }
+            } catch (error) {
+                console.error('Failed to start background cache warming:', error);
+            }
+        }, 100); // Small delay to ensure constructor completes
+    }
+
+    /**
+     * Check if cache is ready for use
+     */
+    isCacheReady(): boolean {
+        return this.cacheManager.isReady();
+    }
+
+    /**
+     * Check if background warming is in progress
+     */
+    isBackgroundWarmingInProgress(): boolean {
+        return this.cacheManager.isBackgroundWarmingInProgress();
     }
 }

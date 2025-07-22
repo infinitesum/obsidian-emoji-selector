@@ -211,15 +211,19 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Get description with current collection status
      */
     private getCollectionStatusDescription(): string {
-        const collectionCount = this.plugin.emojiManager.getAllCollections().length;
-        const emojiCount = this.plugin.emojiManager.getTotalEmojiCount();
-
         let statusText = 'Comma-separated URLs for owo.json files to load emoji collections from. JSON files are cached locally until you click "Update Collections".';
 
-        if (collectionCount > 0) {
-            statusText += ` Currently loaded: ${collectionCount} collections with ${emojiCount} emojis.`;
+        if (this.plugin.isEmojiManagerInitialized()) {
+            const collectionCount = this.plugin.emojiManager!.getAllCollections().length;
+            const emojiCount = this.plugin.emojiManager!.getTotalEmojiCount();
+
+            if (collectionCount > 0) {
+                statusText += ` Currently loaded: ${collectionCount} collections with ${emojiCount} emojis.`;
+            } else {
+                statusText += ' No collections currently loaded.';
+            }
         } else {
-            statusText += ' No collections currently loaded.';
+            statusText += ' Collections will be loaded when first needed.';
         }
 
         return statusText;
@@ -264,8 +268,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             this.plugin.settings.owoJsonUrls = newUrls;
             await this.plugin.saveSettings();
 
-            // Force reload emoji collections
-            await this.plugin.emojiManager.forceReload();
+            // Get emoji manager and force reload emoji collections
+            const emojiManager = await this.plugin.getEmojiManagerForSettings();
+            await emojiManager.forceReload();
 
             // Update state
             this.hasUnsavedChanges = false;
@@ -274,8 +279,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             this.updateButton.addClass('emoji-update-success');
             this.updateButton.textContent = 'Collections Updated!';
 
-            const collectionCount = this.plugin.emojiManager.getAllCollections().length;
-            const emojiCount = this.plugin.emojiManager.getTotalEmojiCount();
+            const collectionCount = emojiManager.getAllCollections().length;
+            const emojiCount = emojiManager.getTotalEmojiCount();
 
             new Notice(`Emoji collections updated! Loaded ${collectionCount} collections with ${emojiCount} emojis.`);
 

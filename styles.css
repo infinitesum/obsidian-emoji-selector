@@ -362,7 +362,7 @@
   max-width: none;
   /* Default sizing - can be overridden by settings */
   width: auto;
-  height: 1.2em;
+  /* height: 1.2em; */
   /* Prevent image selection and dragging */
   pointer-events: none;
   -webkit-user-drag: none;
@@ -555,10 +555,10 @@ code .emoji-text {
 
 /* Responsive sizing and behavior for mobile */
 @media (max-width: 768px) {
-  .emoji-image {
+  /* .emoji-image {
     height: 1.1em !important;
     width: auto !important;
-  }
+  } */
 
   /* Improve mobile modal experience */
   .emoji-picker-modal .modal-content {

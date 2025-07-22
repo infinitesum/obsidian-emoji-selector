@@ -6,64 +6,257 @@ import { EmojiSelectorSettingTab } from './src/settings-tab';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
-	emojiManager: EmojiManager;
+	emojiManager: EmojiManager | null = null;
+	private settingsLoaded: boolean = false;
+	private settingsLoadPromise: Promise<void> | null = null;
+	private cssInjected: boolean = false;
 
 	async onload() {
 		console.log('Loading Emoji Selector Plugin');
 
-		// Load settings
-		await this.loadSettings();
+		// Start loading settings in background (non-blocking)
+		this.loadSettingsAsync();
 
-		// Initialize emoji manager with cache support
-		this.emojiManager = new EmojiManager(
-			this.settings,
-			(data: any) => this.saveData(data),
-			() => this.loadData()
-		);
-
-		// Add settings tab (Requirement 5.4)
+		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
 
-		// Add command to open emoji picker (Requirement 5.1)
+		// Add command to open emoji picker (Requirement 5.1) - defer hotkey setup
 		this.addCommand({
 			id: 'open-emoji-picker',
 			name: 'Open Emoji Picker',
-			editorCallback: (editor: Editor) => {
-				this.openEmojiPicker(editor);
-			},
-			hotkeys: this.settings.enableKeyboardShortcut ? [
-				{
-					modifiers: this.parseHotkey(this.settings.keyboardShortcut).modifiers as Modifier[],
-					key: this.parseHotkey(this.settings.keyboardShortcut).key
-				}
-			] : []
+			editorCallback: async (editor: Editor) => {
+				await this.openEmojiPicker(editor);
+			}
+			// Hotkeys will be set up after settings load
 		});
 
 		// Add ribbon icon to trigger emoji picker (Requirement 5.2)
-		this.addRibbonIcon('smile', 'Open Emoji Picker', () => {
+		this.addRibbonIcon('smile', 'Open Emoji Picker', async () => {
 			// Get the active editor
 			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 			if (activeView && activeView.editor) {
-				this.openEmojiPicker(activeView.editor);
+				await this.openEmojiPicker(activeView.editor);
 			} else {
 				// Show notice if no active editor
 				new Notice('No active editor found. Please open a note to use the emoji picker.');
 			}
 		});
 
-		// Apply dynamic CSS for emoji sizing
-		this.updateEmojiSizeCSS();
+		// Inject base CSS immediately so existing emojis look good
+		// Dynamic sizing CSS will be injected later when settings are loaded
+		this.injectBaseCss();
 	}
 
 	onunload() {
 		console.log('Unloading Emoji Selector Plugin');
+
+		// Clean up injected CSS
+		const baseStyle = document.getElementById('emoji-selector-base-styles');
+		if (baseStyle) {
+			baseStyle.remove();
+		}
+
+		const dynamicStyle = document.getElementById('emoji-selector-dynamic-styles');
+		if (dynamicStyle) {
+			dynamicStyle.remove();
+		}
+	}
+
+	/**
+	 * Load plugin settings asynchronously (non-blocking)
+	 */
+	private loadSettingsAsync(): void {
+		if (this.settingsLoadPromise) {
+			return;
+		}
+
+		this.settingsLoadPromise = this.loadSettings();
 	}
 
 	/**
 	 * Load plugin settings
 	 */
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		try {
+			this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+			this.settingsLoaded = true;
+
+			// Set up hotkeys now that settings are loaded
+			this.setupHotkeys();
+
+			// Apply dynamic CSS now that settings are loaded
+			this.updateEmojiSizeCSS();
+		} catch (error) {
+			console.error('Failed to load emoji selector settings:', error);
+			this.settings = { ...DEFAULT_SETTINGS };
+			this.settingsLoaded = true;
+
+			// Apply default CSS even on error
+			this.updateEmojiSizeCSS();
+		}
+	}
+
+	/**
+	 * Ensure settings are loaded before proceeding
+	 */
+	private async ensureSettingsLoaded(): Promise<void> {
+		if (!this.settingsLoaded && this.settingsLoadPromise) {
+			await this.settingsLoadPromise;
+		}
+	}
+
+	/**
+	 * Setup hotkeys after settings are loaded
+	 */
+	private setupHotkeys(): void {
+		// Find the existing command and update its hotkeys
+		const command = (this.app as any).commands.commands['emoji-selector:open-emoji-picker'];
+		if (command && this.settings.enableKeyboardShortcut) {
+			command.hotkeys = [
+				{
+					modifiers: this.parseHotkey(this.settings.keyboardShortcut).modifiers as Modifier[],
+					key: this.parseHotkey(this.settings.keyboardShortcut).key
+				}
+			];
+		} else if (command) {
+			command.hotkeys = [];
+		}
+	}
+
+	/**
+	 * Lazy initialization of EmojiManager
+	 */
+	private async getEmojiManager(): Promise<EmojiManager> {
+		if (!this.emojiManager) {
+			// Ensure settings are loaded first
+			await this.ensureSettingsLoaded();
+
+			// Initialize emoji manager with cache support
+			this.emojiManager = new EmojiManager(
+				this.settings,
+				(data: any) => this.saveData(data),
+				() => this.loadData()
+			);
+		}
+		return this.emojiManager;
+	}
+
+	/**
+	 * Inject base CSS immediately for existing emojis
+	 */
+	private injectBaseCss(): void {
+		// Check if base CSS is already injected
+		if (document.getElementById('emoji-selector-base-styles')) {
+			return;
+		}
+
+		const style = document.createElement('style');
+		style.id = 'emoji-selector-base-styles';
+
+		// Base CSS that makes emojis look good regardless of settings
+		style.textContent = `
+			/* Base emoji styles - applied to all emoji elements */
+			.emoji-image,
+			.emoji-text {
+				display: inline;
+				vertical-align: text-bottom;
+				line-height: 1;
+				margin: 0 0.05em;
+				user-select: none;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+			}
+
+			/* Image emoji specific styles */
+			.emoji-image {
+				object-fit: contain;
+				border-radius: var(--radius-xs);
+				background: transparent;
+				border: none;
+				outline: none;
+				max-width: none;
+				width: auto;
+				height: 1.2em; /* Default size, will be overridden by dynamic CSS */
+				pointer-events: none;
+				-webkit-user-drag: none;
+				-khtml-user-drag: none;
+				-moz-user-drag: none;
+				-o-user-drag: none;
+			}
+
+			/* Text emoji specific styles */
+			.emoji-text {
+				font-style: normal;
+				font-weight: normal;
+				text-decoration: none;
+				font-size: 1.2em; /* Default size, will be overridden by dynamic CSS */
+				font-family: var(--font-text), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+			}
+
+			/* Ensure proper alignment in different contexts */
+			.cm-editor .emoji-image,
+			.cm-editor .emoji-text {
+				display: inline;
+				vertical-align: text-bottom;
+				position: relative;
+				top: 0;
+			}
+
+			.markdown-preview-view .emoji-image,
+			.markdown-preview-view .emoji-text,
+			.markdown-reading-view .emoji-image,
+			.markdown-reading-view .emoji-text,
+			.markdown-source-view.mod-cm6 .emoji-image,
+			.markdown-source-view.mod-cm6 .emoji-text {
+				vertical-align: middle;
+			}
+
+			/* Fallback for broken images */
+			.emoji-image[alt]:after {
+				content: attr(alt);
+				font-size: 0.8em;
+				color: var(--text-muted);
+				background: var(--background-secondary);
+				padding: 0.1em 0.3em;
+				border-radius: var(--radius-xs);
+				border: 1px solid var(--background-modifier-border);
+				display: inline-block;
+				vertical-align: middle;
+			}
+
+			.emoji-image {
+				color: transparent;
+				display: inline !important;
+			}
+		`;
+
+		document.head.appendChild(style);
+		console.log('Base emoji CSS injected');
+	}
+
+	/**
+	 * Ensure CSS is injected when needed
+	 */
+	private ensureCSSInjected(): void {
+		if (!this.cssInjected) {
+			this.updateEmojiSizeCSS();
+			this.cssInjected = true;
+		}
+	}
+
+	/**
+	 * Get emoji manager for settings tab (safe access)
+	 */
+	async getEmojiManagerForSettings(): Promise<EmojiManager> {
+		return await this.getEmojiManager();
+	}
+
+	/**
+	 * Check if emoji manager is initialized (for settings display)
+	 */
+	isEmojiManagerInitialized(): boolean {
+		return this.emojiManager !== null;
 	}
 
 	/**
@@ -81,6 +274,8 @@ export default class EmojiSelectorPlugin extends Plugin {
 		if (this.emojiManager) {
 			this.emojiManager.updateSettings(this.settings);
 		}
+		// Update hotkeys
+		this.setupHotkeys();
 		// Update dynamic CSS for emoji sizing
 		this.updateEmojiSizeCSS();
 	}
@@ -88,7 +283,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 	/**
 	 * Open the emoji picker modal
 	 */
-	private openEmojiPicker(editor: Editor): void {
+	private async openEmojiPicker(editor: Editor): Promise<void> {
+		// Ensure CSS is injected before opening modal
+		this.ensureCSSInjected();
+
+		// Get emoji manager (lazy initialization)
+		await this.getEmojiManager();
+
 		const modal = new EmojiPickerModal(
 			this.app,
 			this,
@@ -232,6 +433,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Update dynamic CSS for emoji sizing
 	 */
 	private updateEmojiSizeCSS(): void {
+		// Ensure settings are loaded before applying CSS
+		if (!this.settingsLoaded) {
+			// If settings aren't loaded yet, defer this call
+			setTimeout(() => this.updateEmojiSizeCSS(), 100);
+			return;
+		}
+
 		// Remove existing dynamic style
 		const existingStyle = document.getElementById('emoji-selector-dynamic-styles');
 		if (existingStyle) {
@@ -245,9 +453,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 		const emojiSize = this.settings.emojiSize;
 		const customClasses = this.settings.customCssClasses;
 
-		// CSS that applies to all existing and new emojis
+		// CSS that applies to all existing and new emojis - only dynamic sizing
 		style.textContent = `
-			/* Dynamic emoji sizing - applies to all emojis */
+			/* Dynamic emoji sizing - overrides base styles */
 			.emoji-image {
 				height: ${emojiSize} !important;
 				width: auto !important;
@@ -265,5 +473,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 		`;
 
 		document.head.appendChild(style);
+		this.cssInjected = true;
+		console.log(`Dynamic emoji CSS updated with size: ${emojiSize}`);
 	}
 }
