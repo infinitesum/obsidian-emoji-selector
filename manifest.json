@@ -1,0 +1,11 @@
+{
+  "id": "emoji-selector",
+  "name": "Emoji Selector",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "An emoji selector plugin that reads owo.json files and converts selected emojis into HTML img tags",
+  "author": "summer",
+  "authorUrl": "flyalready.com",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}
