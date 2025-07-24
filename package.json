@@ -1,7 +1,7 @@
 {
   "name": "obsidian-emoji-selector",
   "version": "1.0.0",
-  "description": "An emoji selector plugin for Obsidian that reads owo.json files",
+  "description": "Advanced emoji selector with custom collections, fast search, and HTML img tag conversion from owo.json files",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -14,7 +14,7 @@
     "emoji",
     "selector"
   ],
-  "author": "Plugin Developer",
+  "author": "summer",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^16.11.6",

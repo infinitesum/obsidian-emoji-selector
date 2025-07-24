@@ -37,10 +37,10 @@ export class EmojiCacheManager {
             const data = await this.loadData();
             if (data && data.emojiJsonCache && typeof data.emojiJsonCache === 'object') {
                 this.cache = data.emojiJsonCache;
-                console.log(`Emoji cache initialized with ${Object.keys(this.cache).length} cached URLs`);
+                // Cache initialized with existing data
             } else {
                 this.cache = {};
-                console.log('Emoji cache initialized as empty (no existing cache found)');
+                // Cache initialized as empty
             }
             this.isInitialized = true;
         } catch (error) {
@@ -229,7 +229,7 @@ export class EmojiCacheManager {
             const urlsToRemove = cachedUrls.filter(url => !activeUrls.includes(url));
 
             if (urlsToRemove.length > 0) {
-                console.log(`Cleaning up ${urlsToRemove.length} unused cache entries`);
+                // Cleaning up unused cache entries
                 for (const url of urlsToRemove) {
                     delete this.cache[url];
                 }
@@ -254,7 +254,7 @@ export class EmojiCacheManager {
         }
 
         if (this.backgroundWarmingPromise) {
-            console.log('Background cache warming already in progress');
+            // Background cache warming already in progress
             return;
         }
 
@@ -274,16 +274,16 @@ export class EmojiCacheManager {
      * Perform background cache warming
      */
     private async performBackgroundWarming(urls: string[]): Promise<void> {
-        console.log(`Starting background cache warming for ${urls.length} URLs`);
+        // Starting background cache warming
 
         const uncachedUrls = urls.filter(url => !this.isCached(url));
 
         if (uncachedUrls.length === 0) {
-            console.log('All URLs already cached, no warming needed');
+            // All URLs already cached
             return;
         }
 
-        console.log(`Background warming ${uncachedUrls.length} uncached URLs`);
+        // Background warming uncached URLs
 
         // Import OwoFileParser dynamically to avoid circular dependencies
         const { OwoFileParser } = await import('./owo-parser');
@@ -296,7 +296,7 @@ export class EmojiCacheManager {
                 const batchPromises = batch.map(async (url) => {
                     try {
                         await OwoFileParser.loadFromUrl(url);
-                        console.log(`Background warmed cache for: ${url}`);
+                        // Cache warmed for URL
                     } catch (error) {
                         console.warn(`Background warming failed for URL: ${url}`, error);
                     }
@@ -310,7 +310,7 @@ export class EmojiCacheManager {
                 }
             }
 
-            console.log('Background cache warming completed');
+            // Background cache warming completed
         } catch (error) {
             console.error('Background cache warming encountered an error:', error);
         }

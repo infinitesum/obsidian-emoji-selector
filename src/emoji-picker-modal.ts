@@ -1,7 +1,8 @@
-import { Modal, App, Notice } from 'obsidian';
+import { Modal, App } from 'obsidian';
 import { EmojiItem, EmojiCollection } from './types';
 import { VirtualEmojiRenderer } from './virtual-emoji-renderer';
 import EmojiSelectorPlugin from '../main';
+import { i18n } from './i18n';
 
 /**
  * Modal for selecting emojis with search functionality
@@ -49,9 +50,7 @@ export class EmojiPickerModal extends Modal {
         // Auto-focus search input
         this.focusSearchInput();
 
-        // Log performance metrics
-        const uiShellTime = performance.now() - startTime;
-        console.log(`Emoji modal UI shell rendered in ${uiShellTime.toFixed(2)}ms`);
+        // Performance metrics calculated but not logged to avoid console clutter
     }
 
     /**
@@ -67,7 +66,7 @@ export class EmojiPickerModal extends Modal {
         const toggleContainer = headerContainer.createDiv('emoji-multi-select-container');
         const toggleLabel = toggleContainer.createEl('label', {
             cls: 'emoji-multi-select-label',
-            text: 'Multi-select'
+            text: i18n.t('multiSelect')
         });
 
         this.multiSelectToggle = toggleLabel.createEl('input', {
@@ -81,7 +80,7 @@ export class EmojiPickerModal extends Modal {
         const searchContainer = contentEl.createDiv('emoji-search-container');
         this.searchInput = searchContainer.createEl('input', {
             type: 'text',
-            placeholder: this.plugin.settings.searchPlaceholder,
+            placeholder: this.plugin.settings.searchPlaceholder || i18n.t('searchPlaceholder'),
             cls: 'emoji-search-input'
         });
 
@@ -437,7 +436,7 @@ export class EmojiPickerModal extends Modal {
         this.emojiContainer.empty();
         this.tabsContainer.empty();
         const loadingDiv = this.emojiContainer.createDiv('emoji-loading');
-        loadingDiv.textContent = 'Loading emojis...';
+        loadingDiv.textContent = i18n.t('loadingEmojis');
     }
 
     /**
@@ -450,7 +449,7 @@ export class EmojiPickerModal extends Modal {
         this.emojiContainer.empty();
         this.tabsContainer.empty();
         const loadingDiv = this.emojiContainer.createDiv('emoji-loading');
-        loadingDiv.textContent = 'Fetching emoji collections...';
+        loadingDiv.textContent = i18n.t('fetchingEmojiCollections');
     }
 
     /**
@@ -464,19 +463,7 @@ export class EmojiPickerModal extends Modal {
         }
 
         const indicator = this.emojiContainer.createDiv('emoji-cached-indicator');
-        indicator.textContent = 'Using cached data, refreshing...';
-        indicator.style.cssText = `
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--background-modifier-success);
-            color: var(--text-on-accent);
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-s);
-            font-size: var(--font-ui-smaller);
-            z-index: 100;
-            opacity: 0.8;
-        `;
+        indicator.textContent = i18n.t('usingCachedData');
 
         // Auto-remove after 2 seconds
         setTimeout(() => {
@@ -508,10 +495,8 @@ export class EmojiPickerModal extends Modal {
         }
         this.emojiContainer.empty();
         const noConfigDiv = this.emojiContainer.createDiv('emoji-no-config');
-        noConfigDiv.innerHTML = `
-            <p>No emoji collections configured.</p>
-            <p>Please add OWO JSON URLs in the plugin settings.</p>
-        `;
+        noConfigDiv.createEl('p', { text: i18n.t('noEmojiCollections') });
+        noConfigDiv.createEl('p', { text: i18n.t('addOwoJsonUrls') });
     }
 
     /**
@@ -523,11 +508,9 @@ export class EmojiPickerModal extends Modal {
         }
         this.emojiContainer.empty();
         const errorDiv = this.emojiContainer.createDiv('emoji-error');
-        errorDiv.innerHTML = `
-            <p>Failed to load emoji collections.</p>
-            <p>Error: ${errorMessage}</p>
-            <p>Please check your OWO JSON URLs in the plugin settings.</p>
-        `;
+        errorDiv.createEl('p', { text: i18n.t('failedToLoadCollections') });
+        errorDiv.createEl('p', { text: i18n.t('error') + errorMessage });
+        errorDiv.createEl('p', { text: i18n.t('checkOwoJsonUrls') });
     }
 
     /**
@@ -660,7 +643,9 @@ export class EmojiPickerModal extends Modal {
 
         // Render all tabs efficiently
         tabData.forEach(({ name, count, isActive }) => {
-            this.createTab(name, count, isActive);
+            // Translate "All" tab name
+            const displayName = name === 'All' ? i18n.t('all') : name;
+            this.createTab(displayName, count, isActive);
         });
     }
 
@@ -672,7 +657,7 @@ export class EmojiPickerModal extends Modal {
         tab.textContent = name;
 
         const countSpan = tab.createSpan('emoji-tab-count');
-        countSpan.textContent = `(${count})`;
+        countSpan.textContent = '(' + count + ')';
 
         if (isActive) {
             tab.addClass('active');
@@ -722,7 +707,7 @@ export class EmojiPickerModal extends Modal {
 
         tabs.forEach(tab => {
             const tabText = tab.textContent?.split('(')[0].trim();
-            const isActive = (activeCollectionName === 'all' && tabText === 'All') || tabText === activeCollectionName;
+            const isActive = (activeCollectionName === 'all' && (tabText === 'All' || tabText === i18n.t('all'))) || tabText === activeCollectionName;
 
             tab.toggleClass('active', isActive);
         });
@@ -787,7 +772,7 @@ export class EmojiPickerModal extends Modal {
             }
 
             const noResults = this.emojiContainer.createDiv('emoji-no-results');
-            noResults.textContent = 'No emojis found';
+            noResults.textContent = i18n.t('noEmojisFound');
             return;
         }
 

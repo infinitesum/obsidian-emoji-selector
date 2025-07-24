@@ -88,10 +88,10 @@ export interface EmojiSelectorSettings {
  * Default plugin settings
  */
 export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
-    emojiSize: '1.2em',
-    searchPlaceholder: 'Search emojis...',
-    enableKeyboardShortcut: true,
-    keyboardShortcut: 'Ctrl+Shift+E',
+    emojiSize: '2em',
+    searchPlaceholder: '',
+    enableKeyboardShortcut: false,
+    keyboardShortcut: '',
     customCssClasses: '',
     owoJsonUrls: '',
     rememberLastCollection: true,

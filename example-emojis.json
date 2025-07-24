@@ -1,0 +1,33 @@
+{
+  "basic-emojis": {
+    "type": "emoji",
+    "emojis": {
+      "smile": {
+        "icon": "😀",
+        "text": "grinning face",
+        "category": "smileys"
+      },
+      "heart": {
+        "icon": "❤️",
+        "text": "red heart",
+        "category": "symbols"
+      },
+      "thumbs-up": {
+        "icon": "👍",
+        "text": "thumbs up",
+        "category": "people"
+      }
+    }
+  },
+  "custom-images": {
+    "type": "image",
+    "emojis": {
+      "custom-smile": {
+        "icon": "😊",
+        "text": "custom smiling face",
+        "category": "custom",
+        "url": "https://example.com/custom-smile.png"
+      }
+    }
+  }
+}

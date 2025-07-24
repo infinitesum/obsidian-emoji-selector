@@ -42,13 +42,9 @@ export class VirtualEmojiRenderer {
      * Set up the container for virtual scrolling
      */
     private setupContainer(): void {
-        // Ensure container has relative positioning for absolute positioned items
-        this.container.style.position = 'relative';
-        this.container.style.overflow = 'hidden';
-
-        // Set up scroll container
-        this.scrollContainer.style.overflowY = 'auto';
-        this.scrollContainer.style.overflowX = 'hidden';
+        // Add CSS classes instead of hardcoded styles
+        this.container.addClass('emoji-virtual-container');
+        this.scrollContainer.addClass('emoji-virtual-scroll');
     }
 
     /**
@@ -221,7 +217,7 @@ export class VirtualEmojiRenderer {
      */
     private updateContainerHeight(): void {
         const totalHeight = this.totalRows * (this.itemHeight + 8); // 8px gap
-        this.container.style.height = `${totalHeight}px`;
+        this.container.setCssProps({ height: `${totalHeight}px` });
     }
 
     /**
@@ -332,12 +328,14 @@ export class VirtualEmojiRenderer {
         const left = col * (this.itemWidth + gap);
         const top = row * (this.itemHeight + gap);
 
-        // Set absolute positioning
-        emojiElement.style.position = 'absolute';
-        emojiElement.style.left = `${left}px`;
-        emojiElement.style.top = `${top}px`;
-        emojiElement.style.width = `${this.itemWidth}px`;
-        emojiElement.style.height = `${this.itemHeight}px`;
+        // Set positioning using CSS properties
+        emojiElement.addClass('emoji-virtual-item');
+        emojiElement.setCssProps({
+            left: `${left}px`,
+            top: `${top}px`,
+            width: `${this.itemWidth}px`,
+            height: `${this.itemHeight}px`
+        });
 
         // Create emoji display
         const emojiIcon = document.createElement('span');

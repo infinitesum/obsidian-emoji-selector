@@ -566,6 +566,21 @@ code .emoji-text {
   vertical-align: baseline;
 }
 
+/* Virtual scrolling styles */
+.emoji-virtual-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.emoji-virtual-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.emoji-virtual-item {
+  position: absolute;
+}
+
 /* Settings button styles */
 .setting-item button.mod-cta {
   background: var(--interactive-accent);

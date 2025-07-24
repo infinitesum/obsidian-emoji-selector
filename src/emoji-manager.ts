@@ -43,7 +43,7 @@ export class EmojiManager {
             try {
                 await this.cacheManager.initialize();
                 this.cacheInitialized = true;
-                console.log('Emoji cache initialization completed');
+                // Cache initialization completed
             } catch (error) {
                 console.error('Failed to initialize emoji cache:', error);
                 this.cacheInitialized = true; // Mark as initialized even on error for graceful degradation
@@ -129,7 +129,7 @@ export class EmojiManager {
             }
 
             this.lastLoadTime = now;
-            console.log(`Loaded ${collections.length} emoji collections with ${this.storage.getTotalEmojiCount()} total emojis`);
+            // Collections loaded successfully
 
         } catch (error) {
             console.error('Failed to load emoji collections:', error);
@@ -141,10 +141,31 @@ export class EmojiManager {
     }
 
     /**
-     * Search emojis by query
+     * Search emojis by query with optimized indexing
      */
     searchEmojis(query: string): EmojiItem[] {
         return this.storage.searchEmojis(query);
+    }
+
+    /**
+     * Advanced search with category filtering
+     */
+    advancedSearchEmojis(query: string, category?: string): EmojiItem[] {
+        return this.storage.advancedSearch(query, category);
+    }
+
+    /**
+     * Get emojis by category (optimized lookup)
+     */
+    getEmojisByCategory(category: string): EmojiItem[] {
+        return this.storage.getEmojisByCategory(category);
+    }
+
+    /**
+     * Get all available categories
+     */
+    getAllCategories(): string[] {
+        return this.storage.getAllCategories();
     }
 
     /**
@@ -225,7 +246,7 @@ export class EmojiManager {
             }
 
             this.lastLoadTime = Date.now();
-            console.log(`Force reloaded ${collections.length} emoji collections with ${this.storage.getTotalEmojiCount()} total emojis`);
+            // Collections force reloaded successfully
 
         } catch (error) {
             console.error('Failed to force reload emoji collections:', error);
@@ -291,7 +312,7 @@ export class EmojiManager {
 
                 const urls = this.parseUrls(this.settings.owoJsonUrls);
                 if (urls.length > 0) {
-                    console.log(`Starting background cache warming for ${urls.length} URLs`);
+                    // Starting background cache warming
                     await this.cacheManager.startBackgroundWarming(urls);
                 }
             } catch (error) {
@@ -312,5 +333,47 @@ export class EmojiManager {
      */
     isBackgroundWarmingInProgress(): boolean {
         return this.cacheManager.isBackgroundWarmingInProgress();
+    }
+
+    /**
+     * Get memory usage statistics
+     */
+    getMemoryStats(): {
+        storage: {
+            totalEmojis: number;
+            totalCollections: number;
+            indexSizes: {
+                keyIndex: number;
+                textIndex: number;
+                categoryIndex: number;
+            };
+        };
+        cache: { totalUrls: number, totalSize: number, oldestCache: number | null } | null;
+    } {
+        return {
+            storage: this.storage.getMemoryStats(),
+            cache: this.getCacheStats()
+        };
+    }
+
+    /**
+     * Run performance benchmark comparing indexed vs natural search
+     */
+    runSearchPerformanceBenchmark(): void {
+        this.storage.runPerformanceBenchmark();
+    }
+
+    /**
+     * Compare search performance with custom queries
+     */
+    compareSearchPerformance(testQueries: string[]) {
+        return this.storage.compareSearchPerformance(testQueries);
+    }
+
+    /**
+     * Search using natural (non-indexed) method for comparison
+     */
+    searchEmojisNatural(query: string): EmojiItem[] {
+        return this.storage.searchEmojisNatural(query);
     }
 }

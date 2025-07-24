@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import EmojiSelectorPlugin from '../main';
+import { i18n } from './i18n';
 
 /**
  * Settings tab for the Emoji Selector Plugin
@@ -22,12 +23,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         // Plugin title
-        containerEl.createEl('h2', { text: 'Emoji Selector Settings' });
+        containerEl.createEl('h2', { text: i18n.t('settingsTitle') });
 
         // Emoji size setting
         new Setting(containerEl)
-            .setName('Emoji height')
-            .setDesc('CSS height value for emoji display - width will be auto (e.g., 1.2em, 16px)')
+            .setName(i18n.t('emojiHeight'))
+            .setDesc(i18n.t('emojiHeightDesc'))
             .addText(text => text
                 .setPlaceholder('1.2em')
                 .setValue(this.plugin.settings.emojiSize)
@@ -38,19 +39,19 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Search placeholder setting
         new Setting(containerEl)
-            .setName('Search placeholder')
-            .setDesc('Placeholder text shown in the emoji search input')
+            .setName(i18n.t('searchPlaceholder'))
+            .setDesc(i18n.t('searchPlaceholderDesc'))
             .addText(text => text
-                .setPlaceholder('Search emojis...')
+                .setPlaceholder(i18n.t('searchPlaceholder'))
                 .setValue(this.plugin.settings.searchPlaceholder)
                 .onChange(async (value) => {
-                    this.plugin.settings.searchPlaceholder = value || 'Search emojis...';
+                    this.plugin.settings.searchPlaceholder = value || i18n.t('searchPlaceholder');
                     await this.plugin.saveSettings();
                 }));
 
         // OWO JSON URLs setting with confirm button
         const owoUrlsSetting = new Setting(containerEl)
-            .setName('OWO JSON URLs')
+            .setName(i18n.t('owoJsonUrls'))
             .setDesc(this.getCollectionStatusDescription());
 
         let urlTextArea: HTMLTextAreaElement;
@@ -71,8 +72,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         owoUrlsSetting.addButton(button => {
             updateButton = button.buttonEl;
-            button.setButtonText('Update Collections')
-                .setTooltip('Load emoji collections from the URLs above')
+            button.setButtonText(i18n.t('updateCollections'))
+                .setTooltip(i18n.t('updateCollectionsTooltip'))
                 .onClick(async () => {
                     await this.updateEmojiCollections();
                 });
@@ -87,8 +88,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Remember last collection setting
         new Setting(containerEl)
-            .setName('Remember last collection')
-            .setDesc('Remember the last selected emoji collection and restore it when opening the picker')
+            .setName(i18n.t('rememberLastCollection'))
+            .setDesc(i18n.t('rememberLastCollectionDesc'))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.rememberLastCollection)
                 .onChange(async (value) => {
@@ -101,12 +102,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 }));
 
         // Emoji spacing settings section
-        containerEl.createEl('h3', { text: 'Emoji Spacing' });
+        containerEl.createEl('h3', { text: i18n.t('emojiSpacing') });
 
         // Add space after emoji setting (single-select)
         new Setting(containerEl)
-            .setName('Add space after emoji (single-select)')
-            .setDesc('Automatically add a space after inserting an emoji in single-select mode')
+            .setName(i18n.t('addSpaceAfterEmojiSingle'))
+            .setDesc(i18n.t('addSpaceAfterEmojiSingleDesc'))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.addSpaceAfterEmoji)
                 .onChange(async (value) => {
@@ -116,8 +117,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Add space after emoji setting (multi-select)
         new Setting(containerEl)
-            .setName('Add space after emoji (multi-select)')
-            .setDesc('Automatically add a space after inserting an emoji in multi-select mode')
+            .setName(i18n.t('addSpaceAfterEmojiMulti'))
+            .setDesc(i18n.t('addSpaceAfterEmojiMultiDesc'))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.addSpaceAfterEmojiInMultiSelect)
                 .onChange(async (value) => {
@@ -127,8 +128,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Custom CSS classes setting
         new Setting(containerEl)
-            .setName('Custom CSS classes')
-            .setDesc('Additional CSS classes to apply to emoji elements (space-separated)')
+            .setName(i18n.t('customCssClasses'))
+            .setDesc(i18n.t('customCssClassesDesc'))
             .addText(text => text
                 .setPlaceholder('my-emoji-class another-class')
                 .setValue(this.plugin.settings.customCssClasses)
@@ -139,8 +140,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Custom emoji template setting
         new Setting(containerEl)
-            .setName('Custom emoji template')
-            .setDesc('Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}. Leave empty for default HTML.')
+            .setName(i18n.t('customEmojiTemplate'))
+            .setDesc(i18n.t('customEmojiTemplateDesc'))
             .addTextArea(text => text
                 .setPlaceholder('<img src="{url}" alt="{text}" atk-emoticon="{name}" class="{classes}">')
                 .setValue(this.plugin.settings.customEmojiTemplate)
@@ -150,12 +151,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 }));
 
         // Keyboard shortcut settings section
-        containerEl.createEl('h3', { text: 'Keyboard Shortcuts' });
+        containerEl.createEl('h3', { text: i18n.t('keyboardShortcuts') });
 
         // Enable keyboard shortcut setting
         new Setting(containerEl)
-            .setName('Enable keyboard shortcut')
-            .setDesc('Enable keyboard shortcut to open emoji picker')
+            .setName(i18n.t('enableKeyboardShortcut'))
+            .setDesc(i18n.t('enableKeyboardShortcutDesc'))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.enableKeyboardShortcut)
                 .onChange(async (value) => {
@@ -165,8 +166,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Keyboard shortcut setting
         new Setting(containerEl)
-            .setName('Keyboard shortcut')
-            .setDesc('Keyboard shortcut to open emoji picker (e.g., Ctrl+Shift+E)')
+            .setName(i18n.t('keyboardShortcut'))
+            .setDesc(i18n.t('keyboardShortcutDesc'))
             .addText(text => text
                 .setPlaceholder('Ctrl+Shift+E')
                 .setValue(this.plugin.settings.keyboardShortcut)
@@ -211,7 +212,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Get description with current collection status
      */
     private getCollectionStatusDescription(): string {
-        let statusText = 'Comma-separated URLs for owo.json files to load emoji collections from. JSON files are cached locally until you click "Update".';
+        let statusText = i18n.t('owoJsonUrlsDesc');
 
         if (this.plugin.isEmojiManagerInitialized()) {
             const collectionCount = this.plugin.emojiManager!.getAllCollections().length;
@@ -239,7 +240,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         this.updateButton.removeClass('mod-muted', 'mod-cta', 'emoji-update-success', 'emoji-update-error');
 
         const isUpToDate = !this.hasUnsavedChanges;
-        this.updateButton.textContent = isUpToDate ? 'Loaded' : 'Update';
+        this.updateButton.textContent = isUpToDate ? i18n.t('loaded') : i18n.t('update');
         this.updateButton.addClass(isUpToDate ? 'mod-muted' : 'mod-cta');
         this.updateButton.disabled = isUpToDate;
     }
@@ -254,13 +255,13 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Validate URLs before processing
         if (newUrls && !this.validateUrls(newUrls)) {
-            new Notice('Please enter valid URLs separated by commas');
+            new Notice(i18n.t('invalidUrls'));
             return;
         }
 
         // Show loading state
         this.updateButton.removeClass('mod-cta', 'mod-muted', 'emoji-update-success', 'emoji-update-error');
-        this.updateButton.textContent = 'Loading...';
+        this.updateButton.textContent = i18n.t('loading');
         this.updateButton.disabled = true;
 
         try {
@@ -277,12 +278,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
             // Show success state
             this.updateButton.addClass('emoji-update-success');
-            this.updateButton.textContent = 'Collections Updated!';
+            this.updateButton.textContent = i18n.t('collectionsUpdated');
 
             const collectionCount = emojiManager.getAllCollections().length;
             const emojiCount = emojiManager.getTotalEmojiCount();
 
-            new Notice(`Emoji collections updated! Loaded ${collectionCount} collections with ${emojiCount} emojis.`);
+            new Notice(i18n.t('collectionsUpdateSuccess', collectionCount.toString(), emojiCount.toString()));
 
             setTimeout(() => {
                 this.updateButtonState();
@@ -293,10 +294,10 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
             // Show error state
             this.updateButton.addClass('emoji-update-error');
-            this.updateButton.textContent = 'Update Failed';
+            this.updateButton.textContent = i18n.t('updateFailed');
 
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            new Notice(`Failed to update emoji collections: ${errorMessage}`);
+            new Notice(i18n.t('collectionsUpdateFailed', errorMessage));
 
             setTimeout(() => {
                 this.updateButtonState();

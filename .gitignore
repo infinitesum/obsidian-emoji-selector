@@ -9,6 +9,10 @@ node_modules/
 main.js
 *.tsbuildinfo
 
+# Plugin development
+.obsidian/
+data.json
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -25,3 +29,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+
+.kiro/

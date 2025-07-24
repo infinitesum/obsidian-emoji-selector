@@ -12,7 +12,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 	private cssInjected: boolean = false;
 
 	async onload() {
-		console.log('Loading Emoji Selector Plugin');
 
 		// Start loading settings in background (non-blocking)
 		this.loadSettingsAsync();
@@ -22,7 +21,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 		// Add command to open emoji picker (Requirement 5.1) - defer hotkey setup
 		this.addCommand({
-			id: 'open-emoji-picker',
+			id: 'open-picker',
 			name: 'Open Emoji Picker',
 			editorCallback: async (editor: Editor) => {
 				await this.openEmojiPicker(editor);
@@ -48,7 +47,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('Unloading Emoji Selector Plugin');
 
 		// Clean up injected CSS
 		const baseStyle = document.getElementById('emoji-selector-base-styles');
@@ -110,7 +108,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 */
 	private setupHotkeys(): void {
 		// Find the existing command and update its hotkeys
-		const command = (this.app as any).commands.commands['emoji-selector:open-emoji-picker'];
+		const command = (this.app as any).commands.commands['emoji-selector:open-picker'];
 		if (command && this.settings.enableKeyboardShortcut) {
 			command.hotkeys = [
 				{
@@ -261,7 +259,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 		`;
 
 		document.head.appendChild(style);
-		console.log('Base emoji CSS injected');
+		// Base emoji CSS injected
 	}
 
 	/**
@@ -393,9 +391,12 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Escape HTML characters to prevent XSS
 	 */
 	private escapeHtml(text: string): string {
-		const div = document.createElement('div');
-		div.textContent = text;
-		return div.innerHTML;
+		return text
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
 	}
 
 	/**
@@ -503,6 +504,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 		document.head.appendChild(style);
 		this.cssInjected = true;
-		console.log(`Dynamic emoji CSS updated with size: ${emojiSize}`);
+		// Dynamic emoji CSS updated
 	}
 }
