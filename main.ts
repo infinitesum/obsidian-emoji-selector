@@ -229,6 +229,35 @@ export default class EmojiSelectorPlugin extends Plugin {
 				color: transparent;
 				display: inline !important;
 			}
+
+			/* Optimized event handling styles */
+			.emoji-container {
+				outline: none;
+			}
+
+			.emoji-container:focus {
+				outline: 2px solid var(--interactive-accent);
+				outline-offset: 2px;
+			}
+
+			.emoji-item {
+				cursor: pointer;
+				border-radius: var(--radius-s);
+				transition: background-color 0.1s ease;
+			}
+
+			.emoji-item:hover {
+				background-color: var(--background-modifier-hover);
+			}
+
+			.emoji-item.emoji-selected {
+				background-color: var(--interactive-accent);
+				color: var(--text-on-accent);
+			}
+
+			.emoji-item.emoji-selected .emoji-text {
+				color: var(--text-on-accent);
+			}
 		`;
 
 		document.head.appendChild(style);

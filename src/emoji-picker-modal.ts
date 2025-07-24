@@ -94,6 +94,9 @@ export class EmojiPickerModal extends Modal {
         // Create emoji container with initial loading state
         this.emojiContainer = this.emojiScrollContainer.createDiv('emoji-container');
 
+        // Make container focusable for keyboard navigation
+        this.emojiContainer.setAttribute('tabindex', '0');
+
         // Show initial loading indicator (Requirement 2.3)
         this.showInitialLoadingState();
     }
@@ -131,22 +134,11 @@ export class EmojiPickerModal extends Modal {
      * Set up event listeners for the modal with optimized event delegation
      */
     private setupEventListeners(): void {
-        // Search input event listener with debouncing
-        let searchTimeout: NodeJS.Timeout;
-        this.searchInput.addEventListener('input', (event) => {
-            const target = event.target as HTMLInputElement;
+        // Optimized search input handling with improved debouncing
+        this.setupOptimizedSearchHandling();
 
-            // Debounce search input to avoid excessive processing
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                this.handleSearchInput(target.value);
-            }, 150); // 150ms debounce
-        });
-
-        // Keyboard navigation
-        this.searchInput.addEventListener('keydown', (event) => {
-            this.handleKeyboardNavigation(event);
-        });
+        // Enhanced keyboard navigation
+        this.setupEnhancedKeyboardNavigation();
 
         // Multi-select toggle event listener
         this.multiSelectToggle.addEventListener('change', (event) => {
@@ -158,7 +150,7 @@ export class EmojiPickerModal extends Modal {
         // Initialize virtual renderer after container is created
         this.initializeVirtualRenderer();
 
-        // Event delegation for tab clicks
+        // Event delegation for tab clicks (already optimized)
         this.tabsContainer.addEventListener('click', (event) => {
             const tabElement = (event.target as HTMLElement).closest('.emoji-tab');
             if (tabElement) {
@@ -169,6 +161,170 @@ export class EmojiPickerModal extends Modal {
                 }
             }
         });
+    }
+
+    /**
+     * Set up optimized search input handling with mobile-friendly debouncing
+     */
+    private setupOptimizedSearchHandling(): void {
+        let searchTimeout: NodeJS.Timeout;
+        let lastSearchValue: string = '';
+
+        // Simple, mobile-friendly search handler
+        const performSearch = (value: string) => {
+            // Skip if value hasn't changed
+            if (value === lastSearchValue) return;
+
+            lastSearchValue = value;
+            this.handleSearchInput(value);
+        };
+
+        // Input event with mobile-optimized debouncing
+        this.searchInput.addEventListener('input', (event) => {
+            const target = event.target as HTMLInputElement;
+            const value = target.value;
+
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+
+            // Immediate response for empty search (clearing)
+            if (value === '') {
+                performSearch(value);
+                return;
+            }
+
+            // Immediate search for single characters to fix mobile issues
+            if (value.length === 1) {
+                performSearch(value);
+                return;
+            }
+
+            // Very short debounce for multi-character searches - optimized for mobile
+            searchTimeout = setTimeout(() => {
+                performSearch(value);
+            }, 50); // Reduced from 100ms to 50ms for better mobile responsiveness
+        });
+
+        // Handle paste events with minimal delay
+        this.searchInput.addEventListener('paste', () => {
+            clearTimeout(searchTimeout);
+            setTimeout(() => {
+                performSearch(this.searchInput.value);
+            }, 50);
+        });
+    }
+
+    /**
+     * Set up enhanced keyboard navigation with better performance
+     */
+    private setupEnhancedKeyboardNavigation(): void {
+        let navigationTimeout: NodeJS.Timeout;
+
+        // Throttled navigation to prevent excessive updates
+        const throttledNavigation = (handler: () => void) => {
+            clearTimeout(navigationTimeout);
+            navigationTimeout = setTimeout(handler, 16); // ~60fps
+        };
+
+        this.searchInput.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'Escape':
+                    this.close();
+                    break;
+                case 'ArrowDown':
+                    event.preventDefault();
+                    throttledNavigation(() => this.navigateDown());
+                    break;
+                case 'ArrowUp':
+                    event.preventDefault();
+                    throttledNavigation(() => this.navigateUp());
+                    break;
+                case 'ArrowRight':
+                case 'ArrowLeft':
+                    // Allow horizontal navigation within search input
+                    // Only handle if at start/end of input
+                    if (event.key === 'ArrowRight' && this.searchInput.selectionStart === this.searchInput.value.length) {
+                        event.preventDefault();
+                        this.focusEmojiContainer();
+                    } else if (event.key === 'ArrowLeft' && this.searchInput.selectionStart === 0) {
+                        event.preventDefault();
+                        this.focusEmojiContainer();
+                    }
+                    break;
+                case 'Enter':
+                    event.preventDefault();
+                    this.selectCurrentEmoji();
+                    break;
+                case 'Tab':
+                    // Handle tab navigation between collections
+                    if (event.shiftKey) {
+                        event.preventDefault();
+                        this.navigateToPreviousTab();
+                    } else {
+                        event.preventDefault();
+                        this.navigateToNextTab();
+                    }
+                    break;
+                case 'm':
+                case 'M':
+                    // Toggle multi-select mode with Ctrl/Cmd + M
+                    if (event.ctrlKey || event.metaKey) {
+                        event.preventDefault();
+                        this.toggleMultiSelectMode();
+                    }
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Focus the emoji container for keyboard navigation
+     */
+    private focusEmojiContainer(): void {
+        if (this.emojiContainer) {
+            this.emojiContainer.focus();
+            // Select first emoji if none selected
+            if (this.selectedIndex === -1 && this.filteredEmojis.length > 0) {
+                this.selectedIndex = 0;
+                this.updateSelection();
+            }
+        }
+    }
+
+    /**
+     * Navigate to the next tab
+     */
+    private navigateToNextTab(): void {
+        const tabs = Array.from(this.tabsContainer.querySelectorAll('.emoji-tab'));
+        const activeTab = tabs.find(tab => tab.classList.contains('active'));
+
+        if (activeTab) {
+            const currentIndex = tabs.indexOf(activeTab);
+            const nextIndex = (currentIndex + 1) % tabs.length;
+            const nextTab = tabs[nextIndex] as HTMLElement;
+
+            if (nextTab) {
+                nextTab.click();
+            }
+        }
+    }
+
+    /**
+     * Navigate to the previous tab
+     */
+    private navigateToPreviousTab(): void {
+        const tabs = Array.from(this.tabsContainer.querySelectorAll('.emoji-tab'));
+        const activeTab = tabs.find(tab => tab.classList.contains('active'));
+
+        if (activeTab) {
+            const currentIndex = tabs.indexOf(activeTab);
+            const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1;
+            const prevTab = tabs[prevIndex] as HTMLElement;
+
+            if (prevTab) {
+                prevTab.click();
+            }
+        }
     }
 
     /**
@@ -415,55 +571,44 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Handle keyboard navigation
+     * Handle keyboard navigation (legacy method - now handled by setupEnhancedKeyboardNavigation)
+     * Kept for backward compatibility
      */
     private handleKeyboardNavigation(event: KeyboardEvent): void {
-        switch (event.key) {
-            case 'Escape':
-                this.close();
-                break;
-            case 'ArrowDown':
-                event.preventDefault();
-                this.navigateDown();
-                break;
-            case 'ArrowUp':
-                event.preventDefault();
-                this.navigateUp();
-                break;
-            case 'Enter':
-                event.preventDefault();
-                this.selectCurrentEmoji();
-                break;
-            case 'm':
-            case 'M':
-                // Toggle multi-select mode with 'M' key
-                if (event.ctrlKey || event.metaKey) {
-                    event.preventDefault();
-                    this.toggleMultiSelectMode();
-                }
-                break;
-        }
+        // This method is now handled by setupEnhancedKeyboardNavigation
+        // Keeping for any direct calls that might exist
+        console.warn('handleKeyboardNavigation called directly - should use enhanced navigation');
     }
 
     /**
-     * Navigate down in emoji list
+     * Navigate down in emoji list with optimized performance
      */
     private navigateDown(): void {
         if (this.filteredEmojis.length === 0) return;
 
-        this.selectedIndex = (this.selectedIndex + 1) % this.filteredEmojis.length;
-        this.updateSelection();
+        const newIndex = (this.selectedIndex + 1) % this.filteredEmojis.length;
+        this.setSelectedIndex(newIndex);
     }
 
     /**
-     * Navigate up in emoji list
+     * Navigate up in emoji list with optimized performance
      */
     private navigateUp(): void {
         if (this.filteredEmojis.length === 0) return;
 
-        this.selectedIndex = this.selectedIndex <= 0
+        const newIndex = this.selectedIndex <= 0
             ? this.filteredEmojis.length - 1
             : this.selectedIndex - 1;
+        this.setSelectedIndex(newIndex);
+    }
+
+    /**
+     * Set selected index with optimized updates
+     */
+    private setSelectedIndex(newIndex: number): void {
+        if (newIndex === this.selectedIndex) return; // Avoid unnecessary updates
+
+        this.selectedIndex = newIndex;
         this.updateSelection();
     }
 
@@ -478,31 +623,18 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Update visual selection highlighting with virtual scrolling support
+     * Update visual selection highlighting with optimized virtual scrolling support
      */
     private updateSelection(): void {
         if (!this.virtualRenderer) return;
 
-        // Remove previous selection from all visible items
-        const emojiItems = this.emojiContainer.querySelectorAll('.emoji-item');
-        emojiItems.forEach(item => item.removeClass('emoji-selected'));
-
-        // Add selection to current item if it's visible
+        // Use virtual renderer's optimized selection method
         if (this.selectedIndex >= 0 && this.selectedIndex < this.filteredEmojis.length) {
-            // Check if selected item is in visible range
-            const visibleRange = this.virtualRenderer.getVisibleRange();
-
-            if (this.selectedIndex >= visibleRange.start && this.selectedIndex < visibleRange.end) {
-                // Find the corresponding DOM element
-                const selectedEmoji = this.filteredEmojis[this.selectedIndex];
-                const selectedElement = this.emojiContainer.querySelector(`[data-emoji-key="${selectedEmoji.key}"]`);
-                if (selectedElement) {
-                    selectedElement.addClass('emoji-selected');
-                }
-            } else {
-                // Scroll to make the selected item visible
-                this.virtualRenderer.scrollToEmoji(this.selectedIndex);
-            }
+            this.virtualRenderer.selectEmojiByIndex(this.selectedIndex);
+        } else {
+            // Clear selection if index is invalid
+            const selectedElements = this.emojiContainer.querySelectorAll('.emoji-selected');
+            selectedElements.forEach(element => element.classList.remove('emoji-selected'));
         }
     }
 
@@ -647,9 +779,22 @@ export class EmojiPickerModal extends Modal {
         if (this.filteredEmojis.length === 0) {
             // Clear virtual renderer and show no results message
             this.virtualRenderer.setEmojis([]);
+
+            // Remove any existing no-results message first
+            const existingNoResults = this.emojiContainer.querySelector('.emoji-no-results');
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+
             const noResults = this.emojiContainer.createDiv('emoji-no-results');
             noResults.textContent = 'No emojis found';
             return;
+        }
+
+        // Remove any existing no-results message when we have results
+        const existingNoResults = this.emojiContainer.querySelector('.emoji-no-results');
+        if (existingNoResults) {
+            existingNoResults.remove();
         }
 
         // Use virtual renderer for efficient emoji display

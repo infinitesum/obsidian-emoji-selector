@@ -33,6 +33,7 @@ export class VirtualEmojiRenderer {
         this.customCssClasses = customCssClasses;
 
         this.setupContainer();
+        this.setupEventDelegation();
         this.setupObservers();
         this.calculateDimensions();
     }
@@ -48,6 +49,111 @@ export class VirtualEmojiRenderer {
         // Set up scroll container
         this.scrollContainer.style.overflowY = 'auto';
         this.scrollContainer.style.overflowX = 'hidden';
+    }
+
+    /**
+     * Set up event delegation for efficient emoji click handling
+     * Replaces individual emoji listeners with a single delegated listener
+     */
+    private setupEventDelegation(): void {
+        // Use event delegation instead of individual listeners for better performance
+        this.container.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+
+            // Find the closest emoji item element
+            const emojiElement = target.closest('.emoji-item') as HTMLElement;
+            if (!emojiElement) return;
+
+            // Get the emoji key from the data attribute
+            const emojiKey = emojiElement.getAttribute('data-emoji-key');
+            if (!emojiKey) return;
+
+            // Find the emoji object by key
+            const emoji = this.emojis.find(e => e.key === emojiKey);
+            if (emoji) {
+                this.onEmojiClick(emoji);
+            }
+        });
+
+        // Add keyboard navigation support for the container
+        this.container.addEventListener('keydown', (event) => {
+            this.handleContainerKeyNavigation(event);
+        });
+    }
+
+    /**
+     * Handle keyboard navigation within the emoji container
+     */
+    private handleContainerKeyNavigation(event: KeyboardEvent): void {
+        // Only handle navigation if container is focused
+        if (document.activeElement !== this.container) return;
+
+        const selectedElement = this.container.querySelector('.emoji-selected') as HTMLElement;
+        if (!selectedElement) return;
+
+        const emojiKey = selectedElement.getAttribute('data-emoji-key');
+        if (!emojiKey) return;
+
+        const currentIndex = this.emojis.findIndex(e => e.key === emojiKey);
+        if (currentIndex === -1) return;
+
+        let newIndex = currentIndex;
+
+        switch (event.key) {
+            case 'ArrowRight':
+                event.preventDefault();
+                newIndex = Math.min(currentIndex + 1, this.emojis.length - 1);
+                break;
+            case 'ArrowLeft':
+                event.preventDefault();
+                newIndex = Math.max(currentIndex - 1, 0);
+                break;
+            case 'ArrowDown':
+                event.preventDefault();
+                newIndex = Math.min(currentIndex + this.itemsPerRow, this.emojis.length - 1);
+                break;
+            case 'ArrowUp':
+                event.preventDefault();
+                newIndex = Math.max(currentIndex - this.itemsPerRow, 0);
+                break;
+            case 'Enter':
+            case ' ':
+                event.preventDefault();
+                const emoji = this.emojis[currentIndex];
+                if (emoji) {
+                    this.onEmojiClick(emoji);
+                }
+                return;
+        }
+
+        if (newIndex !== currentIndex) {
+            this.selectEmojiByIndex(newIndex);
+        }
+    }
+
+    /**
+     * Select emoji by index and ensure it's visible
+     */
+    public selectEmojiByIndex(index: number): void {
+        if (index < 0 || index >= this.emojis.length) return;
+
+        // Remove previous selection
+        const previousSelected = this.container.querySelector('.emoji-selected');
+        if (previousSelected) {
+            previousSelected.classList.remove('emoji-selected');
+        }
+
+        // Ensure the emoji is visible
+        this.scrollToEmoji(index);
+
+        // Add selection to new emoji (after a brief delay to ensure rendering)
+        setTimeout(() => {
+            const emoji = this.emojis[index];
+            const emojiElement = this.container.querySelector(`[data-emoji-key="${emoji.key}"]`);
+            if (emojiElement) {
+                emojiElement.classList.add('emoji-selected');
+            }
+        }, 50);
     }
 
     /**
@@ -124,16 +230,26 @@ export class VirtualEmojiRenderer {
     public setEmojis(emojis: EmojiItem[]): void {
         this.emojis = emojis;
         this.calculateDimensions();
-        this.updateVisibleRange();
+        // Force re-render when emojis change, even if visible range is the same
+        this.forceRender();
     }
 
     /**
-     * Update the visible range based on scroll position
+     * Force re-render of visible items (used when emoji content changes)
      */
-    private updateVisibleRange(): void {
+    private forceRender(): void {
+        // Calculate the visible range
+        this.calculateVisibleRange();
+        // Always render, even if range hasn't changed
+        this.renderVisibleItems();
+    }
+
+    /**
+     * Calculate visible range without triggering render
+     */
+    private calculateVisibleRange(): void {
         if (this.emojis.length === 0 || this.itemsPerRow === 0) {
             this.visibleRange = { start: 0, end: 0 };
-            this.renderVisibleItems();
             return;
         }
 
@@ -153,9 +269,21 @@ export class VirtualEmojiRenderer {
         const startIndex = startRowWithOverscan * this.itemsPerRow;
         const endIndex = Math.min(this.emojis.length, endRowWithOverscan * this.itemsPerRow);
 
-        // Only update if range changed
-        if (this.visibleRange.start !== startIndex || this.visibleRange.end !== endIndex) {
-            this.visibleRange = { start: startIndex, end: endIndex };
+        this.visibleRange = { start: startIndex, end: endIndex };
+    }
+
+    /**
+     * Update the visible range based on scroll position
+     */
+    private updateVisibleRange(): void {
+        const oldStart = this.visibleRange.start;
+        const oldEnd = this.visibleRange.end;
+
+        // Calculate new visible range
+        this.calculateVisibleRange();
+
+        // Only render if range changed
+        if (this.visibleRange.start !== oldStart || this.visibleRange.end !== oldEnd) {
             this.renderVisibleItems();
         }
     }
@@ -230,10 +358,9 @@ export class VirtualEmojiRenderer {
 
         emojiElement.appendChild(emojiIcon);
 
-        // Add click handler
-        emojiElement.addEventListener('click', () => {
-            this.onEmojiClick(emoji);
-        });
+        // No individual click handler needed - using event delegation
+        // Make element focusable for keyboard navigation
+        emojiElement.setAttribute('tabindex', '-1');
 
         return emojiElement;
     }
