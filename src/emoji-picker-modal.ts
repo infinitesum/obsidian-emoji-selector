@@ -1,5 +1,6 @@
 import { Modal, App, Notice } from 'obsidian';
 import { EmojiItem, EmojiCollection } from './types';
+import { VirtualEmojiRenderer } from './virtual-emoji-renderer';
 import EmojiSelectorPlugin from '../main';
 
 /**
@@ -9,6 +10,7 @@ export class EmojiPickerModal extends Modal {
     private plugin: EmojiSelectorPlugin;
     private searchInput: HTMLInputElement;
     private emojiContainer: HTMLElement;
+    private emojiScrollContainer: HTMLElement;
     private tabsContainer: HTMLElement;
     private multiSelectToggle: HTMLInputElement;
     private filteredEmojis: EmojiItem[] = [];
@@ -18,6 +20,7 @@ export class EmojiPickerModal extends Modal {
     private collections: EmojiCollection[] = [];
     private isLoading: boolean = false;
     private isMultiSelectMode: boolean = false;
+    private virtualRenderer: VirtualEmojiRenderer | null = null;
 
     constructor(app: App, plugin: EmojiSelectorPlugin, onEmojiSelect: (emoji: EmojiItem, isMultiSelectMode: boolean) => void) {
         super(app);
@@ -26,16 +29,39 @@ export class EmojiPickerModal extends Modal {
     }
 
     onOpen(): void {
+        const startTime = performance.now();
+
         const { contentEl } = this;
         contentEl.empty();
 
         // Add specific class to modal for CSS targeting
         contentEl.closest('.modal')?.addClass('emoji-picker-modal');
 
+        // Show UI shell immediately (Requirement 2.1)
+        this.createUIShell();
+
+        // Set up event listeners
+        this.setupEventListeners();
+
+        // Load emojis progressively in background (Requirement 2.2)
+        this.loadEmojisProgressively();
+
+        // Auto-focus search input
+        this.focusSearchInput();
+
+        // Log performance metrics
+        const uiShellTime = performance.now() - startTime;
+        console.log(`Emoji modal UI shell rendered in ${uiShellTime.toFixed(2)}ms`);
+    }
+
+    /**
+     * Create the UI shell immediately for fast modal opening (Requirement 2.1)
+     */
+    private createUIShell(): void {
+        const { contentEl } = this;
+
         // Create header with title and multi-select toggle
         const headerContainer = contentEl.createDiv('emoji-header-container');
-
-
 
         // Create multi-select toggle
         const toggleContainer = headerContainer.createDiv('emoji-multi-select-container');
@@ -62,34 +88,59 @@ export class EmojiPickerModal extends Modal {
         // Create tabs container
         this.tabsContainer = contentEl.createDiv('emoji-tabs');
 
-        // Create emoji container
-        this.emojiContainer = contentEl.createDiv('emoji-container');
+        // Create emoji scroll container for virtual scrolling
+        this.emojiScrollContainer = contentEl.createDiv('emoji-scroll-container');
 
-        // Set up event listeners
-        this.setupEventListeners();
+        // Create emoji container with initial loading state
+        this.emojiContainer = this.emojiScrollContainer.createDiv('emoji-container');
 
-        // Load and display initial emojis
-        this.loadEmojis();
-
-        // Auto-focus search input
-        this.focusSearchInput();
+        // Show initial loading indicator (Requirement 2.3)
+        this.showInitialLoadingState();
     }
 
 
 
     onClose(): void {
+        // Clean up virtual renderer
+        if (this.virtualRenderer) {
+            this.virtualRenderer.destroy();
+            this.virtualRenderer = null;
+        }
+
         const { contentEl } = this;
         contentEl.empty();
     }
 
     /**
-     * Set up event listeners for the modal
+     * Initialize the virtual emoji renderer
+     */
+    private initializeVirtualRenderer(): void {
+        if (this.virtualRenderer) {
+            this.virtualRenderer.destroy();
+        }
+
+        this.virtualRenderer = new VirtualEmojiRenderer(
+            this.emojiContainer,
+            this.emojiScrollContainer,
+            (emoji: EmojiItem) => this.handleEmojiClick(emoji),
+            this.plugin.settings.customCssClasses
+        );
+    }
+
+    /**
+     * Set up event listeners for the modal with optimized event delegation
      */
     private setupEventListeners(): void {
-        // Search input event listener
+        // Search input event listener with debouncing
+        let searchTimeout: NodeJS.Timeout;
         this.searchInput.addEventListener('input', (event) => {
             const target = event.target as HTMLInputElement;
-            this.handleSearchInput(target.value);
+
+            // Debounce search input to avoid excessive processing
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.handleSearchInput(target.value);
+            }, 150); // 150ms debounce
         });
 
         // Keyboard navigation
@@ -103,18 +154,64 @@ export class EmojiPickerModal extends Modal {
             this.isMultiSelectMode = target.checked;
             this.updateMultiSelectUI();
         });
+
+        // Initialize virtual renderer after container is created
+        this.initializeVirtualRenderer();
+
+        // Event delegation for tab clicks
+        this.tabsContainer.addEventListener('click', (event) => {
+            const tabElement = (event.target as HTMLElement).closest('.emoji-tab');
+            if (tabElement) {
+                const tabText = tabElement.textContent?.split('(')[0].trim();
+                if (tabText) {
+                    const collectionName = tabText.toLowerCase() === 'all' ? 'all' : tabText;
+                    this.switchToCollection(collectionName);
+                }
+            }
+        });
     }
 
     /**
-     * Load emojis from storage and display them
+     * Load emojis progressively without blocking UI (Requirement 2.2)
      */
-    private async loadEmojis(): Promise<void> {
+    private async loadEmojisProgressively(): Promise<void> {
         if (this.isLoading) return;
         this.isLoading = true;
 
-        // Show loading state
-        this.showLoadingState();
+        try {
+            // Check if we have cached data first (Requirement 2.3)
+            const hasCachedData = this.plugin.emojiManager.getTotalEmojiCount() > 0;
 
+            if (hasCachedData) {
+                // Use cached data immediately
+                this.collections = this.plugin.emojiManager.getAllCollections();
+                this.setInitialActiveCollection();
+                this.renderTabs();
+                this.showCollectionEmojis(this.activeCollection);
+
+                // Update loading indicator to show using cached data
+                this.showCachedDataIndicator();
+
+                // Load fresh data in background
+                this.loadFreshDataInBackground();
+            } else {
+                // No cached data, show loading and fetch
+                this.showProgressiveLoadingState();
+                await this.loadFreshEmojiData();
+            }
+
+        } catch (error) {
+            console.error('Failed to load emojis:', error);
+            this.showErrorMessage(error.message);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    /**
+     * Load fresh emoji data and update UI
+     */
+    private async loadFreshEmojiData(): Promise<void> {
         try {
             // Load emoji collections from URLs
             await this.plugin.emojiManager.loadEmojiCollections();
@@ -135,18 +232,52 @@ export class EmojiPickerModal extends Modal {
             this.showCollectionEmojis(this.activeCollection);
 
         } catch (error) {
-            console.error('Failed to load emojis:', error);
+            console.error('Failed to load fresh emoji data:', error);
             this.showErrorMessage(error.message);
-            new Notice(`Failed to load emoji collections: ${error.message}`);
-        } finally {
-            this.isLoading = false;
+            throw error;
         }
     }
 
     /**
-     * Show loading state
+     * Load fresh data in background while showing cached data
      */
-    private showLoadingState(): void {
+    private async loadFreshDataInBackground(): Promise<void> {
+        try {
+            // Small delay to let UI render first
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Load fresh data
+            await this.plugin.emojiManager.loadEmojiCollections();
+
+            // Update collections if new data is available
+            const newCollections = this.plugin.emojiManager.getAllCollections();
+            if (newCollections.length > 0) {
+                this.collections = newCollections;
+
+                // Update tabs if needed
+                this.renderTabs();
+
+                // Update current view if needed
+                this.showCollectionEmojis(this.activeCollection);
+
+                // Clear any loading indicators
+                this.clearLoadingIndicators();
+            }
+
+        } catch (error) {
+            console.warn('Background data refresh failed:', error);
+            // Don't show error for background refresh - cached data is still usable
+            this.clearLoadingIndicators();
+        }
+    }
+
+    /**
+     * Show initial loading state immediately when modal opens (Requirement 2.3)
+     */
+    private showInitialLoadingState(): void {
+        if (this.virtualRenderer) {
+            this.virtualRenderer.setEmojis([]);
+        }
         this.emojiContainer.empty();
         this.tabsContainer.empty();
         const loadingDiv = this.emojiContainer.createDiv('emoji-loading');
@@ -154,9 +285,71 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
+     * Show progressive loading state with better UX (Requirement 2.3)
+     */
+    private showProgressiveLoadingState(): void {
+        if (this.virtualRenderer) {
+            this.virtualRenderer.setEmojis([]);
+        }
+        this.emojiContainer.empty();
+        this.tabsContainer.empty();
+        const loadingDiv = this.emojiContainer.createDiv('emoji-loading');
+        loadingDiv.textContent = 'Fetching emoji collections...';
+    }
+
+    /**
+     * Show indicator that cached data is being used (Requirement 2.3)
+     */
+    private showCachedDataIndicator(): void {
+        // Add a subtle indicator that cached data is being used
+        const existingIndicator = this.emojiContainer.querySelector('.emoji-cached-indicator');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+
+        const indicator = this.emojiContainer.createDiv('emoji-cached-indicator');
+        indicator.textContent = 'Using cached data, refreshing...';
+        indicator.style.cssText = `
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--background-modifier-success);
+            color: var(--text-on-accent);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-s);
+            font-size: var(--font-ui-smaller);
+            z-index: 100;
+            opacity: 0.8;
+        `;
+
+        // Auto-remove after 2 seconds
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.remove();
+            }
+        }, 2000);
+    }
+
+    /**
+     * Clear all loading indicators (Requirement 2.3)
+     */
+    private clearLoadingIndicators(): void {
+        const cachedIndicator = this.emojiContainer.querySelector('.emoji-cached-indicator');
+        if (cachedIndicator) {
+            cachedIndicator.remove();
+        }
+
+        const loadingElements = this.emojiContainer.querySelectorAll('.emoji-loading');
+        loadingElements.forEach(element => element.remove());
+    }
+
+    /**
      * Show no configuration message
      */
     private showNoConfigMessage(): void {
+        if (this.virtualRenderer) {
+            this.virtualRenderer.setEmojis([]);
+        }
         this.emojiContainer.empty();
         const noConfigDiv = this.emojiContainer.createDiv('emoji-no-config');
         noConfigDiv.innerHTML = `
@@ -169,6 +362,9 @@ export class EmojiPickerModal extends Modal {
      * Show error message
      */
     private showErrorMessage(errorMessage: string): void {
+        if (this.virtualRenderer) {
+            this.virtualRenderer.setEmojis([]);
+        }
         this.emojiContainer.empty();
         const errorDiv = this.emojiContainer.createDiv('emoji-error');
         errorDiv.innerHTML = `
@@ -282,23 +478,31 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Update visual selection highlighting
+     * Update visual selection highlighting with virtual scrolling support
      */
     private updateSelection(): void {
-        const emojiItems = this.emojiContainer.querySelectorAll('.emoji-item');
+        if (!this.virtualRenderer) return;
 
-        // Remove previous selection
+        // Remove previous selection from all visible items
+        const emojiItems = this.emojiContainer.querySelectorAll('.emoji-item');
         emojiItems.forEach(item => item.removeClass('emoji-selected'));
 
-        // Add selection to current item
-        if (this.selectedIndex >= 0 && this.selectedIndex < emojiItems.length) {
-            emojiItems[this.selectedIndex].addClass('emoji-selected');
+        // Add selection to current item if it's visible
+        if (this.selectedIndex >= 0 && this.selectedIndex < this.filteredEmojis.length) {
+            // Check if selected item is in visible range
+            const visibleRange = this.virtualRenderer.getVisibleRange();
 
-            // Scroll into view if needed
-            emojiItems[this.selectedIndex].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
+            if (this.selectedIndex >= visibleRange.start && this.selectedIndex < visibleRange.end) {
+                // Find the corresponding DOM element
+                const selectedEmoji = this.filteredEmojis[this.selectedIndex];
+                const selectedElement = this.emojiContainer.querySelector(`[data-emoji-key="${selectedEmoji.key}"]`);
+                if (selectedElement) {
+                    selectedElement.addClass('emoji-selected');
+                }
+            } else {
+                // Scroll to make the selected item visible
+                this.virtualRenderer.scrollToEmoji(this.selectedIndex);
+            }
         }
     }
 
@@ -342,9 +546,7 @@ export class EmojiPickerModal extends Modal {
             tab.addClass('active');
         }
 
-        tab.addEventListener('click', () => {
-            this.switchToCollection(name.toLowerCase() === 'all' ? 'all' : name);
-        });
+        // No individual click handlers - using event delegation for better performance
     }
 
     /**
@@ -431,51 +633,27 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Render emojis in the container
+     * Render emojis using virtual scrolling for better performance
      */
     private renderEmojis(): void {
-        this.emojiContainer.empty();
+        // Clear loading indicators first
+        this.clearLoadingIndicators();
+
+        if (!this.virtualRenderer) {
+            console.warn('Virtual renderer not initialized');
+            return;
+        }
 
         if (this.filteredEmojis.length === 0) {
+            // Clear virtual renderer and show no results message
+            this.virtualRenderer.setEmojis([]);
             const noResults = this.emojiContainer.createDiv('emoji-no-results');
             noResults.textContent = 'No emojis found';
             return;
         }
 
-        this.filteredEmojis.forEach(emoji => {
-            const emojiElement = this.emojiContainer.createDiv('emoji-item');
-            emojiElement.setAttribute('data-emoji-key', emoji.key);
-            emojiElement.setAttribute('title', emoji.text);
-
-            // Create emoji display (only icon, no text)
-            const emojiIcon = emojiElement.createSpan('emoji-icon');
-            const customClasses = this.plugin.settings.customCssClasses;
-
-            if (emoji.type === 'image' && emoji.url) {
-                emojiIcon.createEl('img', {
-                    attr: {
-                        src: emoji.url,
-                        alt: emoji.text,
-                        title: emoji.text
-                    },
-                    cls: `emoji-image ${customClasses}`.trim()
-                });
-                // Size is controlled by dynamic CSS, no inline styles needed
-            } else {
-                emojiIcon.textContent = emoji.icon;
-                emojiIcon.addClass(`emoji-text ${customClasses}`.trim());
-                emojiIcon.setAttribute('title', emoji.text);
-                // Size is controlled by dynamic CSS, no inline styles needed
-            }
-
-            // Add click handler
-            emojiElement.addEventListener('click', () => {
-                this.handleEmojiClick(emoji);
-            });
-
-            // Add hover effect
-            emojiElement.addClass('emoji-clickable');
-        });
+        // Use virtual renderer for efficient emoji display
+        this.virtualRenderer.setEmojis(this.filteredEmojis);
     }
 
     /**

@@ -211,7 +211,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Get description with current collection status
      */
     private getCollectionStatusDescription(): string {
-        let statusText = 'Comma-separated URLs for owo.json files to load emoji collections from. JSON files are cached locally until you click "Update Collections".';
+        let statusText = 'Comma-separated URLs for owo.json files to load emoji collections from. JSON files are cached locally until you click "Update".';
 
         if (this.plugin.isEmojiManagerInitialized()) {
             const collectionCount = this.plugin.emojiManager!.getAllCollections().length;
@@ -239,7 +239,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         this.updateButton.removeClass('mod-muted', 'mod-cta', 'emoji-update-success', 'emoji-update-error');
 
         const isUpToDate = !this.hasUnsavedChanges;
-        this.updateButton.textContent = isUpToDate ? 'Collections Up to Date' : 'Update Collections';
+        this.updateButton.textContent = isUpToDate ? 'Loaded' : 'Update';
         this.updateButton.addClass(isUpToDate ? 'mod-muted' : 'mod-cta');
         this.updateButton.disabled = isUpToDate;
     }
