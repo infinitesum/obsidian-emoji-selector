@@ -2,6 +2,9 @@
 .emoji-picker-modal .modal-content {
   max-width: 600px;
   max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Header container with title and toggle */
@@ -95,10 +98,10 @@
 /* Collection tabs */
 .emoji-tabs {
   display: flex;
-  gap: var(--size-2-1);
+  gap: var(--size-2-3);
   margin-bottom: var(--size-2-3);
-  border-bottom: 1px solid var(--background-modifier-border);
-  overflow-x: auto;
+  /* border-bottom: 1px solid var(--background-modifier-border); */
+  /* overflow-x: auto; */
   padding-bottom: var(--size-2-1);
 }
 
@@ -158,7 +161,9 @@
 
 /* Virtual scrolling container */
 .emoji-scroll-container {
-  max-height: 400px;
+  /* max-height: 400px; */
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   border: 1px solid var(--background-modifier-border);
@@ -345,7 +350,7 @@
 /* Modal specific adjustments */
 .modal .emoji-search-container {
   margin-bottom: var(--size-4-2);
-  border-bottom: 1px solid var(--background-modifier-border);
+  /* border-bottom: 1px solid var(--background-modifier-border); */
   padding-bottom: var(--size-2-3);
 }
 

@@ -3,6 +3,8 @@
  */
 
 export interface I18nStrings {
+    // Command
+    openEmojiPicker: string;
     // Settings tab
     settingsTitle: string;
     emojiHeight: string;
@@ -54,9 +56,12 @@ export interface I18nStrings {
     invalidUrls: string;
     collectionsUpdateSuccess: string;
     collectionsUpdateFailed: string;
+    noActiveCollection: string;
 }
 
 const EN_STRINGS: I18nStrings = {
+    // Command
+    openEmojiPicker: 'Open Emoji Picker',
     // Settings tab
     settingsTitle: 'Emoji Selector Settings',
     emojiHeight: 'Emoji height',
@@ -77,7 +82,7 @@ const EN_STRINGS: I18nStrings = {
     customCssClasses: 'Custom CSS classes',
     customCssClassesDesc: 'Additional CSS classes to apply to emoji elements (space-separated)',
     customEmojiTemplate: 'Custom emoji template',
-    customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}. Leave empty for default HTML.',
+    customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}. Leave empty for default HTML.',
     keyboardShortcuts: 'Keyboard Shortcuts',
     enableKeyboardShortcut: 'Enable keyboard shortcut',
     enableKeyboardShortcutDesc: 'Enable keyboard shortcut to open emoji picker',
@@ -107,10 +112,13 @@ const EN_STRINGS: I18nStrings = {
     // Notices
     invalidUrls: 'Please enter valid URLs separated by commas',
     collectionsUpdateSuccess: 'Emoji collections updated! Loaded {0} collections with {1} emojis.',
-    collectionsUpdateFailed: 'Failed to update emoji collections: {0}'
+    collectionsUpdateFailed: 'Failed to update emoji collections: {0}',
+    noActiveCollection: 'No active editor found. Please open a note to use the emoji picker.'
 };
 
 const ZH_CN_STRINGS: I18nStrings = {
+    // Command
+    openEmojiPicker: '打开表情符号选择器',
     // Settings tab
     settingsTitle: '表情符号选择器设置',
     emojiHeight: '表情符号高度',
@@ -131,7 +139,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     customCssClasses: '自定义 CSS 类',
     customCssClassesDesc: '应用于表情符号元素的额外 CSS 类（用空格分隔）',
     customEmojiTemplate: '自定义表情符号模板',
-    customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：{url}, {name}, {text}, {category}, {type}, {classes}。留空使用默认 HTML。',
+    customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：{url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}。留空使用默认 HTML。',
     keyboardShortcuts: '键盘快捷键',
     enableKeyboardShortcut: '启用键盘快捷键',
     enableKeyboardShortcutDesc: '启用键盘快捷键打开表情符号选择器',
@@ -161,7 +169,8 @@ const ZH_CN_STRINGS: I18nStrings = {
     // Notices
     invalidUrls: '请输入用逗号分隔的有效 URL',
     collectionsUpdateSuccess: '表情符号集合已更新！加载了 {0} 个集合，共 {1} 个表情符号。',
-    collectionsUpdateFailed: '更新表情符号集合失败：{0}'
+    collectionsUpdateFailed: '更新表情符号集合失败：{0}',
+    noActiveCollection: '未找到活动编辑器。请打开一个笔记使用表情符号选择器。'
 };
 
 export class I18n {

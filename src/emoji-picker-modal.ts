@@ -153,7 +153,7 @@ export class EmojiPickerModal extends Modal {
         this.tabsContainer.addEventListener('click', (event) => {
             const tabElement = (event.target as HTMLElement).closest('.emoji-tab');
             if (tabElement) {
-                const tabText = tabElement.textContent?.split('(')[0].trim();
+                const tabText = tabElement.getAttribute('data-raw-name');
                 if (tabText) {
                     const collectionName = tabText.toLowerCase() === 'all' ? 'all' : tabText;
                     this.switchToCollection(collectionName);
@@ -645,16 +645,18 @@ export class EmojiPickerModal extends Modal {
         tabData.forEach(({ name, count, isActive }) => {
             // Translate "All" tab name
             const displayName = name === 'All' ? i18n.t('all') : name;
-            this.createTab(displayName, count, isActive);
+            const rawName = name;
+            this.createTab(displayName, count, isActive, rawName);
         });
     }
 
     /**
      * Create a single tab element
      */
-    private createTab(name: string, count: number, isActive: boolean): void {
+    private createTab(name: string, count: number, isActive: boolean, rawName: string): void {
         const tab = this.tabsContainer.createDiv('emoji-tab');
         tab.textContent = name;
+        tab.setAttribute('data-raw-name', rawName);
 
         const countSpan = tab.createSpan('emoji-tab-count');
         countSpan.textContent = '(' + count + ')';
@@ -706,7 +708,7 @@ export class EmojiPickerModal extends Modal {
         const tabs = this.tabsContainer.querySelectorAll('.emoji-tab');
 
         tabs.forEach(tab => {
-            const tabText = tab.textContent?.split('(')[0].trim();
+            const tabText = tab.getAttribute('data-raw-name');
             const isActive = (activeCollectionName === 'all' && (tabText === 'All' || tabText === i18n.t('all'))) || tabText === activeCollectionName;
 
             tab.toggleClass('active', isActive);
