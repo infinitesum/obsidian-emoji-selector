@@ -101,8 +101,10 @@
   gap: var(--size-2-3);
   margin-bottom: var(--size-2-3);
   /* border-bottom: 1px solid var(--background-modifier-border); */
-  /* overflow-x: auto; */
+  overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: var(--size-2-1);
+  min-height: 2.5rem;
 }
 
 .emoji-tab {
@@ -381,6 +383,24 @@
   background: var(--background-modifier-border-hover);
 }
 
+/* Scrollbar styling for emoji tabs */
+/* .emoji-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.emoji-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.emoji-tabs::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: var(--radius-s);
+}
+
+.emoji-tabs::-webkit-scrollbar-thumb:hover {
+  background: var(--background-modifier-border-hover);
+} */
+
 /* Emoji display styles for both edit and preview modes */
 /* These styles ensure consistent emoji rendering across different Obsidian views */
 
@@ -645,13 +665,15 @@ code .emoji-text {
 
   /* Mobile-friendly header layout */
   .emoji-header-container {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--size-2-2);
   }
 
   .emoji-multi-select-container {
-    align-self: flex-end;
+    flex-shrink: 0;
   }
 }
 
