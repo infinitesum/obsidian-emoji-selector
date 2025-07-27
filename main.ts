@@ -3,6 +3,7 @@ import { EmojiPickerModal } from './src/emoji-picker-modal';
 import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types';
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
+import { i18n } from './src/i18n';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
@@ -22,7 +23,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Add command to open emoji picker (Requirement 5.1) - defer hotkey setup
 		this.addCommand({
 			id: 'open-picker',
-			name: 'Open Emoji Picker',
+			name: i18n.t('openEmojiPicker'),
 			editorCallback: async (editor: Editor) => {
 				await this.openEmojiPicker(editor);
 			}
@@ -30,14 +31,14 @@ export default class EmojiSelectorPlugin extends Plugin {
 		});
 
 		// Add ribbon icon to trigger emoji picker (Requirement 5.2)
-		this.addRibbonIcon('smile', 'Open Emoji Picker', async () => {
+		this.addRibbonIcon('smile', i18n.t('openEmojiPicker'), async () => {
 			// Get the active editor
 			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 			if (activeView && activeView.editor) {
 				await this.openEmojiPicker(activeView.editor);
 			} else {
 				// Show notice if no active editor
-				new Notice('No active editor found. Please open a note to use the emoji picker.');
+				new Notice(i18n.t('noActiveCollection'));
 			}
 		});
 
@@ -408,6 +409,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 			? `emoji-image ${customClasses}`.trim()
 			: `emoji-text ${customClasses}`.trim();
 
+		// Get filename from url
+		const fullfilename = emoji.url ? emoji.url.substring(emoji.url.lastIndexOf('/') + 1) : '';
+
+		const dotIndex = fullfilename.lastIndexOf('.');
+		const filename = dotIndex !== -1
+			? fullfilename.substring(0, dotIndex)
+			: fullfilename;
 		// Create variables map
 		const variables: Record<string, string> = {
 			url: emoji.url ? this.sanitizeUrl(emoji.url) : '',
@@ -416,7 +424,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 			category: this.escapeHtml(emoji.category),
 			type: emoji.type,
 			classes: classes,
-			icon: emoji.icon
+			icon: emoji.icon,
+			filename: filename,
+			fullfilename: fullfilename
 		};
 
 		// Replace variables in template
