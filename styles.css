@@ -100,11 +100,9 @@
   display: flex;
   gap: var(--size-2-3);
   margin-bottom: var(--size-2-3);
-  /* border-bottom: 1px solid var(--background-modifier-border); */
   overflow-x: auto;
-  overflow-y: hidden;
   padding-bottom: var(--size-2-1);
-  min-height: 2.5rem;
+  min-height: 2rem;
 }
 
 .emoji-tab {
@@ -384,7 +382,7 @@
 }
 
 /* Scrollbar styling for emoji tabs */
-/* .emoji-tabs::-webkit-scrollbar {
+.emoji-tabs::-webkit-scrollbar {
   height: 6px;
 }
 
@@ -402,7 +400,8 @@
 } */
 
 /* Emoji display styles for both edit and preview modes */
-/* These styles ensure consistent emoji rendering across different Obsidian views */
+
+/* These styles ensure consistent emoji rendering across different Obsidian views
 
 /* Base emoji styles - applied to all emoji elements */
 .emoji-image,
