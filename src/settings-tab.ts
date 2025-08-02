@@ -101,6 +101,62 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 }));
 
+        // Recent emojis settings section
+        containerEl.createEl('h3', { text: i18n.t('recentEmojis') });
+
+        // Enable recent emojis setting
+        new Setting(containerEl)
+            .setName(i18n.t('enableRecentEmojis'))
+            .setDesc(i18n.t('enableRecentEmojisDesc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableRecentEmojis)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableRecentEmojis = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        // Prefer recent over remembered setting
+        new Setting(containerEl)
+            .setName(i18n.t('preferRecentOverRemembered'))
+            .setDesc(i18n.t('preferRecentOverRememberedDesc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.preferRecentOverRemembered)
+                .onChange(async (value) => {
+                    this.plugin.settings.preferRecentOverRemembered = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        // Max recent emojis setting
+        new Setting(containerEl)
+            .setName(i18n.t('maxRecentEmojis'))
+            .setDesc(i18n.t('maxRecentEmojisDesc'))
+            .addSlider(slider => slider
+                .setLimits(1, 50, 1)
+                .setValue(this.plugin.settings.maxRecentEmojis)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.maxRecentEmojis = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        // Clear recent emojis button
+        new Setting(containerEl)
+            .setName(i18n.t('clearRecentEmojis'))
+            .setDesc(i18n.t('clearRecentEmojisDesc'))
+            .addButton(button => button
+                .setButtonText(i18n.t('clearRecentEmojisButton'))
+                .setWarning()
+                .onClick(async () => {
+                    try {
+                        const emojiManager = await this.plugin.getEmojiManagerForSettings();
+                        await emojiManager.clearRecentEmojis();
+                        new Notice(i18n.t('recentEmojisCleared'));
+                    } catch (error) {
+                        console.error('Failed to clear recent emojis:', error);
+                        new Notice(i18n.t('failedToClearRecentEmojis'));
+                    }
+                }));
+
         // Emoji spacing settings section
         containerEl.createEl('h3', { text: i18n.t('emojiSpacing') });
 

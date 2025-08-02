@@ -22,6 +22,7 @@ export class EmojiPickerModal extends Modal {
     private isLoading: boolean = false;
     private isMultiSelectMode: boolean = false;
     private virtualRenderer: VirtualEmojiRenderer | null = null;
+    private userExplicitlySelectedRecent: boolean = false;
 
     constructor(app: App, plugin: EmojiSelectorPlugin, onEmojiSelect: (emoji: EmojiItem, isMultiSelectMode: boolean) => void) {
         super(app);
@@ -124,7 +125,7 @@ export class EmojiPickerModal extends Modal {
         this.virtualRenderer = new VirtualEmojiRenderer(
             this.emojiContainer,
             this.emojiScrollContainer,
-            (emoji: EmojiItem) => this.handleEmojiClick(emoji),
+            async (emoji: EmojiItem) => await this.handleEmojiClick(emoji),
             this.plugin.settings.customCssClasses
         );
     }
@@ -150,13 +151,18 @@ export class EmojiPickerModal extends Modal {
         this.initializeVirtualRenderer();
 
         // Event delegation for tab clicks (already optimized)
-        this.tabsContainer.addEventListener('click', (event) => {
+        this.tabsContainer.addEventListener('click', async (event) => {
             const tabElement = (event.target as HTMLElement).closest('.emoji-tab');
             if (tabElement) {
                 const tabText = tabElement.getAttribute('data-raw-name');
                 if (tabText) {
-                    const collectionName = tabText.toLowerCase() === 'all' ? 'all' : tabText;
-                    this.switchToCollection(collectionName);
+                    let collectionName = tabText;
+                    if (tabText.toLowerCase() === 'all') {
+                        collectionName = 'all';
+                    } else if (tabText.toLowerCase() === 'recent') {
+                        collectionName = 'recent';
+                    }
+                    await this.switchToCollection(collectionName);
                 }
             }
         });
@@ -170,16 +176,16 @@ export class EmojiPickerModal extends Modal {
         let lastSearchValue: string = '';
 
         // Simple, mobile-friendly search handler
-        const performSearch = (value: string) => {
+        const performSearch = async (value: string) => {
             // Skip if value hasn't changed
             if (value === lastSearchValue) return;
 
             lastSearchValue = value;
-            this.handleSearchInput(value);
+            await this.handleSearchInput(value);
         };
 
         // Input event with mobile-optimized debouncing
-        this.searchInput.addEventListener('input', (event) => {
+        this.searchInput.addEventListener('input', async (event) => {
             const target = event.target as HTMLInputElement;
             const value = target.value;
 
@@ -188,27 +194,27 @@ export class EmojiPickerModal extends Modal {
 
             // Immediate response for empty search (clearing)
             if (value === '') {
-                performSearch(value);
+                await performSearch(value);
                 return;
             }
 
             // Immediate search for single characters to fix mobile issues
             if (value.length === 1) {
-                performSearch(value);
+                await performSearch(value);
                 return;
             }
 
             // Very short debounce for multi-character searches - optimized for mobile
-            searchTimeout = setTimeout(() => {
-                performSearch(value);
+            searchTimeout = setTimeout(async () => {
+                await performSearch(value);
             }, 50); // Reduced from 100ms to 50ms for better mobile responsiveness
         });
 
         // Handle paste events with minimal delay
         this.searchInput.addEventListener('paste', () => {
             clearTimeout(searchTimeout);
-            setTimeout(() => {
-                performSearch(this.searchInput.value);
+            setTimeout(async () => {
+                await performSearch(this.searchInput.value);
             }, 50);
         });
     }
@@ -340,9 +346,9 @@ export class EmojiPickerModal extends Modal {
             if (hasCachedData) {
                 // Use cached data immediately
                 this.collections = this.plugin.emojiManager.getAllCollections();
-                this.setInitialActiveCollection();
-                this.renderTabs();
-                this.showCollectionEmojis(this.activeCollection);
+                await this.setInitialActiveCollection();
+                await this.renderTabs();
+                await this.showCollectionEmojis(this.activeCollection);
             } else {
                 // Load fresh data
                 this.showProgressiveLoadingState();
@@ -354,9 +360,9 @@ export class EmojiPickerModal extends Modal {
                     return;
                 }
 
-                this.setInitialActiveCollection();
-                this.renderTabs();
-                this.showCollectionEmojis(this.activeCollection);
+                await this.setInitialActiveCollection();
+                await this.renderTabs();
+                await this.showCollectionEmojis(this.activeCollection);
             }
 
         } catch (error) {
@@ -384,11 +390,11 @@ export class EmojiPickerModal extends Modal {
             }
 
             // Set active collection from last remembered selection
-            this.setInitialActiveCollection();
+            await this.setInitialActiveCollection();
 
             // Render tabs and emojis
-            this.renderTabs();
-            this.showCollectionEmojis(this.activeCollection);
+            await this.renderTabs();
+            await this.showCollectionEmojis(this.activeCollection);
 
         } catch (error) {
             console.error('Failed to load fresh emoji data:', error);
@@ -414,10 +420,10 @@ export class EmojiPickerModal extends Modal {
                 this.collections = newCollections;
 
                 // Update tabs if needed
-                this.renderTabs();
+                await this.renderTabs();
 
                 // Update current view if needed
-                this.showCollectionEmojis(this.activeCollection);
+                await this.showCollectionEmojis(this.activeCollection);
 
                 // Clear any loading indicators
                 this.clearLoadingIndicators();
@@ -518,32 +524,67 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Set initial active collection from settings or default
+     * Set initial active collection with intelligent priority handling
+     * Priority: Recent (if enabled and has items) -> Remembered -> Default
      */
-    private setInitialActiveCollection(): void {
-        if (this.plugin.settings.rememberLastCollection) {
-            const lastSelected = this.plugin.settings.lastSelectedCollection;
-
-            // Check if last selected collection still exists
-            if (lastSelected === 'all' || this.collections.some(c => c.name === lastSelected)) {
-                this.activeCollection = lastSelected;
+    private async setInitialActiveCollection(): Promise<void> {
+        // Strategy 1: Check if we should prefer recent emojis
+        if (this.plugin.settings.enableRecentEmojis && this.plugin.settings.preferRecentOverRemembered) {
+            const recentCount = await this.plugin.emojiManager.getRecentEmojisCount();
+            if (recentCount > 0) {
+                this.activeCollection = 'recent';
                 return;
             }
         }
 
-        // Fallback to first collection or 'all' if not remembering or collection doesn't exist
+        // Strategy 2: Use remembered collection if enabled
+        if (this.plugin.settings.rememberLastCollection) {
+            const lastSelected = this.plugin.settings.lastSelectedCollection;
+
+            // Check if last selected collection still exists
+            if (lastSelected === 'all' ||
+                lastSelected === 'recent' ||
+                this.collections.some(c => c.name === lastSelected)) {
+
+                // If it's recent but recent is disabled or empty, fallback
+                if (lastSelected === 'recent') {
+                    if (this.plugin.settings.enableRecentEmojis) {
+                        const recentCount = await this.plugin.emojiManager.getRecentEmojisCount();
+                        if (recentCount > 0) {
+                            this.activeCollection = 'recent';
+                            return;
+                        }
+                    }
+                    // Recent is disabled or empty, fallback to default strategy
+                } else {
+                    this.activeCollection = lastSelected;
+                    return;
+                }
+            }
+        }
+
+        // Strategy 3: Check if recent should be default (when not preferring over remembered)
+        if (this.plugin.settings.enableRecentEmojis && !this.plugin.settings.preferRecentOverRemembered) {
+            const recentCount = await this.plugin.emojiManager.getRecentEmojisCount();
+            if (recentCount > 0) {
+                this.activeCollection = 'recent';
+                return;
+            }
+        }
+
+        // Strategy 4: Fallback to first collection or 'all'
         this.activeCollection = this.collections.length > 0 ? this.collections[0].name : 'all';
     }
 
     /**
      * Handle search input changes
      */
-    private handleSearchInput(query: string): void {
+    private async handleSearchInput(query: string): Promise<void> {
         const trimmedQuery = query.trim();
 
         if (trimmedQuery === '') {
             // If search is empty, show emojis based on active collection
-            this.showCollectionEmojis(this.activeCollection);
+            await this.showCollectionEmojis(this.activeCollection);
         } else {
             // Use emoji manager for search
             const searchResults = this.plugin.emojiManager.searchEmojis(trimmedQuery);
@@ -628,27 +669,66 @@ export class EmojiPickerModal extends Modal {
     /**
      * Render collection tabs
      */
-    private renderTabs(): void {
+    private async renderTabs(): Promise<void> {
         this.tabsContainer.empty();
 
-        // Create tab data array for efficient rendering
-        const tabData = [
-            ...this.collections.map(collection => ({
-                name: collection.name,
-                count: collection.items.length,
-                isActive: this.activeCollection === collection.name
-            })),
-            {
-                name: 'All',
-                count: this.plugin.emojiManager.getTotalEmojiCount(),
-                isActive: this.activeCollection === 'all'
+        // Get recent emojis count
+        const recentCount = this.plugin.settings.enableRecentEmojis
+            ? await this.plugin.emojiManager.getRecentEmojisCount()
+            : 0;
+
+        // Handle case where recent was selected but now has no items
+        if (this.activeCollection === 'recent' && (!this.plugin.settings.enableRecentEmojis || recentCount === 0)) {
+            // Fallback to a sensible default
+            if (this.plugin.settings.rememberLastCollection) {
+                // Try to use the previously remembered non-recent collection
+                const lastSelected = this.plugin.settings.lastSelectedCollection;
+                if (lastSelected !== 'recent' && (lastSelected === 'all' || this.collections.some(c => c.name === lastSelected))) {
+                    this.activeCollection = lastSelected;
+                } else {
+                    this.activeCollection = this.collections.length > 0 ? this.collections[0].name : 'all';
+                }
+            } else {
+                this.activeCollection = this.collections.length > 0 ? this.collections[0].name : 'all';
             }
-        ];
+        }
+
+        // Create tab data array for efficient rendering
+        const tabData = [];
+
+        // Add Recent tab first if enabled and has items
+        if (this.plugin.settings.enableRecentEmojis && recentCount > 0) {
+            tabData.push({
+                name: 'Recent',
+                count: recentCount,
+                isActive: this.activeCollection === 'recent'
+            });
+        }
+
+        // Add collection tabs
+        tabData.push(...this.collections.map(collection => ({
+            name: collection.name,
+            count: collection.items.length,
+            isActive: this.activeCollection === collection.name
+        })));
+
+        // Add All tab
+        tabData.push({
+            name: 'All',
+            count: this.plugin.emojiManager.getTotalEmojiCount(),
+            isActive: this.activeCollection === 'all'
+        });
 
         // Render all tabs efficiently
         tabData.forEach(({ name, count, isActive }) => {
-            // Translate "All" tab name
-            const displayName = name === 'All' ? i18n.t('all') : name;
+            // Translate special tab names
+            let displayName = name;
+            if (name === 'All') {
+                displayName = i18n.t('all');
+            } else if (name === 'Recent') {
+                displayName = i18n.t('recent');
+            }
+
             const rawName = name;
             this.createTab(displayName, count, isActive, rawName);
         });
@@ -675,25 +755,47 @@ export class EmojiPickerModal extends Modal {
     /**
      * Switch to a specific collection
      */
-    private switchToCollection(collectionName: string): void {
+    private async switchToCollection(collectionName: string, userInitiated: boolean = true): Promise<void> {
         if (this.activeCollection === collectionName) return;
 
         this.activeCollection = collectionName;
-        this.rememberCollectionSelection(collectionName);
+
+        // Track if user explicitly selected recent
+        if (collectionName === 'recent' && userInitiated) {
+            this.userExplicitlySelectedRecent = true;
+        }
+
+        await this.rememberCollectionSelection(collectionName);
         this.updateTabActiveState(collectionName);
         this.searchInput.value = '';
 
         // Show emojis for this collection
-        this.showCollectionEmojis(collectionName);
+        await this.showCollectionEmojis(collectionName);
     }
 
     /**
-     * Remember the collection selection in settings
+     * Remember the collection selection in settings with intelligent handling
      */
     private async rememberCollectionSelection(collectionName: string): Promise<void> {
         // Only remember if the setting is enabled
-        if (this.plugin.settings.rememberLastCollection &&
-            this.plugin.settings.lastSelectedCollection !== collectionName) {
+        if (!this.plugin.settings.rememberLastCollection) {
+            return;
+        }
+
+        // Don't update if it's the same as current
+        if (this.plugin.settings.lastSelectedCollection === collectionName) {
+            return;
+        }
+
+        // Special handling for recent collection
+        if (collectionName === 'recent') {
+            // Only remember recent if user explicitly selected it
+            if (this.userExplicitlySelectedRecent) {
+                this.plugin.settings.lastSelectedCollection = collectionName;
+                await this.plugin.saveSettings();
+            }
+        } else {
+            // For non-recent collections, always remember
             this.plugin.settings.lastSelectedCollection = collectionName;
             await this.plugin.saveSettings();
         }
@@ -707,7 +809,15 @@ export class EmojiPickerModal extends Modal {
 
         tabs.forEach(tab => {
             const tabText = tab.getAttribute('data-raw-name');
-            const isActive = (activeCollectionName === 'all' && (tabText === 'All' || tabText === i18n.t('all'))) || tabText === activeCollectionName;
+            let isActive = false;
+
+            if (activeCollectionName === 'all' && (tabText === 'All' || tabText === i18n.t('all'))) {
+                isActive = true;
+            } else if (activeCollectionName === 'recent' && (tabText === 'Recent' || tabText === i18n.t('recent'))) {
+                isActive = true;
+            } else if (tabText === activeCollectionName) {
+                isActive = true;
+            }
 
             tab.toggleClass('active', isActive);
         });
@@ -716,9 +826,9 @@ export class EmojiPickerModal extends Modal {
     /**
      * Show emojis for a specific collection
      */
-    private showCollectionEmojis(collectionName: string): void {
+    private async showCollectionEmojis(collectionName: string): Promise<void> {
         // Get emojis for the collection
-        const newEmojis = this.getEmojisForCollection(collectionName);
+        const newEmojis = await this.getEmojisForCollection(collectionName);
 
         // Only update if emojis actually changed
         if (!this.areEmojiArraysEqual(this.filteredEmojis, newEmojis)) {
@@ -731,9 +841,13 @@ export class EmojiPickerModal extends Modal {
     /**
      * Get emojis for a specific collection
      */
-    private getEmojisForCollection(collectionName: string): EmojiItem[] {
+    private async getEmojisForCollection(collectionName: string): Promise<EmojiItem[]> {
         if (collectionName === 'all') {
             return this.plugin.emojiManager.getAllEmojis();
+        }
+
+        if (collectionName === 'recent') {
+            return await this.plugin.emojiManager.getRecentEmojis();
         }
 
         const collection = this.collections.find(c => c.name === collectionName);
@@ -790,7 +904,12 @@ export class EmojiPickerModal extends Modal {
      * Handle emoji click events
      * Implements requirement 1.2: insert emoji at current cursor position
      */
-    private handleEmojiClick(emoji: EmojiItem): void {
+    private async handleEmojiClick(emoji: EmojiItem): Promise<void> {
+        // Add to recent emojis (async but don't wait)
+        this.plugin.emojiManager.addToRecent(emoji).catch(error => {
+            console.warn('Failed to add emoji to recent list:', error);
+        });
+
         // Call the callback to insert the emoji, passing multi-select mode
         this.onEmojiSelect(emoji, this.isMultiSelectMode);
 

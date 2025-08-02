@@ -2,6 +2,7 @@ import { EmojiItem, EmojiCollection, EmojiSelectorSettings } from './types';
 import { EmojiStorage } from './emoji-storage';
 import { OwoFileParser } from './owo-parser';
 import { EmojiCacheManager } from './emoji-cache';
+import { RecentEmojiManager } from './recent-emoji-manager';
 
 /**
  * Manages emoji collections and provides search functionality
@@ -15,11 +16,17 @@ export class EmojiManager {
     private cacheManager: EmojiCacheManager;
     private cacheInitialized: boolean = false;
     private cacheInitPromise: Promise<void> | null = null;
+    private recentManager: RecentEmojiManager;
 
     constructor(settings: EmojiSelectorSettings, saveData: (data: any) => Promise<void>, loadData: () => Promise<any>) {
         this.storage = new EmojiStorage();
         this.settings = settings;
         this.cacheManager = new EmojiCacheManager(saveData, loadData);
+        this.recentManager = new RecentEmojiManager(
+            settings.maxRecentEmojis,
+            saveData,
+            loadData
+        );
 
         // Set the cache manager in the parser
         OwoFileParser.setCacheManager(this.cacheManager);
@@ -70,7 +77,15 @@ export class EmojiManager {
      */
     updateSettings(settings: EmojiSelectorSettings): void {
         const oldUrls = this.settings.owoJsonUrls;
+        const oldMaxRecent = this.settings.maxRecentEmojis;
         this.settings = settings;
+
+        // Update recent manager max size if changed
+        if (oldMaxRecent !== settings.maxRecentEmojis) {
+            this.recentManager.updateMaxSize(settings.maxRecentEmojis).catch(error => {
+                console.error('Failed to update recent emojis max size:', error);
+            });
+        }
 
         // Clean up cache if URLs changed
         if (oldUrls !== settings.owoJsonUrls) {
@@ -391,5 +406,53 @@ export class EmojiManager {
      */
     getConfiguredUrls(): string[] {
         return this.parseUrls(this.settings.owoJsonUrls);
+    }
+
+    /**
+     * Add emoji to recent list
+     */
+    async addToRecent(emoji: EmojiItem): Promise<void> {
+        if (this.settings.enableRecentEmojis) {
+            await this.recentManager.addEmoji(emoji);
+        }
+    }
+
+    /**
+     * Get recent emojis
+     */
+    async getRecentEmojis(): Promise<EmojiItem[]> {
+        if (!this.settings.enableRecentEmojis) {
+            return [];
+        }
+        return await this.recentManager.getRecentEmojis();
+    }
+
+    /**
+     * Clear recent emojis
+     */
+    async clearRecentEmojis(): Promise<void> {
+        await this.recentManager.clear();
+    }
+
+    /**
+     * Get recent emojis count
+     */
+    async getRecentEmojisCount(): Promise<number> {
+        if (!this.settings.enableRecentEmojis) {
+            return 0;
+        }
+        return await this.recentManager.getCount();
+    }
+
+    /**
+     * Get recent emojis statistics
+     */
+    async getRecentEmojisStats(): Promise<{
+        totalCount: number;
+        totalUsage: number;
+        mostUsed: any;
+        oldestEntry: any;
+    }> {
+        return await this.recentManager.getStats();
     }
 }

@@ -57,6 +57,28 @@ export interface EmojiJsonCache {
 }
 
 /**
+ * Recent emoji entry with usage metadata
+ */
+export interface RecentEmojiEntry {
+    /** The emoji item */
+    emoji: EmojiItem;
+    /** Last used timestamp */
+    lastUsed: number;
+    /** Usage count */
+    count: number;
+}
+
+/**
+ * Recent emojis storage data
+ */
+export interface RecentEmojisData {
+    /** Map of emoji key to recent entry */
+    entries: Record<string, RecentEmojiEntry>;
+    /** Ordered list of emoji keys by recency */
+    order: string[];
+}
+
+/**
  * Plugin settings interface
  */
 export interface EmojiSelectorSettings {
@@ -82,6 +104,12 @@ export interface EmojiSelectorSettings {
     addSpaceAfterEmojiInMultiSelect: boolean;
     /** Custom emoji insertion template with variables */
     customEmojiTemplate: string;
+    /** Maximum number of recent emojis to keep */
+    maxRecentEmojis: number;
+    /** Enable recent emojis feature */
+    enableRecentEmojis: boolean;
+    /** Prefer recent emojis over remembered collection when opening picker */
+    preferRecentOverRemembered: boolean;
 }
 
 /**
@@ -98,5 +126,8 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     lastSelectedCollection: 'all',
     addSpaceAfterEmoji: true,
     addSpaceAfterEmojiInMultiSelect: false,
-    customEmojiTemplate: ''
+    customEmojiTemplate: '',
+    maxRecentEmojis: 20,
+    enableRecentEmojis: true,
+    preferRecentOverRemembered: true
 };

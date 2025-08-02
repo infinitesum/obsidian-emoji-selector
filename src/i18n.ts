@@ -32,6 +32,20 @@ export interface I18nStrings {
     keyboardShortcut: string;
     keyboardShortcutDesc: string;
 
+    // Recent emojis
+    recentEmojis: string;
+    enableRecentEmojis: string;
+    enableRecentEmojisDesc: string;
+    maxRecentEmojis: string;
+    maxRecentEmojisDesc: string;
+    clearRecentEmojis: string;
+    clearRecentEmojisDesc: string;
+    clearRecentEmojisButton: string;
+    recentEmojisCleared: string;
+    failedToClearRecentEmojis: string;
+    preferRecentOverRemembered: string;
+    preferRecentOverRememberedDesc: string;
+
     // Button states
     loaded: string;
     update: string;
@@ -51,6 +65,7 @@ export interface I18nStrings {
     checkOwoJsonUrls: string;
     noEmojisFound: string;
     all: string;
+    recent: string;
 
     // Notices
     invalidUrls: string;
@@ -89,6 +104,20 @@ const EN_STRINGS: I18nStrings = {
     keyboardShortcut: 'Keyboard shortcut',
     keyboardShortcutDesc: 'Keyboard shortcut to open emoji picker (e.g., Ctrl+Shift+E)',
 
+    // Recent emojis
+    recentEmojis: 'Recent Emojis',
+    enableRecentEmojis: 'Enable recent emojis',
+    enableRecentEmojisDesc: 'Show recently used emojis in a separate tab',
+    maxRecentEmojis: 'Max recent emojis',
+    maxRecentEmojisDesc: 'Maximum number of recent emojis to keep (1-50)',
+    clearRecentEmojis: 'Clear recent emojis',
+    clearRecentEmojisDesc: 'Remove all recently used emojis',
+    clearRecentEmojisButton: 'Clear',
+    recentEmojisCleared: 'Recent emojis cleared',
+    failedToClearRecentEmojis: 'Failed to clear recent emojis',
+    preferRecentOverRemembered: 'Prefer recent over remembered collection',
+    preferRecentOverRememberedDesc: 'When opening the picker, show recent emojis first if available, instead of the last remembered collection',
+
     // Button states
     loaded: 'Loaded',
     update: 'Update',
@@ -108,6 +137,7 @@ const EN_STRINGS: I18nStrings = {
     checkOwoJsonUrls: 'Please check your OWO JSON URLs in the plugin settings.',
     noEmojisFound: 'No emojis found',
     all: 'All',
+    recent: 'Recent',
 
     // Notices
     invalidUrls: 'Please enter valid URLs separated by commas',
@@ -146,6 +176,20 @@ const ZH_CN_STRINGS: I18nStrings = {
     keyboardShortcut: '键盘快捷键',
     keyboardShortcutDesc: '打开表情符号选择器的键盘快捷键（例如：Ctrl+Shift+E）',
 
+    // Recent emojis
+    recentEmojis: '最近使用的表情符号',
+    enableRecentEmojis: '启用最近使用的表情符号',
+    enableRecentEmojisDesc: '在单独的标签页中显示最近使用的表情符号',
+    maxRecentEmojis: '最大最近表情符号数量',
+    maxRecentEmojisDesc: '保留的最近表情符号的最大数量（1-50）',
+    clearRecentEmojis: '清除最近使用的表情符号',
+    clearRecentEmojisDesc: '删除所有最近使用的表情符号',
+    clearRecentEmojisButton: '清除',
+    recentEmojisCleared: '最近使用的表情符号已清除',
+    failedToClearRecentEmojis: '清除最近使用的表情符号失败',
+    preferRecentOverRemembered: '优先显示最近使用而非记住的集合',
+    preferRecentOverRememberedDesc: '打开选择器时，如果有最近使用的表情符号，优先显示最近使用标签页，而不是上次记住的集合',
+
     // Button states
     loaded: '已加载',
     update: '更新',
@@ -165,6 +209,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     checkOwoJsonUrls: '请检查插件设置中的 OWO JSON URLs。',
     noEmojisFound: '未找到表情符号',
     all: '全部',
+    recent: '最近',
 
     // Notices
     invalidUrls: '请输入用逗号分隔的有效 URL',
