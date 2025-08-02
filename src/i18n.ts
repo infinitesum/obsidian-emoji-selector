@@ -26,11 +26,6 @@ export interface I18nStrings {
     customCssClassesDesc: string;
     customEmojiTemplate: string;
     customEmojiTemplateDesc: string;
-    keyboardShortcuts: string;
-    enableKeyboardShortcut: string;
-    enableKeyboardShortcutDesc: string;
-    keyboardShortcut: string;
-    keyboardShortcutDesc: string;
 
     // Recent emojis
     recentEmojis: string;
@@ -98,11 +93,6 @@ const EN_STRINGS: I18nStrings = {
     customCssClassesDesc: 'Additional CSS classes to apply to emoji elements (space-separated)',
     customEmojiTemplate: 'Custom emoji template',
     customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}. Leave empty for default HTML.',
-    keyboardShortcuts: 'Keyboard Shortcuts',
-    enableKeyboardShortcut: 'Enable keyboard shortcut',
-    enableKeyboardShortcutDesc: 'Enable keyboard shortcut to open emoji picker',
-    keyboardShortcut: 'Keyboard shortcut',
-    keyboardShortcutDesc: 'Keyboard shortcut to open emoji picker (e.g., Ctrl+Shift+E)',
 
     // Recent emojis
     recentEmojis: 'Recent Emojis',
@@ -170,11 +160,6 @@ const ZH_CN_STRINGS: I18nStrings = {
     customCssClassesDesc: '应用于表情符号元素的额外 CSS 类（用空格分隔）',
     customEmojiTemplate: '自定义表情符号模板',
     customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：{url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}。留空使用默认 HTML。',
-    keyboardShortcuts: '键盘快捷键',
-    enableKeyboardShortcut: '启用键盘快捷键',
-    enableKeyboardShortcutDesc: '启用键盘快捷键打开表情符号选择器',
-    keyboardShortcut: '键盘快捷键',
-    keyboardShortcutDesc: '打开表情符号选择器的键盘快捷键（例如：Ctrl+Shift+E）',
 
     // Recent emojis
     recentEmojis: '最近使用的表情符号',

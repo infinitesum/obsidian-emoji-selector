@@ -206,44 +206,6 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 }));
 
-        // Keyboard shortcut settings section
-        containerEl.createEl('h3', { text: i18n.t('keyboardShortcuts') });
-
-        // Enable keyboard shortcut setting
-        new Setting(containerEl)
-            .setName(i18n.t('enableKeyboardShortcut'))
-            .setDesc(i18n.t('enableKeyboardShortcutDesc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableKeyboardShortcut)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableKeyboardShortcut = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        // Keyboard shortcut setting
-        new Setting(containerEl)
-            .setName(i18n.t('keyboardShortcut'))
-            .setDesc(i18n.t('keyboardShortcutDesc'))
-            .addText(text => text
-                .setPlaceholder('Ctrl+Shift+E')
-                .setValue(this.plugin.settings.keyboardShortcut)
-                .setDisabled(!this.plugin.settings.enableKeyboardShortcut)
-                .onChange(async (value) => {
-                    this.plugin.settings.keyboardShortcut = value || 'Ctrl+Shift+E';
-                    await this.plugin.saveSettings();
-                }));
-
-        // Update shortcut input state when toggle changes
-        const shortcutSetting = containerEl.querySelector('input[placeholder="Ctrl+Shift+E"]') as HTMLInputElement;
-        if (shortcutSetting) {
-            const toggleSetting = containerEl.querySelector('input[type="checkbox"]') as HTMLInputElement;
-            if (toggleSetting) {
-                toggleSetting.addEventListener('change', () => {
-                    shortcutSetting.disabled = !toggleSetting.checked;
-                });
-            }
-        }
-
         // Initialize button state
         this.updateButtonState();
     }

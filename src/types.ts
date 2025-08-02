@@ -86,10 +86,6 @@ export interface EmojiSelectorSettings {
     emojiSize: string;
     /** Search input placeholder text */
     searchPlaceholder: string;
-    /** Enable keyboard shortcut */
-    enableKeyboardShortcut: boolean;
-    /** Keyboard shortcut string */
-    keyboardShortcut: string;
     /** Additional CSS classes for styling */
     customCssClasses: string;
     /** URLs for owo.json files (comma-separated) */
@@ -118,8 +114,6 @@ export interface EmojiSelectorSettings {
 export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     emojiSize: '2em',
     searchPlaceholder: '',
-    enableKeyboardShortcut: false,
-    keyboardShortcut: '',
     customCssClasses: '',
     owoJsonUrls: '',
     rememberLastCollection: true,

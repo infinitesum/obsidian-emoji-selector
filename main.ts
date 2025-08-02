@@ -1,4 +1,4 @@
-import { Plugin, Editor, MarkdownView, Notice, Modifier } from 'obsidian';
+import { Plugin, Editor, MarkdownView, Notice } from 'obsidian';
 import { EmojiPickerModal } from './src/emoji-picker-modal';
 import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types';
 import { EmojiManager } from './src/emoji-manager';
@@ -25,14 +25,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
 
-		// Add command to open emoji picker (Requirement 5.1) - defer hotkey setup
+		// Add command to open emoji picker (Requirement 5.1)
 		this.addCommand({
 			id: 'open-picker',
 			name: i18n.t('openEmojiPicker'),
 			editorCallback: async (editor: Editor) => {
 				await this.openEmojiPicker(editor);
 			}
-			// Hotkeys will be set up after settings load
 		});
 
 		// Add ribbon icon to trigger emoji picker (Requirement 5.2)
@@ -100,9 +99,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 			this.settings = Object.assign({}, DEFAULT_SETTINGS, settingsFromData);
 			this.settingsLoaded = true;
 
-			// Set up hotkeys now that settings are loaded
-			this.setupHotkeys();
-
 			// Apply dynamic CSS now that settings are loaded
 			this.updateEmojiSizeCSS();
 		} catch (error) {
@@ -121,24 +117,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 	private async ensureSettingsLoaded(): Promise<void> {
 		if (!this.settingsLoaded && this.settingsLoadPromise) {
 			await this.settingsLoadPromise;
-		}
-	}
-
-	/**
-	 * Setup hotkeys after settings are loaded
-	 */
-	private setupHotkeys(): void {
-		// Find the existing command and update its hotkeys
-		const command = (this.app as any).commands.commands['emoji-selector:open-picker'];
-		if (command && this.settings.enableKeyboardShortcut) {
-			command.hotkeys = [
-				{
-					modifiers: this.parseHotkey(this.settings.keyboardShortcut).modifiers as Modifier[],
-					key: this.parseHotkey(this.settings.keyboardShortcut).key
-				}
-			];
-		} else if (command) {
-			command.hotkeys = [];
 		}
 	}
 
@@ -331,8 +309,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 		if (this.emojiManager) {
 			this.emojiManager.updateSettings(this.settings);
 		}
-		// Update hotkeys
-		this.setupHotkeys();
 		// Update dynamic CSS for emoji sizing
 		this.updateEmojiSizeCSS();
 	}
@@ -466,36 +442,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Parse hotkey string into modifiers and key
-	 */
-	private parseHotkey(hotkeyString: string): { modifiers: string[], key: string } {
-		const parts = hotkeyString.split('+').map(part => part.trim());
-		const key = parts.pop() || '';
-		const modifiers: string[] = [];
-
-		for (const part of parts) {
-			switch (part.toLowerCase()) {
-				case 'ctrl':
-				case 'control':
-					modifiers.push('Mod');
-					break;
-				case 'shift':
-					modifiers.push('Shift');
-					break;
-				case 'alt':
-					modifiers.push('Alt');
-					break;
-				case 'cmd':
-				case 'meta':
-					modifiers.push('Meta');
-					break;
-			}
-		}
-
-		return { modifiers, key: key.toLowerCase() };
 	}
 
 	/**
