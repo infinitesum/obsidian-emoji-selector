@@ -4,6 +4,7 @@ import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types'
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
 import { i18n } from './src/i18n';
+import { perfMonitor } from './src/performance-monitor';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
@@ -13,9 +14,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 	private cssInjected: boolean = false;
 
 	async onload() {
+		perfMonitor.start('plugin-onload');
 
-		// Start loading settings in background (non-blocking)
-		this.loadSettingsAsync();
+		// Start loading settings immediately and await it
+		// This ensures settings are ready when needed, reducing first-use latency
+		perfMonitor.start('settings-load');
+		await this.loadSettings();
+		perfMonitor.end('settings-load');
 
 		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
@@ -45,6 +50,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Inject base CSS immediately so existing emojis look good
 		// Dynamic sizing CSS will be injected later when settings are loaded
 		this.injectBaseCss();
+
+		perfMonitor.end('plugin-onload');
+		perfMonitor.logMetrics();
 	}
 
 	onunload() {
@@ -62,7 +70,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 	}
 
 	/**
-	 * Load plugin settings asynchronously (non-blocking)
+	 * Load plugin settings asynchronously (non-blocking) - kept for compatibility
 	 */
 	private loadSettingsAsync(): void {
 		if (this.settingsLoadPromise) {
@@ -123,12 +131,15 @@ export default class EmojiSelectorPlugin extends Plugin {
 	}
 
 	/**
-	 * Lazy initialization of EmojiManager
+	 * Lazy initialization of EmojiManager (optimized)
 	 */
 	private async getEmojiManager(): Promise<EmojiManager> {
 		if (!this.emojiManager) {
-			// Ensure settings are loaded first
-			await this.ensureSettingsLoaded();
+			// Settings should already be loaded from onload()
+			// But ensure they're loaded just in case
+			if (!this.settingsLoaded) {
+				await this.ensureSettingsLoaded();
+			}
 
 			// Initialize emoji manager with cache support
 			this.emojiManager = new EmojiManager(
@@ -260,7 +271,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 		`;
 
 		document.head.appendChild(style);
-		// Base emoji CSS injected
 	}
 
 	/**

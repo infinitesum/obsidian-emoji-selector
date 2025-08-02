@@ -31,11 +31,8 @@ export class EmojiManager {
         // Set the cache manager in the parser
         OwoFileParser.setCacheManager(this.cacheManager);
 
-        // Initialize cache asynchronously (non-blocking)
-        this.initializeCache();
-
-        // Start background cache warming for configured URLs
-        this.startBackgroundCacheWarming();
+        // Defer heavy initialization to first use
+        // This improves plugin startup time significantly
     }
 
     /**
@@ -99,10 +96,25 @@ export class EmojiManager {
     }
 
     /**
+     * Ensure heavy initialization is done (called on first use)
+     */
+    private async ensureInitialized(): Promise<void> {
+        if (!this.cacheInitPromise) {
+            // Initialize cache asynchronously (non-blocking)
+            this.initializeCache();
+
+            // Start background cache warming for configured URLs
+            this.startBackgroundCacheWarming();
+        }
+    }
+
+    /**
      * Load emoji collections from configured URLs
      * This method is called when the emoji picker is opened
      */
     async loadEmojiCollections(): Promise<void> {
+        // Ensure initialization is done
+        await this.ensureInitialized();
         // Prevent concurrent loading
         if (this.isLoading) {
             return;

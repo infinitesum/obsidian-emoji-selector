@@ -275,5 +275,25 @@ export class I18n {
     }
 }
 
-// Export singleton instance
-export const i18n = I18n.getInstance();
+// Export lazy-loaded singleton instance
+let _i18nInstance: I18n | null = null;
+export const i18n = {
+    t: (key: keyof I18nStrings, ...args: string[]): string => {
+        if (!_i18nInstance) {
+            _i18nInstance = I18n.getInstance();
+        }
+        return _i18nInstance.t(key, ...args);
+    },
+    setLanguage: (language: string): void => {
+        if (!_i18nInstance) {
+            _i18nInstance = I18n.getInstance();
+        }
+        _i18nInstance.setLanguage(language);
+    },
+    getCurrentLanguage: (): string => {
+        if (!_i18nInstance) {
+            _i18nInstance = I18n.getInstance();
+        }
+        return _i18nInstance.getCurrentLanguage();
+    }
+};
