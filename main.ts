@@ -85,7 +85,19 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 */
 	async loadSettings() {
 		try {
-			this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+			const data = await this.loadData();
+			
+			// Only extract settings fields, ignore user data like recentEmojis
+			const settingsFromData: any = {};
+			if (data) {
+				Object.keys(DEFAULT_SETTINGS).forEach(key => {
+					if (key in data) {
+						settingsFromData[key] = data[key];
+					}
+				});
+			}
+			
+			this.settings = Object.assign({}, DEFAULT_SETTINGS, settingsFromData);
 			this.settingsLoaded = true;
 
 			// Set up hotkeys now that settings are loaded
@@ -303,10 +315,17 @@ export default class EmojiSelectorPlugin extends Plugin {
 	async saveSettings() {
 		// Load existing data to preserve cache and other data
 		const existingData = await this.loadData();
+		
+		// Only update settings fields, preserve other data like recentEmojis, cache, etc.
 		const updatedData = {
-			...existingData,
-			...this.settings
+			...existingData
 		};
+		
+		// Explicitly update only the settings fields to avoid overwriting user data
+		Object.keys(this.settings).forEach(key => {
+			updatedData[key] = this.settings[key as keyof EmojiSelectorSettings];
+		});
+		
 		await this.saveData(updatedData);
 		// Update emoji manager with new settings
 		if (this.emojiManager) {

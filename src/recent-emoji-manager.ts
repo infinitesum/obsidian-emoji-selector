@@ -11,6 +11,7 @@ export class RecentEmojiManager {
     private saveData: (data: any) => Promise<void>;
     private loadData: () => Promise<any>;
     private isInitialized: boolean = false;
+    private saveQueue: Promise<void> = Promise.resolve();
 
     constructor(
         maxSize: number,
@@ -218,14 +219,33 @@ export class RecentEmojiManager {
     }
 
     /**
-     * Persist recent emojis data
+     * Persist recent emojis data with queuing to prevent concurrent saves
      */
     private async persist(): Promise<void> {
+        // Queue save operations to prevent concurrent writes
+        this.saveQueue = this.saveQueue.then(() => this.performSave());
+        return this.saveQueue;
+    }
+
+    /**
+     * Perform the actual save with proper error handling
+     */
+    private async performSave(): Promise<void> {
         try {
             const existingData = await this.loadData();
 
+            // Convert Map to plain object more explicitly
+            const entriesObj: Record<string, RecentEmojiEntry> = {};
+            for (const [key, value] of this.entries) {
+                entriesObj[key] = {
+                    emoji: value.emoji,
+                    lastUsed: value.lastUsed,
+                    count: value.count
+                };
+            }
+
             const recentData: RecentEmojisData = {
-                entries: Object.fromEntries(this.entries),
+                entries: entriesObj,
                 order: [...this.order]
             };
 
