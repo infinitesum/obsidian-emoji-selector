@@ -17,10 +17,7 @@
   padding-bottom: 0.5rem;
 }
 
-.emoji-picker-modal .modal-title {
-  margin: 0;
-}
-
+.emoji-picker-modal .modal-title,
 .emoji-picker-modal .modal-header {
   margin: 0;
 }
@@ -103,6 +100,8 @@
   overflow-x: auto;
   padding-bottom: var(--size-2-1);
   min-height: 2rem;
+  align-items: stretch;
+  flex-wrap: nowrap;
 }
 
 .emoji-tab {
@@ -110,13 +109,17 @@
   border-radius: var(--radius-s);
   cursor: pointer;
   font-size: var(--font-ui-small);
-  font-family: var(--font-interface);
   color: var(--text-muted);
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   transition: all 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* min-height: 2rem; */
+  line-height: 1.2;
 }
 
 .emoji-tab:hover {
@@ -144,7 +147,6 @@
   background: var(--background-primary);
   color: var(--text-normal);
   font-size: var(--font-ui-medium);
-  font-family: var(--font-interface);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -161,7 +163,6 @@
 
 /* Virtual scrolling container */
 .emoji-scroll-container {
-  /* max-height: 400px; */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -176,7 +177,6 @@
   position: relative;
   padding: var(--size-2-2);
   min-height: 100%;
-  /* Remove grid layout for virtual scrolling */
 }
 
 .emoji-item {
@@ -237,32 +237,17 @@
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   flex: 1;
-  font-family: var(--font-interface);
   line-height: var(--line-height-tight);
   word-break: break-word;
 }
 
-.emoji-no-results {
-  text-align: center;
-  color: var(--text-muted);
-  padding: var(--size-4-6);
-  font-style: italic;
-  font-size: var(--font-ui-medium);
-  font-family: var(--font-interface);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-}
-
+.emoji-no-results,
 .emoji-loading {
   text-align: center;
   color: var(--text-muted);
   padding: var(--size-4-6);
   font-style: italic;
   font-size: var(--font-ui-medium);
-  font-family: var(--font-interface);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -303,14 +288,11 @@
   }
 }
 
-.emoji-error {
+.emoji-error,
+.emoji-no-config {
   text-align: center;
-  color: var(--text-error);
   padding: var(--size-4-6);
-  border: 1px solid var(--text-error);
   border-radius: var(--radius-s);
-  background-color: var(--background-modifier-error);
-  font-family: var(--font-interface);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -319,28 +301,19 @@
   max-width: 400px;
 }
 
-.emoji-error p {
-  margin: var(--size-2-2) 0;
-  font-size: var(--font-ui-small);
-  line-height: var(--line-height-normal);
+.emoji-error {
+  color: var(--text-error);
+  border: 1px solid var(--text-error);
+  background-color: var(--background-modifier-error);
 }
 
 .emoji-no-config {
-  text-align: center;
   color: var(--text-muted);
-  padding: var(--size-4-6);
   border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
   background-color: var(--background-secondary);
-  font-family: var(--font-interface);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - var(--size-4-4));
-  max-width: 400px;
 }
 
+.emoji-error p,
 .emoji-no-config p {
   margin: var(--size-2-2) 0;
   font-size: var(--font-ui-small);
@@ -350,7 +323,6 @@
 /* Modal specific adjustments */
 .modal .emoji-search-container {
   margin-bottom: var(--size-4-2);
-  /* border-bottom: 1px solid var(--background-modifier-border); */
   padding-bottom: var(--size-2-3);
 }
 
@@ -397,11 +369,11 @@
 
 .emoji-tabs::-webkit-scrollbar-thumb:hover {
   background: var(--background-modifier-border-hover);
-} */
+}
+*/
 
 /* Emoji display styles for both edit and preview modes */
-
-/* These styles ensure consistent emoji rendering across different Obsidian views
+/* These styles ensure consistent emoji rendering across different Obsidian views */
 
 /* Base emoji styles - applied to all emoji elements */
 .emoji-image,
@@ -424,10 +396,7 @@
   border: none;
   outline: none;
   max-width: none;
-  /* Default sizing - can be overridden by settings */
   width: auto;
-  /* height: 1.2em; */
-  /* Prevent image selection and dragging */
   pointer-events: none;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
@@ -435,16 +404,11 @@
   -o-user-drag: none;
 }
 
-/* .emoji-image:hover {
-  transform: scale(1.5);
-} */
-
 /* Text emoji specific styles */
 .emoji-text {
   font-style: normal;
   font-weight: normal;
   text-decoration: none;
-  /* Ensure consistent font rendering */
   font-family: var(--font-text), "Apple Color Emoji", "Segoe UI Emoji",
     "Noto Color Emoji", sans-serif;
 }
@@ -452,27 +416,17 @@
 /* Edit mode specific styles */
 .cm-editor .emoji-image,
 .cm-editor .emoji-text {
-  /* Ensure proper alignment in CodeMirror editor */
   display: inline;
   vertical-align: text-bottom;
   position: relative;
   top: 0;
 }
 
-/* Preview mode specific styles */
+/* Preview and reading mode styles */
 .markdown-preview-view .emoji-image,
-.markdown-preview-view .emoji-text {
-  /* Ensure proper alignment in preview */
-  vertical-align: middle;
-}
-
-/* Reading mode specific styles */
+.markdown-preview-view .emoji-text,
 .markdown-reading-view .emoji-image,
-.markdown-reading-view .emoji-text {
-  vertical-align: middle;
-}
-
-/* Live preview mode styles */
+.markdown-reading-view .emoji-text,
 .markdown-source-view.mod-cm6 .emoji-image,
 .markdown-source-view.mod-cm6 .emoji-text {
   vertical-align: middle;
@@ -634,35 +588,31 @@ code .emoji-text {
 
 /* Responsive sizing and behavior for mobile */
 @media (max-width: 768px) {
-  /* .emoji-image {
-    height: 1.1em !important;
-    width: auto !important;
-  } */
-
-  /* Improve mobile modal experience */
   .emoji-picker-modal .modal-content {
     max-height: 80vh;
     max-width: 95vw;
   }
 
-  /* Larger touch targets on mobile */
   .emoji-item {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Better tab spacing on mobile */
   .emoji-tabs {
     gap: var(--size-2-2);
     padding-bottom: var(--size-2-2);
+    
   }
 
-  /* Prevent zoom on input focus */
+  .emoji-tab {
+    
+    padding: var(--size-2-3) var(--size-2-4);
+  }
+
   .emoji-search-input {
     font-size: 16px;
   }
 
-  /* Mobile-friendly header layout */
   .emoji-header-container {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -676,14 +626,12 @@ code .emoji-text {
   }
 }
 
-/* Settings tab button styles */
-.setting-item button.mod-muted {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
+
+/* Settings tab button styles */
+.setting-item button.mod-muted,
 .setting-item button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 

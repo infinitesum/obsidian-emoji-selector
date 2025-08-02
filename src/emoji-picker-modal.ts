@@ -334,7 +334,7 @@ export class EmojiPickerModal extends Modal {
         this.isLoading = true;
 
         try {
-            // Check if we have cached data first (Requirement 2.3)
+            // Check if we have cached data first
             const hasCachedData = this.plugin.emojiManager.getTotalEmojiCount() > 0;
 
             if (hasCachedData) {
@@ -343,16 +343,20 @@ export class EmojiPickerModal extends Modal {
                 this.setInitialActiveCollection();
                 this.renderTabs();
                 this.showCollectionEmojis(this.activeCollection);
-
-                // Update loading indicator to show using cached data
-                this.showCachedDataIndicator();
-
-                // Load fresh data in background
-                this.loadFreshDataInBackground();
             } else {
-                // No cached data, show loading and fetch
+                // Load fresh data
                 this.showProgressiveLoadingState();
-                await this.loadFreshEmojiData();
+                await this.plugin.emojiManager.loadEmojiCollections();
+                this.collections = this.plugin.emojiManager.getAllCollections();
+
+                if (this.collections.length === 0) {
+                    this.showNoConfigMessage();
+                    return;
+                }
+
+                this.setInitialActiveCollection();
+                this.renderTabs();
+                this.showCollectionEmojis(this.activeCollection);
             }
 
         } catch (error) {
@@ -672,17 +676,11 @@ export class EmojiPickerModal extends Modal {
      * Switch to a specific collection
      */
     private switchToCollection(collectionName: string): void {
-        if (this.activeCollection === collectionName) return; // Avoid unnecessary work
+        if (this.activeCollection === collectionName) return;
 
         this.activeCollection = collectionName;
-
-        // Remember the selection
         this.rememberCollectionSelection(collectionName);
-
-        // Update tab active state efficiently
         this.updateTabActiveState(collectionName);
-
-        // Clear search when switching tabs
         this.searchInput.value = '';
 
         // Show emojis for this collection
@@ -850,6 +848,7 @@ export class EmojiPickerModal extends Modal {
         this.multiSelectToggle.checked = this.isMultiSelectMode;
         this.updateMultiSelectUI();
     }
+
 
 
 }

@@ -28,6 +28,16 @@ export class EmojiStorage {
     }
 
     /**
+     * Add multiple collections at once (more efficient)
+     */
+    addCollections(collections: EmojiCollection[]): void {
+        for (const collection of collections) {
+            this.collections.set(collection.name, collection);
+        }
+        this.rebuildIndexes(); // Only rebuild once
+    }
+
+    /**
      * Remove a collection from storage
      */
     removeCollection(name: string): void {

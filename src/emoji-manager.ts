@@ -123,10 +123,8 @@ export class EmojiManager {
             // Load collections from URLs with proper error handling
             const collections = await OwoFileParser.loadFromUrls(urls);
 
-            // Add collections to storage
-            for (const collection of collections) {
-                this.storage.addCollection(collection);
-            }
+            // Add collections to storage (batch operation)
+            this.storage.addCollections(collections);
 
             this.lastLoadTime = now;
             // Collections loaded successfully
@@ -240,10 +238,8 @@ export class EmojiManager {
             // Load collections from URLs with force refresh
             const collections = await OwoFileParser.loadFromUrls(urls, true);
 
-            // Add collections to storage
-            for (const collection of collections) {
-                this.storage.addCollection(collection);
-            }
+            // Add collections to storage (batch operation)
+            this.storage.addCollections(collections);
 
             this.lastLoadTime = Date.now();
             // Collections force reloaded successfully
@@ -375,5 +371,25 @@ export class EmojiManager {
      */
     searchEmojisNatural(query: string): EmojiItem[] {
         return this.storage.searchEmojisNatural(query);
+    }
+
+    /**
+     * Load single collection by URL
+     */
+    async loadSingleCollection(url: string): Promise<EmojiCollection[]> {
+        try {
+            await this.ensureCacheInitialized();
+        } catch (error) {
+            console.warn('Cache initialization failed:', error);
+        }
+
+        return await OwoFileParser.loadFromUrl(url);
+    }
+
+    /**
+     * Get URLs from settings
+     */
+    getConfiguredUrls(): string[] {
+        return this.parseUrls(this.settings.owoJsonUrls);
     }
 }
