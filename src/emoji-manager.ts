@@ -31,12 +31,13 @@ export class EmojiManager {
         // Set the cache manager in the parser
         OwoFileParser.setCacheManager(this.cacheManager);
 
-        // Defer heavy initialization to first use
+        // Defer ALL heavy initialization to first use
         // This improves plugin startup time significantly
+        // Cache initialization is now completely deferred
     }
 
     /**
-     * Initialize the cache manager (non-blocking)
+     * Initialize the cache manager (completely deferred until first actual use)
      */
     private initializeCache(): void {
         if (this.cacheInitialized || this.cacheInitPromise) {
@@ -45,9 +46,10 @@ export class EmojiManager {
 
         this.cacheInitPromise = (async () => {
             try {
+                // This is now the first time we actually read emoji cache data
                 await this.cacheManager.initialize();
                 this.cacheInitialized = true;
-                // Cache initialization completed
+                // Cache initialization completed (deferred)
             } catch (error) {
                 console.error('Failed to initialize emoji cache:', error);
                 this.cacheInitialized = true; // Mark as initialized even on error for graceful degradation
@@ -94,11 +96,11 @@ export class EmojiManager {
     }
 
     /**
-     * Ensure heavy initialization is done (called on first use)
+     * Ensure heavy initialization is done (called only when emoji picker is opened)
      */
     private async ensureInitialized(): Promise<void> {
         if (!this.cacheInitPromise) {
-            // Initialize cache asynchronously (non-blocking)
+            // Initialize cache asynchronously - this is when we first read emoji cache data
             this.initializeCache();
 
             // Start background cache warming for configured URLs
