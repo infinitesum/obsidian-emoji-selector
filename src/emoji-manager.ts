@@ -18,10 +18,10 @@ export class EmojiManager {
     private cacheInitPromise: Promise<void> | null = null;
     private recentManager: RecentEmojiManager;
 
-    constructor(settings: EmojiSelectorSettings, saveData: (data: any) => Promise<void>, loadData: () => Promise<any>) {
+    constructor(settings: EmojiSelectorSettings, app: any, saveData: (data: any) => Promise<void>, loadData: () => Promise<any>) {
         this.storage = new EmojiStorage();
         this.settings = settings;
-        this.cacheManager = new EmojiCacheManager(saveData, loadData);
+        this.cacheManager = new EmojiCacheManager(app);
         this.recentManager = new RecentEmojiManager(
             settings.maxRecentEmojis,
             saveData,

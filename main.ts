@@ -16,13 +16,8 @@ export default class EmojiSelectorPlugin extends Plugin {
 	async onload() {
 		perfMonitor.start('plugin-onload');
 
-		// Use default settings on startup to avoid reading large data.json file
-		// All settings will be loaded lazily when first needed
-		this.settings = { ...DEFAULT_SETTINGS };
-		this.settingsLoaded = false;
-
-		// Apply default CSS immediately for existing emojis
-		this.updateEmojiSizeCSS();
+		// Load only settings on startup (now that cache is separated, data.json is small)
+		await this.loadSettings();
 
 		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
@@ -140,6 +135,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 			// Use specialized data access functions that only load what's needed
 			this.emojiManager = new EmojiManager(
 				this.settings,
+				this.app,
 				(data: any) => this.saveEmojiData(data),
 				() => this.loadEmojiData()
 			);

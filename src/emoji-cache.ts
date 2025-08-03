@@ -1,20 +1,20 @@
 import { EmojiJsonCache } from './types';
 
 /**
- * Manages persistent caching of emoji JSON files
+ * Manages persistent caching of emoji JSON files using separate cache file
  */
 export class EmojiCacheManager {
     private cache: EmojiJsonCache = {};
-    private saveData: (data: any) => Promise<void>;
-    private loadData: () => Promise<any>;
+    private app: any; // Obsidian App instance
+    private cacheFilePath: string;
     private initializationPromise: Promise<void> | null = null;
     private isInitialized: boolean = false;
     private backgroundWarmingPromise: Promise<void> | null = null;
     private saveQueue: Promise<void> = Promise.resolve();
 
-    constructor(saveData: (data: any) => Promise<void>, loadData: () => Promise<any>) {
-        this.saveData = saveData;
-        this.loadData = loadData;
+    constructor(app: any) {
+        this.app = app;
+        this.cacheFilePath = '.obsidian/plugins/emoji-selector/cache.json';
     }
 
     /**
@@ -34,13 +34,15 @@ export class EmojiCacheManager {
      */
     private async performInitialization(): Promise<void> {
         try {
-            const data = await this.loadData();
-            if (data && data.emojiJsonCache && typeof data.emojiJsonCache === 'object') {
-                this.cache = data.emojiJsonCache;
-                // Cache initialized with existing data
+            // Try to read from separate cache file first
+            const cacheExists = await this.app.vault.adapter.exists(this.cacheFilePath);
+            if (cacheExists) {
+                const cacheContent = await this.app.vault.adapter.read(this.cacheFilePath);
+                this.cache = JSON.parse(cacheContent);
+                // Cache initialized from separate file
             } else {
-                this.cache = {};
-                // Cache initialized as empty
+                // Migration: check if cache exists in old data.json format
+                await this.migrateCacheFromDataJson();
             }
             this.isInitialized = true;
         } catch (error) {
@@ -48,6 +50,33 @@ export class EmojiCacheManager {
             this.cache = {};
             this.isInitialized = true;
             // Don't throw error - graceful degradation
+        }
+    }
+
+    /**
+     * Migrate cache from old data.json format to separate cache file
+     */
+    private async migrateCacheFromDataJson(): Promise<void> {
+        try {
+            // This is a one-time migration for existing users
+            const dataPath = '.obsidian/plugins/emoji-selector/data.json';
+            const dataExists = await this.app.vault.adapter.exists(dataPath);
+            if (dataExists) {
+                const dataContent = await this.app.vault.adapter.read(dataPath);
+                const data = JSON.parse(dataContent);
+                if (data && data.emojiJsonCache && typeof data.emojiJsonCache === 'object') {
+                    this.cache = data.emojiJsonCache;
+                    // Save to new cache file
+                    await this.saveCacheToFile();
+                    // Remove cache from data.json to keep it small
+                    delete data.emojiJsonCache;
+                    await this.app.vault.adapter.write(dataPath, JSON.stringify(data, null, 2));
+                    console.log('Migrated emoji cache to separate file');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to migrate cache from data.json:', error);
+            this.cache = {};
         }
     }
 
@@ -68,27 +97,31 @@ export class EmojiCacheManager {
     }
 
     /**
-     * Save cache to persistent storage with queuing to prevent concurrent saves
+     * Save cache to separate file with queuing to prevent concurrent saves
      */
     async saveCache(): Promise<void> {
         // Queue save operations to prevent concurrent writes
-        this.saveQueue = this.saveQueue.then(() => this.performSave());
+        this.saveQueue = this.saveQueue.then(() => this.saveCacheToFile());
         return this.saveQueue;
     }
 
     /**
-     * Perform the actual cache save with proper error handling
+     * Save cache to separate file
      */
-    private async performSave(): Promise<void> {
+    private async saveCacheToFile(): Promise<void> {
         try {
-            const data = await this.loadData();
-            const updatedData = {
-                ...data,
-                emojiJsonCache: this.cache
-            };
-            await this.saveData(updatedData);
+            // Ensure the plugin directory exists
+            const pluginDir = '.obsidian/plugins/emoji-selector';
+            const dirExists = await this.app.vault.adapter.exists(pluginDir);
+            if (!dirExists) {
+                await this.app.vault.adapter.mkdir(pluginDir);
+            }
+
+            // Save cache to separate file
+            const cacheContent = JSON.stringify(this.cache, null, 2);
+            await this.app.vault.adapter.write(this.cacheFilePath, cacheContent);
         } catch (error) {
-            console.error('Failed to save emoji cache:', error);
+            console.error('Failed to save emoji cache to separate file:', error);
             // Don't throw error - graceful degradation
         }
     }
