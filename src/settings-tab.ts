@@ -199,7 +199,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setName(i18n.t('customEmojiTemplate'))
             .setDesc(i18n.t('customEmojiTemplateDesc'))
             .addTextArea(text => text
-                .setPlaceholder('<img src="{url}" alt="{text}" atk-emoticon="{name}" class="{classes}">')
+                .setPlaceholder('<img src="{url}" alt="{text}" title="{text}" class="{classes}">')
                 .setValue(this.plugin.settings.customEmojiTemplate)
                 .onChange(async (value) => {
                     this.plugin.settings.customEmojiTemplate = value;
