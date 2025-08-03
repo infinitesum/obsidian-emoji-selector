@@ -294,10 +294,20 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Load existing data to preserve cache and other data
 		const existingData = await this.loadData();
 		
+		// Check if URLs changed to clear cache
+		const oldUrls = existingData?.owoJsonUrls;
+		const newUrls = this.settings.owoJsonUrls;
+		const urlsChanged = oldUrls !== newUrls;
+		
 		// Only update settings fields, preserve other data like recentEmojis, cache, etc.
 		const updatedData = {
 			...existingData
 		};
+		
+		// If URLs changed, clear the emoji JSON cache from persistent storage
+		if (urlsChanged && updatedData.emojiJsonCache) {
+			delete updatedData.emojiJsonCache;
+		}
 		
 		// Explicitly update only the settings fields to avoid overwriting user data
 		Object.keys(this.settings).forEach(key => {

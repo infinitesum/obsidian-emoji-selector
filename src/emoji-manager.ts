@@ -70,7 +70,7 @@ export class EmojiManager {
     }
 
     /**
-     * Update settings and clean up cache if URLs changed
+     * Update settings and clear cache if URLs changed
      */
     updateSettings(settings: EmojiSelectorSettings): void {
         const oldUrls = this.settings.owoJsonUrls;
@@ -84,14 +84,12 @@ export class EmojiManager {
             });
         }
 
-        // Clean up cache if URLs changed
+        // If URLs changed, clear all cache and reload
         if (oldUrls !== settings.owoJsonUrls) {
-            this.cleanupCache().catch(error => {
-                console.error('Failed to cleanup emoji cache:', error);
+            // Clear all cache and force reload
+            this.clearCacheAndReload().catch((error: any) => {
+                console.error('Failed to clear cache and reload:', error);
             });
-
-            // Start background warming for new URLs
-            this.startBackgroundCacheWarming();
         }
     }
 
@@ -289,6 +287,34 @@ export class EmojiManager {
      */
     getCachedUrls(): string[] {
         return this.cacheManager ? this.cacheManager.getCachedUrls() : [];
+    }
+
+    /**
+     * Clear all cache and reload collections (used when URLs change)
+     */
+    async clearCacheAndReload(): Promise<void> {
+        try {
+            // Ensure cache is initialized
+            await this.ensureCacheInitialized();
+
+            // Clear all cache
+            if (this.cacheManager) {
+                await this.cacheManager.clearAll();
+            }
+
+            // Clear memory storage
+            this.storage.clear();
+
+            // Reset load time to force reload
+            this.lastLoadTime = 0;
+
+            // Start background warming for new URLs
+            this.startBackgroundCacheWarming();
+
+        } catch (error) {
+            console.error('Failed to clear cache and reload:', error);
+            // Don't throw error - allow graceful degradation
+        }
     }
 
     /**
