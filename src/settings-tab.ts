@@ -22,6 +22,21 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        // Ensure all settings are loaded when opening settings tab
+        this.plugin.loadSettings().then(() => {
+            // Re-render the settings after loading
+            this.renderSettings();
+        });
+
+        // Show loading message initially
+        containerEl.createEl('div', { text: 'Loading settings...' });
+    }
+
+    private renderSettings(): void {
+        const { containerEl } = this;
+
+        containerEl.empty();
+
         // Plugin title
         containerEl.createEl('h2', { text: i18n.t('settingsTitle') });
 
@@ -84,8 +99,6 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         this.updateButton = updateButton;
         this.hasUnsavedChanges = hasUnsavedChanges;
 
-
-
         // Remember last collection setting
         new Setting(containerEl)
             .setName(i18n.t('rememberLastCollection'))
@@ -98,6 +111,22 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                     if (!value) {
                         this.plugin.settings.lastSelectedCollection = 'all';
                     }
+                    await this.plugin.saveSettings();
+                }));
+
+        // Performance settings section
+        containerEl.createEl('h3', { text: 'Performance' });
+
+        // Initial load count setting
+        new Setting(containerEl)
+            .setName('Initial load count')
+            .setDesc('Number of emoji URLs to load immediately on startup. Remaining URLs will load in background. Lower values improve startup speed.')
+            .addSlider(slider => slider
+                .setLimits(1, 10, 1)
+                .setValue(this.plugin.settings.initialLoadCount)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.initialLoadCount = value;
                     await this.plugin.saveSettings();
                 }));
 

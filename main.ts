@@ -17,9 +17,12 @@ export default class EmojiSelectorPlugin extends Plugin {
 		perfMonitor.start('plugin-onload');
 
 		// Use default settings on startup to avoid reading large data.json file
-		// Settings will be loaded lazily when first needed
+		// All settings will be loaded lazily when first needed
 		this.settings = { ...DEFAULT_SETTINGS };
 		this.settingsLoaded = false;
+
+		// Apply default CSS immediately for existing emojis
+		this.updateEmojiSizeCSS();
 
 		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
@@ -78,8 +81,10 @@ export default class EmojiSelectorPlugin extends Plugin {
 		this.settingsLoadPromise = this.loadSettings();
 	}
 
+
+
 	/**
-	 * Load plugin settings (completely deferred to avoid reading large data.json on startup)
+	 * Load all plugin settings (deferred until needed)
 	 */
 	async loadSettings() {
 		if (this.settingsLoaded) {
@@ -89,7 +94,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 		try {
 			const data = await this.loadData();
 
-			// Only extract settings fields, ignore user data like recentEmojis and emojiJsonCache
+			// Extract all settings fields, ignore user data like recentEmojis and emojiJsonCache
 			const settingsFromData: any = {};
 			if (data) {
 				Object.keys(DEFAULT_SETTINGS).forEach(key => {
@@ -102,7 +107,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 			this.settings = Object.assign({}, DEFAULT_SETTINGS, settingsFromData);
 			this.settingsLoaded = true;
 
-			// Apply dynamic CSS now that settings are loaded
+			// Apply dynamic CSS now that all settings are loaded
 			this.updateEmojiSizeCSS();
 		} catch (error) {
 			console.error('Failed to load emoji selector settings:', error);
