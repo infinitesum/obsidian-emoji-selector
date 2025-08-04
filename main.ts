@@ -4,7 +4,6 @@ import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types'
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
 import { i18n } from './src/i18n';
-import { perfMonitor } from './src/performance-monitor';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
@@ -14,8 +13,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 	private cssInjected: boolean = false;
 
 	async onload() {
-		perfMonitor.start('plugin-onload');
-
 		// Load only settings on startup (now that cache is separated, data.json is small)
 		await this.loadSettings();
 
@@ -46,9 +43,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Inject base CSS immediately so existing emojis look good
 		// Dynamic sizing CSS will be injected later when settings are loaded
 		this.injectBaseCss();
-
-		perfMonitor.end('plugin-onload');
-		perfMonitor.logMetrics();
 	}
 
 	onunload() {

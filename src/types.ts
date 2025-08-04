@@ -106,8 +106,6 @@ export interface EmojiSelectorSettings {
     enableRecentEmojis: boolean;
     /** Prefer recent emojis over remembered collection when opening picker */
     preferRecentOverRemembered: boolean;
-    /** Number of URLs to load immediately on startup (rest load in background) */
-    initialLoadCount: number;
 }
 
 /**
@@ -125,6 +123,5 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     customEmojiTemplate: '',
     maxRecentEmojis: 20,
     enableRecentEmojis: true,
-    preferRecentOverRemembered: true,
-    initialLoadCount: 3
+    preferRecentOverRemembered: true
 };
