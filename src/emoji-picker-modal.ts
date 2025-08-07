@@ -85,6 +85,13 @@ export class EmojiPickerModal extends Modal {
             cls: 'emoji-search-input'
         });
 
+        // Add advanced search tip
+        const searchTip = searchContainer.createDiv('emoji-search-tip');
+        searchTip.textContent = i18n.t('advancedSearchTip');
+        searchTip.style.fontSize = '0.8em';
+        searchTip.style.color = 'var(--text-faint)';
+        searchTip.style.marginTop = '4px';
+
         // Create tabs container
         this.tabsContainer = contentEl.createDiv('emoji-tabs');
 
@@ -577,7 +584,7 @@ export class EmojiPickerModal extends Modal {
     }
 
     /**
-     * Handle search input changes
+     * Handle search input changes with advanced search support
      */
     private async handleSearchInput(query: string): Promise<void> {
         const trimmedQuery = query.trim();
@@ -586,8 +593,8 @@ export class EmojiPickerModal extends Modal {
             // If search is empty, show emojis based on active collection
             await this.showCollectionEmojis(this.activeCollection);
         } else {
-            // Use emoji manager for search
-            const searchResults = this.plugin.emojiManager.searchEmojis(trimmedQuery);
+            // Use advanced search that supports regex, fuzzy matching, and collection filtering
+            const searchResults = this.plugin.emojiManager.advancedSearchWithCollections(trimmedQuery);
 
             // Only update if search results changed
             if (!this.areEmojiArraysEqual(this.filteredEmojis, searchResults)) {

@@ -155,6 +155,327 @@ export class EmojiStorage {
     }
 
     /**
+     * Advanced search with regex, fuzzy matching, and collection name filtering
+     * Supports patterns like "活字乱刷.*a" to search collection "活字乱刷" for emojis containing "a"
+     * Also supports pure regex patterns and fuzzy matching
+     */
+    advancedSearchWithCollections(query: string, enableRegex: boolean = true, enableFuzzy: boolean = true): EmojiItem[] {
+        if (!query.trim()) {
+            return this.getAllEmojis();
+        }
+
+        const trimmedQuery = query.trim();
+
+        // Try to parse collection-specific search pattern: "collectionName.*searchTerm"
+        const collectionSearchMatch = trimmedQuery.match(/^(.+?)\.\*(.*)$/);
+
+        if (collectionSearchMatch) {
+            const [, collectionPattern, searchPattern] = collectionSearchMatch;
+            return this.searchInCollections(collectionPattern, searchPattern, enableRegex, enableFuzzy);
+        }
+
+        // Check if query looks like a regex pattern and regex is enabled
+        if (enableRegex && this.isRegexPattern(trimmedQuery)) {
+            return this.regexSearch(trimmedQuery, enableFuzzy);
+        }
+
+        // Default to fuzzy search with collection name matching (if enabled)
+        if (enableFuzzy) {
+            return this.fuzzySearchWithCollections(trimmedQuery);
+        } else {
+            // Fall back to basic search if fuzzy is disabled
+            return this.searchEmojis(trimmedQuery);
+        }
+    }
+
+    /**
+     * Search within specific collections matching a pattern
+     */
+    private searchInCollections(collectionPattern: string, searchPattern: string, enableRegex: boolean = true, enableFuzzy: boolean = true): EmojiItem[] {
+        const results: EmojiItem[] = [];
+        const collectionRegex = this.createFuzzyRegex(collectionPattern);
+
+        for (const [collectionName, collection] of this.collections.entries()) {
+            // Check if collection name matches the pattern
+            if (collectionRegex.test(collectionName)) {
+                // Search within this collection
+                const collectionResults = this.searchInSpecificCollection(collection, searchPattern, enableRegex, enableFuzzy);
+                results.push(...collectionResults);
+            }
+        }
+
+        return this.removeDuplicates(results);
+    }
+
+    /**
+     * Search within a specific collection
+     */
+    private searchInSpecificCollection(collection: EmojiCollection, searchPattern: string, enableRegex: boolean = true, enableFuzzy: boolean = true): EmojiItem[] {
+        if (!searchPattern.trim()) {
+            return collection.items;
+        }
+
+        const results: EmojiItem[] = [];
+
+        for (const emoji of collection.items) {
+            if (this.matchesAdvancedPattern(emoji, searchPattern, enableRegex, enableFuzzy)) {
+                results.push(emoji);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Regex-based search across all emojis
+     */
+    private regexSearch(pattern: string, enableFuzzy: boolean = true): EmojiItem[] {
+        try {
+            const regex = new RegExp(pattern, 'i'); // Case insensitive
+            const results: EmojiItem[] = [];
+
+            for (const emoji of this.emojiIndex.values()) {
+                if (this.matchesRegex(emoji, regex)) {
+                    results.push(emoji);
+                }
+            }
+
+            return results;
+        } catch (error) {
+            // If regex is invalid, fall back to fuzzy search or basic search
+            console.warn('Invalid regex pattern, falling back to alternative search:', error);
+            if (enableFuzzy) {
+                return this.fuzzySearchWithCollections(pattern);
+            } else {
+                return this.searchEmojis(pattern);
+            }
+        }
+    }
+
+    /**
+     * Fuzzy search that includes collection names in the search
+     */
+    private fuzzySearchWithCollections(query: string): EmojiItem[] {
+        const results: EmojiItem[] = [];
+        const queryLower = query.toLowerCase();
+
+        // First, try exact and substring matches (fast path)
+        const exactResults = this.searchEmojis(query);
+        results.push(...exactResults);
+
+        // Then, search by collection names
+        const collectionResults = this.searchByCollectionName(queryLower);
+        results.push(...collectionResults);
+
+        // Finally, fuzzy matching for remaining cases
+        const fuzzyResults = this.performFuzzySearch(queryLower);
+        results.push(...fuzzyResults);
+
+        return this.removeDuplicates(results);
+    }
+
+    /**
+     * Search emojis by collection name
+     */
+    private searchByCollectionName(query: string): EmojiItem[] {
+        const results: EmojiItem[] = [];
+
+        for (const [collectionName, collection] of this.collections.entries()) {
+            if (collectionName.toLowerCase().includes(query)) {
+                // If collection name matches, include all its emojis
+                results.push(...collection.items);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Perform fuzzy search using Levenshtein distance and other fuzzy matching techniques
+     */
+    private performFuzzySearch(query: string): EmojiItem[] {
+        const results: EmojiItem[] = [];
+        const maxDistance = Math.max(1, Math.floor(query.length * 0.3)); // Allow 30% character differences
+
+        for (const emoji of this.emojiIndex.values()) {
+            if (this.isFuzzyMatch(emoji, query, maxDistance)) {
+                results.push(emoji);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Check if a query looks like a regex pattern
+     */
+    private isRegexPattern(query: string): boolean {
+        // Check for common regex metacharacters
+        const regexChars = /[.*+?^${}()|[\]\\]/;
+        return regexChars.test(query);
+    }
+
+    /**
+     * Create a fuzzy regex from a pattern (converts wildcards and handles fuzzy matching)
+     */
+    private createFuzzyRegex(pattern: string): RegExp {
+        // Escape special regex characters except * and ?
+        let regexPattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+
+        // Convert wildcards
+        regexPattern = regexPattern.replace(/\*/g, '.*').replace(/\?/g, '.');
+
+        // Make it case insensitive and allow partial matches
+        return new RegExp(regexPattern, 'i');
+    }
+
+    /**
+     * Check if emoji matches advanced pattern
+     */
+    private matchesAdvancedPattern(emoji: EmojiItem, pattern: string, enableRegex: boolean = true, enableFuzzy: boolean = true): boolean {
+        // Try regex matching first if enabled
+        if (enableRegex) {
+            try {
+                const regex = this.createFuzzyRegex(pattern);
+                if (regex.test(emoji.key) || regex.test(emoji.text) || regex.test(emoji.category)) {
+                    return true;
+                }
+            } catch (error) {
+                // Ignore regex errors and continue with other matching methods
+            }
+        }
+
+        // Try basic substring matching
+        const lowerPattern = pattern.toLowerCase();
+        if (emoji.key.toLowerCase().includes(lowerPattern) ||
+            emoji.text.toLowerCase().includes(lowerPattern) ||
+            emoji.category.toLowerCase().includes(lowerPattern)) {
+            return true;
+        }
+
+        // Try fuzzy matching if enabled
+        if (enableFuzzy) {
+            return this.isFuzzyMatch(emoji, pattern, Math.max(1, Math.floor(pattern.length * 0.3)));
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if emoji matches regex pattern
+     */
+    private matchesRegex(emoji: EmojiItem, regex: RegExp): boolean {
+        return regex.test(emoji.key) ||
+            regex.test(emoji.text) ||
+            regex.test(emoji.category);
+    }
+
+    /**
+     * Check if emoji is a fuzzy match using multiple techniques
+     */
+    private isFuzzyMatch(emoji: EmojiItem, query: string, maxDistance: number): boolean {
+        const targets = [emoji.key.toLowerCase(), emoji.text.toLowerCase(), emoji.category.toLowerCase()];
+
+        for (const target of targets) {
+            // Levenshtein distance check
+            if (this.levenshteinDistance(target, query) <= maxDistance) {
+                return true;
+            }
+
+            // Subsequence matching (characters appear in order but not necessarily consecutive)
+            if (this.isSubsequence(query, target)) {
+                return true;
+            }
+
+            // Soundex matching for phonetic similarity (simplified)
+            if (this.soundexMatch(query, target)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Calculate Levenshtein distance between two strings
+     */
+    private levenshteinDistance(str1: string, str2: string): number {
+        const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+
+        for (let i = 0; i <= str1.length; i++) {
+            matrix[0][i] = i;
+        }
+
+        for (let j = 0; j <= str2.length; j++) {
+            matrix[j][0] = j;
+        }
+
+        for (let j = 1; j <= str2.length; j++) {
+            for (let i = 1; i <= str1.length; i++) {
+                const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                matrix[j][i] = Math.min(
+                    matrix[j][i - 1] + 1, // deletion
+                    matrix[j - 1][i] + 1, // insertion
+                    matrix[j - 1][i - 1] + indicator // substitution
+                );
+            }
+        }
+
+        return matrix[str2.length][str1.length];
+    }
+
+    /**
+     * Check if query is a subsequence of target (characters appear in order)
+     */
+    private isSubsequence(query: string, target: string): boolean {
+        let queryIndex = 0;
+
+        for (let i = 0; i < target.length && queryIndex < query.length; i++) {
+            if (target[i] === query[queryIndex]) {
+                queryIndex++;
+            }
+        }
+
+        return queryIndex === query.length;
+    }
+
+    /**
+     * Simple soundex-like matching for phonetic similarity
+     */
+    private soundexMatch(query: string, target: string): boolean {
+        if (query.length < 3 || target.length < 3) {
+            return false;
+        }
+
+        // Simple phonetic matching: same first letter and similar consonant patterns
+        if (query[0] !== target[0]) {
+            return false;
+        }
+
+        const queryConsonants = query.replace(/[aeiou]/g, '');
+        const targetConsonants = target.replace(/[aeiou]/g, '');
+
+        return this.levenshteinDistance(queryConsonants, targetConsonants) <= 1;
+    }
+
+    /**
+     * Remove duplicate emojis from results array
+     */
+    private removeDuplicates(emojis: EmojiItem[]): EmojiItem[] {
+        const seen = new Set<string>();
+        const unique: EmojiItem[] = [];
+
+        for (const emoji of emojis) {
+            if (!seen.has(emoji.key)) {
+                seen.add(emoji.key);
+                unique.push(emoji);
+            }
+        }
+
+        return unique;
+    }
+
+    /**
      * Get all available categories
      */
     getAllCategories(): string[] {

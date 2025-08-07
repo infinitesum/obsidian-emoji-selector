@@ -173,6 +173,18 @@ export class EmojiManager {
     }
 
     /**
+     * Advanced search with regex, fuzzy matching, and collection name filtering
+     * Supports patterns like "活字乱刷.*a" to search collection "活字乱刷" for emojis containing "a"
+     */
+    advancedSearchWithCollections(query: string): EmojiItem[] {
+        return this.storage.advancedSearchWithCollections(
+            query,
+            this.settings.enableRegexSearch,
+            this.settings.enableFuzzySearch
+        );
+    }
+
+    /**
      * Advanced search with category filtering
      */
     advancedSearchEmojis(query: string, category?: string): EmojiItem[] {

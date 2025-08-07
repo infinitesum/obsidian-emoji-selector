@@ -130,6 +130,31 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 }));
 
+        // Advanced search settings section
+        containerEl.createEl('h3', { text: i18n.t('advancedSearch') });
+
+        // Enable regex search setting
+        new Setting(containerEl)
+            .setName(i18n.t('enableRegexSearch'))
+            .setDesc(i18n.t('enableRegexSearchDesc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableRegexSearch)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableRegexSearch = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        // Enable fuzzy search setting
+        new Setting(containerEl)
+            .setName(i18n.t('enableFuzzySearch'))
+            .setDesc(i18n.t('enableFuzzySearchDesc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableFuzzySearch)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableFuzzySearch = value;
+                    await this.plugin.saveSettings();
+                }));
+
         // Recent emojis settings section
         containerEl.createEl('h3', { text: i18n.t('recentEmojis') });
 

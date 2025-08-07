@@ -28,9 +28,9 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
         const line = editor.getLine(cursor.line);
         const beforeCursor = line.substring(0, cursor.ch);
 
-        // Look for pattern like ":cry" or ":smile"
-        // Match : followed by at least one alphanumeric character or underscore
-        const match = beforeCursor.match(/:([a-zA-Z0-9_]+)$/);
+        // Look for pattern like ":cry" or ":smile" or ":.*heart.*"
+        // Match : followed by at least one character (support regex and special chars)
+        const match = beforeCursor.match(/:([^\s:]+)$/);
 
         if (!match) {
             return null;
@@ -47,7 +47,7 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
     }
 
     /**
-     * Generate emoji suggestions based on the query
+     * Generate emoji suggestions based on the query with advanced search support
      */
     async getSuggestions(context: EditorSuggestContext): Promise<EmojiItem[]> {
         const { query } = context;
@@ -55,8 +55,8 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
         // Ensure emoji manager is initialized
         const emojiManager = await this.plugin.getEmojiManagerForSettings();
 
-        // Search for emojis matching the query
-        const results = emojiManager.searchEmojis(query);
+        // Use advanced search for better results (supports regex, fuzzy matching, collection filtering)
+        const results = emojiManager.advancedSearchWithCollections(query);
 
         // Limit results and prioritize exact matches
         return results

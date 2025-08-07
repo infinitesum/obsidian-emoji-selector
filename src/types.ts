@@ -108,6 +108,10 @@ export interface EmojiSelectorSettings {
     preferRecentOverRemembered: boolean;
     /** Enable quick emoji insertion with :emoji_name syntax */
     enableQuickInsertion: boolean;
+    /** Enable regex search support */
+    enableRegexSearch: boolean;
+    /** Enable fuzzy search support */
+    enableFuzzySearch: boolean;
 }
 
 /**
@@ -126,5 +130,7 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     maxRecentEmojis: 20,
     enableRecentEmojis: true,
     preferRecentOverRemembered: true,
-    enableQuickInsertion: true
+    enableQuickInsertion: true,
+    enableRegexSearch: true,
+    enableFuzzySearch: true
 };
