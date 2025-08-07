@@ -55,6 +55,17 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
         // Ensure emoji manager is initialized
         const emojiManager = await this.plugin.getEmojiManagerForSettings();
 
+        // Ensure emoji collections are loaded before searching
+        // This is critical for quick insertion to work immediately after plugin load
+        if (emojiManager.getTotalEmojiCount() === 0) {
+            try {
+                await emojiManager.loadEmojiCollections();
+            } catch (error) {
+                console.warn('Failed to load emoji collections for quick insertion:', error);
+                return []; // Return empty array if loading fails
+            }
+        }
+
         // Use advanced search for better results (supports regex, fuzzy matching, collection filtering)
         const results = emojiManager.advancedSearchWithCollections(query);
 

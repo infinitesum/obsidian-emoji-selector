@@ -85,13 +85,6 @@ export class EmojiPickerModal extends Modal {
             cls: 'emoji-search-input'
         });
 
-        // Add advanced search tip
-        const searchTip = searchContainer.createDiv('emoji-search-tip');
-        searchTip.textContent = i18n.t('advancedSearchTip');
-        searchTip.style.fontSize = '0.8em';
-        searchTip.style.color = 'var(--text-faint)';
-        searchTip.style.marginTop = '4px';
-
         // Create tabs container
         this.tabsContainer = contentEl.createDiv('emoji-tabs');
 
