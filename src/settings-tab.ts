@@ -73,6 +73,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setName(i18n.t('owoJsonUrls'))
             .setDesc(this.getCollectionStatusDescription());
 
+        // Add CSS class for multi-line layout
+        owoUrlsSetting.settingEl.addClass('emoji-setting-multiline');
+
         let urlTextArea: HTMLTextAreaElement;
         let updateButton: HTMLButtonElement;
         let hasUnsavedChanges = false;
@@ -253,16 +256,20 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 }));
 
         // Custom emoji template setting
-        new Setting(containerEl)
+        const customTemplateSetting = new Setting(containerEl)
             .setName(i18n.t('customEmojiTemplate'))
-            .setDesc(i18n.t('customEmojiTemplateDesc'))
-            .addTextArea(text => text
-                .setPlaceholder('<img src="{url}" alt="{text}" title="{text}" class="{classes}">')
-                .setValue(this.plugin.settings.customEmojiTemplate)
-                .onChange(async (value) => {
-                    this.plugin.settings.customEmojiTemplate = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(i18n.t('customEmojiTemplateDesc'));
+
+        // Add CSS class for multi-line layout
+        customTemplateSetting.settingEl.addClass('emoji-setting-multiline');
+
+        customTemplateSetting.addTextArea(text => text
+            .setPlaceholder('<img src="{url}" alt="{text}" title="{text}" class="{classes}">')
+            .setValue(this.plugin.settings.customEmojiTemplate)
+            .onChange(async (value) => {
+                this.plugin.settings.customEmojiTemplate = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Initialize button state
         this.updateButtonState();

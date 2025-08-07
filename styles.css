@@ -266,3 +266,26 @@
   color: var(--interactive-accent-hover);
   text-decoration: underline;
 }
+
+/* Settings layout improvements */
+.setting-item-control textarea {
+  width: 100%;
+  min-height: 80px;
+  margin-top: 0.5rem;
+}
+
+/* Specific styling for multi-line input settings */
+.emoji-setting-multiline .setting-item-info {
+  margin-bottom: 0.5rem;
+}
+
+.emoji-setting-multiline .setting-item-control {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.emoji-setting-multiline .setting-item-control textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+}
