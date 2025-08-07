@@ -86,7 +86,7 @@ const EN_STRINGS: I18nStrings = {
     // Command
     openEmojiPicker: 'Open Emoji Picker',
     // Settings tab
-    settingsTitle: 'Emoji Selector Settings',
+    settingsTitle: 'General',
     emojiHeight: 'Emoji height',
     emojiHeightDesc: 'CSS height value for emoji display - width will be auto (e.g., 1.2em, 16px)',
     searchPlaceholder: 'Search placeholder',
@@ -166,7 +166,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     // Command
     openEmojiPicker: '打开表情符号选择器',
     // Settings tab
-    settingsTitle: '表情符号选择器设置',
+    settingsTitle: '通用',
     emojiHeight: '表情符号高度',
     emojiHeightDesc: '表情符号显示的 CSS 高度值 - 宽度将自动调整（例如：1.2em, 16px）',
     searchPlaceholder: '搜索占位符',

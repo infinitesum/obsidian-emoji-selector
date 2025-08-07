@@ -56,10 +56,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height:1.7rem;
+  height: 1.7rem;
   font-size: var(--font-ui-small);
   color: var(--text-muted);
-
 }
 
 .emoji-tab:hover {
@@ -197,7 +196,6 @@
   cursor: not-allowed;
 }
 
-
 /* multiselect checkbox */
 
 /* 让文字和开关在同一行，并垂直居中 */
@@ -225,7 +223,7 @@
 
 /* 开关的圆点 */
 .emoji-toggle-slider::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 18px;
   height: 18px;
@@ -246,4 +244,25 @@
 /* 把圆点移动到右边 */
 .emoji-multi-select-toggle:checked + .emoji-toggle-slider::before {
   transform: translateX(18px);
+}
+
+/* Made by section - simple and elegant */
+.emoji-made-by {
+  text-align: left;
+  margin: 0.5rem 0 0.5rem 0;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  opacity: 0.8;
+}
+
+.emoji-made-by a {
+  color: var(--interactive-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.emoji-made-by a:hover {
+  color: var(--interactive-accent-hover);
+  text-decoration: underline;
 }

@@ -37,8 +37,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        // Made by section
+        const madeByEl = containerEl.createDiv('emoji-made-by');
+        madeByEl.innerHTML = 'Made by <a href="https://flyalready.com" target="_blank" rel="noopener noreferrer">Summer</a> with ❤️';
+
         // Plugin title
-        containerEl.createEl('h2', { text: i18n.t('settingsTitle') });
+        containerEl.createEl('h3', { text: i18n.t('settingsTitle') });
 
         // Emoji size setting
         new Setting(containerEl)
