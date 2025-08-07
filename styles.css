@@ -240,7 +240,7 @@
 
 /* 改变轨道的背景色 */
 .emoji-multi-select-toggle:checked + .emoji-toggle-slider {
-  background-color: #A87FFE; /* 打开时的颜色 */
+  background-color: var(--interactive-accent); /* 打开时的颜色 */
 }
 
 /* 把圆点移动到右边 */

@@ -156,7 +156,6 @@ export class EmojiStorage {
 
     /**
      * Advanced search with regex, fuzzy matching, and collection name filtering
-     * Supports patterns like "活字乱刷.*a" to search collection "活字乱刷" for emojis containing "a"
      * Also supports pure regex patterns and fuzzy matching
      */
     advancedSearchWithCollections(query: string, enableRegex: boolean = true, enableFuzzy: boolean = true): EmojiItem[] {
@@ -167,25 +166,23 @@ export class EmojiStorage {
         const trimmedQuery = query.trim();
 
         // Try to parse collection-specific search pattern: "collectionName.*searchTerm"
-        const collectionSearchMatch = trimmedQuery.match(/^(.+?)\.\*(.*)$/);
+        // Only if regex is enabled, since this uses regex-like syntax
+        if (enableRegex) {
+            const collectionSearchMatch = trimmedQuery.match(/^(.+?)\.\*(.*)$/);
 
-        if (collectionSearchMatch) {
-            const [, collectionPattern, searchPattern] = collectionSearchMatch;
-            return this.searchInCollections(collectionPattern, searchPattern, enableRegex, enableFuzzy);
+            if (collectionSearchMatch) {
+                const [, collectionPattern, searchPattern] = collectionSearchMatch;
+                return this.searchInCollections(collectionPattern, searchPattern, enableRegex, enableFuzzy);
+            }
         }
 
-        // Check if query looks like a regex pattern and regex is enabled
-        if (enableRegex && this.isRegexPattern(trimmedQuery)) {
+        // If regex is enabled, treat the query as a potential regex pattern
+        if (enableRegex) {
             return this.regexSearch(trimmedQuery, enableFuzzy);
         }
 
-        // Default to fuzzy search with collection name matching (if enabled)
-        if (enableFuzzy) {
-            return this.fuzzySearchWithCollections(trimmedQuery);
-        } else {
-            // Fall back to basic search if fuzzy is disabled
-            return this.searchEmojis(trimmedQuery);
-        }
+        // If regex is disabled, use fuzzy search with collection name matching
+        return this.fuzzySearchWithCollections(trimmedQuery, enableFuzzy);
     }
 
     /**
@@ -193,11 +190,25 @@ export class EmojiStorage {
      */
     private searchInCollections(collectionPattern: string, searchPattern: string, enableRegex: boolean = true, enableFuzzy: boolean = true): EmojiItem[] {
         const results: EmojiItem[] = [];
-        const collectionRegex = this.createFuzzyRegex(collectionPattern);
 
         for (const [collectionName, collection] of this.collections.entries()) {
             // Check if collection name matches the pattern
-            if (collectionRegex.test(collectionName)) {
+            let collectionMatches = false;
+
+            if (enableRegex) {
+                try {
+                    const collectionRegex = this.createFuzzyRegex(collectionPattern);
+                    collectionMatches = collectionRegex.test(collectionName);
+                } catch (error) {
+                    // If regex fails, fall back to simple string matching
+                    collectionMatches = collectionName.toLowerCase().includes(collectionPattern.toLowerCase());
+                }
+            } else {
+                // Simple string matching when regex is disabled
+                collectionMatches = collectionName.toLowerCase().includes(collectionPattern.toLowerCase());
+            }
+
+            if (collectionMatches) {
                 // Search within this collection
                 const collectionResults = this.searchInSpecificCollection(collection, searchPattern, enableRegex, enableFuzzy);
                 results.push(...collectionResults);
@@ -244,18 +255,14 @@ export class EmojiStorage {
         } catch (error) {
             // If regex is invalid, fall back to fuzzy search or basic search
             console.warn('Invalid regex pattern, falling back to alternative search:', error);
-            if (enableFuzzy) {
-                return this.fuzzySearchWithCollections(pattern);
-            } else {
-                return this.searchEmojis(pattern);
-            }
+            return this.fuzzySearchWithCollections(pattern, enableFuzzy);
         }
     }
 
     /**
      * Fuzzy search that includes collection names in the search
      */
-    private fuzzySearchWithCollections(query: string): EmojiItem[] {
+    private fuzzySearchWithCollections(query: string, enableFuzzy: boolean = true): EmojiItem[] {
         const results: EmojiItem[] = [];
         const queryLower = query.toLowerCase();
 
@@ -267,9 +274,11 @@ export class EmojiStorage {
         const collectionResults = this.searchByCollectionName(queryLower);
         results.push(...collectionResults);
 
-        // Finally, fuzzy matching for remaining cases
-        const fuzzyResults = this.performFuzzySearch(queryLower);
-        results.push(...fuzzyResults);
+        // Finally, fuzzy matching for remaining cases (only if enabled)
+        if (enableFuzzy) {
+            const fuzzyResults = this.performFuzzySearch(queryLower);
+            results.push(...fuzzyResults);
+        }
 
         return this.removeDuplicates(results);
     }
@@ -306,14 +315,7 @@ export class EmojiStorage {
         return results;
     }
 
-    /**
-     * Check if a query looks like a regex pattern
-     */
-    private isRegexPattern(query: string): boolean {
-        // Check for common regex metacharacters
-        const regexChars = /[.*+?^${}()|[\]\\]/;
-        return regexChars.test(query);
-    }
+
 
     /**
      * Create a fuzzy regex from a pattern (converts wildcards and handles fuzzy matching)

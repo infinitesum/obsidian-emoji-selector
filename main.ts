@@ -437,7 +437,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 	async getEmojiManagerForSettings(): Promise<EmojiManager> {
 		// Ensure settings are loaded before creating emoji manager
 		await this.ensureSettingsLoaded();
-		return await this.getEmojiManager();
+		const manager = await this.getEmojiManager();
+
+		// Force update settings to ensure the manager has the latest settings
+		// This is important because settings might have been changed after the manager was created
+		manager.updateSettings(this.settings);
+
+		return manager;
 	}
 
 	/**
@@ -475,10 +481,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 		});
 
 		await this.saveData(updatedData);
-		// Update emoji manager with new settings
+		// Update emoji manager with new settings (always update if it exists)
 		if (this.emojiManager) {
 			this.emojiManager.updateSettings(this.settings);
 		}
+		// Note: If emojiManager doesn't exist yet, it will use the updated settings when created
+		// because getEmojiManager() calls ensureSettingsLoaded() which loads the latest settings
+
 		// Update dynamic CSS for emoji sizing
 		this.updateEmojiSizeCSS();
 		// Update emoji suggest registration
