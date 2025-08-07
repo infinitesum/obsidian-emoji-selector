@@ -84,7 +84,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
   gap: 2px;
-  position: relative;
+  /* position: relative; */
+  background: transparent;
 }
 
 .emoji-item,

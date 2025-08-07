@@ -3,7 +3,9 @@ import { EmojiPickerModal } from './src/emoji-picker-modal';
 import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types';
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
+import { EmojiSuggest } from './src/emoji-suggest';
 import { i18n } from './src/i18n';
+import { perfMonitor } from './src/performance-monitor';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
@@ -11,8 +13,11 @@ export default class EmojiSelectorPlugin extends Plugin {
 	private settingsLoaded: boolean = false;
 	private settingsLoadPromise: Promise<void> | null = null;
 	private cssInjected: boolean = false;
+	private emojiSuggest: EmojiSuggest | null = null;
 
 	async onload() {
+		perfMonitor.start('plugin-onload');
+
 		// Load only settings on startup (now that cache is separated, data.json is small)
 		await this.loadSettings();
 
@@ -43,6 +48,12 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Inject base CSS immediately so existing emojis look good
 		// Dynamic sizing CSS will be injected later when settings are loaded
 		this.injectBaseCss();
+
+		// Register emoji suggest for quick insertion (will be enabled after settings load)
+		this.setupEmojiSuggest();
+
+		perfMonitor.end('plugin-onload');
+		perfMonitor.logMetrics();
 	}
 
 	onunload() {
@@ -68,6 +79,28 @@ export default class EmojiSelectorPlugin extends Plugin {
 		}
 
 		this.settingsLoadPromise = this.loadSettings();
+	}
+
+	/**
+	 * Setup emoji suggest based on settings
+	 */
+	private async setupEmojiSuggest(): Promise<void> {
+		// Wait for settings to load
+		await this.ensureSettingsLoaded();
+
+		// Register or unregister based on settings
+		if (this.settings.enableQuickInsertion) {
+			if (!this.emojiSuggest) {
+				this.emojiSuggest = new EmojiSuggest(this);
+				this.registerEditorSuggest(this.emojiSuggest);
+			}
+		} else {
+			if (this.emojiSuggest) {
+				// Note: Obsidian doesn't provide unregisterEditorSuggest, 
+				// so we'll just disable it by setting it to null
+				this.emojiSuggest = null;
+			}
+		}
 	}
 
 
@@ -300,6 +333,61 @@ export default class EmojiSelectorPlugin extends Plugin {
 			.emoji-item.emoji-selected .emoji-text {
 				color: var(--text-on-accent);
 			}
+
+			/* Emoji suggest dropdown styles */
+			.emoji-suggest-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 12px;
+				cursor: pointer;
+				border-radius: var(--radius-s);
+				transition: background-color 0.1s ease;
+			}
+
+			.emoji-suggest-item:hover,
+			.emoji-suggest-item.is-selected {
+				background-color: var(--background-modifier-hover);
+			}
+
+			.emoji-suggest-preview {
+				flex-shrink: 0;
+				width: 24px;
+				height: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.emoji-suggest-image {
+				max-width: 100%;
+				max-height: 100%;
+				object-fit: contain;
+			}
+
+			.emoji-suggest-text {
+				font-size: 18px;
+				line-height: 1;
+			}
+
+			.emoji-suggest-info {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.emoji-suggest-key {
+				font-family: var(--font-monospace);
+				font-size: 0.9em;
+				margin-bottom: 2px;
+			}
+
+			.emoji-suggest-desc {
+				margin-bottom: 1px;
+			}
+
+			.emoji-suggest-category {
+				font-style: italic;
+			}
 		`;
 
 		document.head.appendChild(style);
@@ -365,6 +453,8 @@ export default class EmojiSelectorPlugin extends Plugin {
 		}
 		// Update dynamic CSS for emoji sizing
 		this.updateEmojiSizeCSS();
+		// Update emoji suggest registration
+		await this.setupEmojiSuggest();
 	}
 
 	/**

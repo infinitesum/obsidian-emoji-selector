@@ -27,6 +27,11 @@ export interface I18nStrings {
     customEmojiTemplate: string;
     customEmojiTemplateDesc: string;
 
+    // Quick insertion
+    quickInsertion: string;
+    enableQuickInsertion: string;
+    enableQuickInsertionDesc: string;
+
     // Recent emojis
     recentEmojis: string;
     enableRecentEmojis: string;
@@ -94,6 +99,11 @@ const EN_STRINGS: I18nStrings = {
     customEmojiTemplate: 'Custom emoji template',
     customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}. Leave empty for default HTML.',
 
+    // Quick insertion
+    quickInsertion: 'Quick Insertion',
+    enableQuickInsertion: 'Enable quick emoji insertion',
+    enableQuickInsertionDesc: 'Allow typing :emoji_name to show a dropdown with matching emojis for quick insertion',
+
     // Recent emojis
     recentEmojis: 'Recent Emojis',
     enableRecentEmojis: 'Enable recent emojis',
@@ -160,6 +170,11 @@ const ZH_CN_STRINGS: I18nStrings = {
     customCssClassesDesc: '应用于表情符号元素的额外 CSS 类（用空格分隔）',
     customEmojiTemplate: '自定义表情符号模板',
     customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：{url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}。留空使用默认 HTML。',
+
+    // Quick insertion
+    quickInsertion: '快速插入',
+    enableQuickInsertion: '启用快速表情符号插入',
+    enableQuickInsertionDesc: '允许输入 :表情符号名称 来显示匹配表情符号的下拉框进行快速插入',
 
     // Recent emojis
     recentEmojis: '最近使用的表情符号',

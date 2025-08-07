@@ -106,6 +106,8 @@ export interface EmojiSelectorSettings {
     enableRecentEmojis: boolean;
     /** Prefer recent emojis over remembered collection when opening picker */
     preferRecentOverRemembered: boolean;
+    /** Enable quick emoji insertion with :emoji_name syntax */
+    enableQuickInsertion: boolean;
 }
 
 /**
@@ -123,5 +125,6 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     customEmojiTemplate: '',
     maxRecentEmojis: 20,
     enableRecentEmojis: true,
-    preferRecentOverRemembered: true
+    preferRecentOverRemembered: true,
+    enableQuickInsertion: true
 };

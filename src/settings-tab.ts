@@ -116,6 +116,20 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
 
 
+        // Quick insertion settings section
+        containerEl.createEl('h3', { text: i18n.t('quickInsertion') });
+
+        // Enable quick insertion setting
+        new Setting(containerEl)
+            .setName(i18n.t('enableQuickInsertion'))
+            .setDesc(i18n.t('enableQuickInsertionDesc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableQuickInsertion)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableQuickInsertion = value;
+                    await this.plugin.saveSettings();
+                }));
+
         // Recent emojis settings section
         containerEl.createEl('h3', { text: i18n.t('recentEmojis') });
 
