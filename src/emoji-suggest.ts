@@ -12,7 +12,7 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
     constructor(plugin: EmojiSelectorPlugin) {
         super(plugin.app);
         this.plugin = plugin;
-        this.limit = 10; // Show up to 10 suggestions
+        this.limit = 50; // Show up to 10 suggestions
     }
 
     /**
@@ -143,9 +143,13 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
         // Generate the emoji HTML
         const emojiHtml = this.generateEmojiHtml(emoji);
 
+        // Add space after emoji if enabled in single-select mode setting
+        const shouldAddSpace = this.plugin.settings.addSpaceAfterEmoji;
+        const textToInsert = shouldAddSpace ? emojiHtml + ' ' : emojiHtml;
+
         // Replace the trigger text (including the :) with the emoji
         editor.replaceRange(
-            emojiHtml,
+            textToInsert,
             this.context.start,
             this.context.end
         );

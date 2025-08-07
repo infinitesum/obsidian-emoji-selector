@@ -49,8 +49,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 		// Dynamic sizing CSS will be injected later when settings are loaded
 		this.injectBaseCss();
 
-		// Register emoji suggest for quick insertion (will be enabled after settings load)
-		this.setupEmojiSuggest();
+		// Register emoji suggest for quick insertion immediately with default settings
+		// This ensures it works right after plugin loads, then gets updated when settings load
+		this.setupEmojiSuggestImmediate();
 
 		perfMonitor.end('plugin-onload');
 		perfMonitor.logMetrics();
@@ -101,6 +102,33 @@ export default class EmojiSelectorPlugin extends Plugin {
 				this.emojiSuggest = null;
 			}
 		}
+	}
+
+	/**
+	 * Setup emoji suggest immediately with default settings, then update when settings load
+	 */
+	private setupEmojiSuggestImmediate(): void {
+		// Register with default settings immediately to ensure it works on startup
+		if (DEFAULT_SETTINGS.enableQuickInsertion && !this.emojiSuggest) {
+			this.emojiSuggest = new EmojiSuggest(this);
+			this.registerEditorSuggest(this.emojiSuggest);
+		}
+
+		// Then update based on actual settings when they load
+		this.ensureSettingsLoaded().then(() => {
+			// Re-evaluate based on actual settings
+			if (this.settings.enableQuickInsertion) {
+				if (!this.emojiSuggest) {
+					this.emojiSuggest = new EmojiSuggest(this);
+					this.registerEditorSuggest(this.emojiSuggest);
+				}
+			} else {
+				// If disabled in settings, disable it
+				this.emojiSuggest = null;
+			}
+		}).catch(error => {
+			console.error('Failed to setup emoji suggest:', error);
+		});
 	}
 
 
