@@ -118,7 +118,7 @@ export interface EmojiSelectorSettings {
  * Default plugin settings
  */
 export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
-    emojiSize: '2em',
+    emojiSize: '2rem',
     searchPlaceholder: '',
     customCssClasses: '',
     owoJsonUrls: '',
@@ -131,6 +131,6 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     enableRecentEmojis: true,
     preferRecentOverRemembered: true,
     enableQuickInsertion: true,
-    enableRegexSearch: true,
-    enableFuzzySearch: true
+    enableRegexSearch: false,
+    enableFuzzySearch: false
 };

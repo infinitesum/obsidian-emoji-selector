@@ -32,6 +32,23 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         containerEl.createEl('div', { text: 'Loading settings...' });
     }
 
+    /**
+     * Format description text with code formatting support
+     * Converts `code` to <code>code</code>
+     */
+    private formatDescription(text: string): string {
+        return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    /**
+     * Set description with HTML support for a setting
+     */
+    private setDescWithHtml(setting: Setting, text: string): Setting {
+        setting.setDesc(''); // Clear default description
+        setting.descEl.innerHTML = this.formatDescription(text);
+        return setting;
+    }
+
     private renderSettings(): void {
         const { containerEl } = this;
 
@@ -45,33 +62,38 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         containerEl.createEl('h3', { text: i18n.t('settingsTitle') });
 
         // Emoji size setting
-        new Setting(containerEl)
-            .setName(i18n.t('emojiHeight'))
-            .setDesc(i18n.t('emojiHeightDesc'))
-            .addText(text => text
-                .setPlaceholder('1.2em')
-                .setValue(this.plugin.settings.emojiSize)
-                .onChange(async (value) => {
-                    this.plugin.settings.emojiSize = value || '1.2em';
-                    await this.plugin.saveSettings();
-                }));
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('emojiHeight')),
+            i18n.t('emojiHeightDesc')
+        ).addText(text => text
+            .setPlaceholder('1.2em')
+            .setValue(this.plugin.settings.emojiSize)
+            .onChange(async (value) => {
+                this.plugin.settings.emojiSize = value || '1.2em';
+                await this.plugin.saveSettings();
+            }));
 
         // Search placeholder setting
-        new Setting(containerEl)
-            .setName(i18n.t('searchPlaceholder'))
-            .setDesc(i18n.t('searchPlaceholderDesc'))
-            .addText(text => text
-                .setPlaceholder(i18n.t('searchPlaceholder'))
-                .setValue(this.plugin.settings.searchPlaceholder)
-                .onChange(async (value) => {
-                    this.plugin.settings.searchPlaceholder = value || i18n.t('searchPlaceholder');
-                    await this.plugin.saveSettings();
-                }));
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('searchPlaceholder')),
+            i18n.t('searchPlaceholderDesc')
+        ).addText(text => text
+            .setPlaceholder(i18n.t('searchPlaceholder'))
+            .setValue(this.plugin.settings.searchPlaceholder)
+            .onChange(async (value) => {
+                this.plugin.settings.searchPlaceholder = value || i18n.t('searchPlaceholder');
+                await this.plugin.saveSettings();
+            }));
 
         // OWO JSON URLs setting with confirm button
         const owoUrlsSetting = new Setting(containerEl)
             .setName(i18n.t('owoJsonUrls'))
-            .setDesc(this.getCollectionStatusDescription());
+            .setDesc(''); // Will be set with HTML content below
+
+        // Set description with HTML support
+        owoUrlsSetting.descEl.innerHTML = this.getCollectionStatusDescription();
 
         // Add CSS class for multi-line layout
         owoUrlsSetting.settingEl.addClass('emoji-setting-multiline');
@@ -107,60 +129,93 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         this.hasUnsavedChanges = hasUnsavedChanges;
 
         // Remember last collection setting
-        new Setting(containerEl)
-            .setName(i18n.t('rememberLastCollection'))
-            .setDesc(i18n.t('rememberLastCollectionDesc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.rememberLastCollection)
-                .onChange(async (value) => {
-                    this.plugin.settings.rememberLastCollection = value;
-                    // Reset to default when disabled
-                    if (!value) {
-                        this.plugin.settings.lastSelectedCollection = 'all';
-                    }
-                    await this.plugin.saveSettings();
-                }));
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('rememberLastCollection')),
+            i18n.t('rememberLastCollectionDesc')
+        ).addToggle(toggle => toggle
+            .setValue(this.plugin.settings.rememberLastCollection)
+            .onChange(async (value) => {
+                this.plugin.settings.rememberLastCollection = value;
+                // Reset to default when disabled
+                if (!value) {
+                    this.plugin.settings.lastSelectedCollection = 'all';
+                }
+                await this.plugin.saveSettings();
+            }));
 
+        // Emoji spacing settings section (moved up to general section)
 
+        containerEl.createEl('h3', { text: i18n.t('emojiSpacing') });
+        // Add space after emoji setting (single-select)
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('addSpaceAfterEmojiSingle')),
+            i18n.t('addSpaceAfterEmojiSingleDesc')
+        ).addToggle(toggle => toggle
+            .setValue(this.plugin.settings.addSpaceAfterEmoji)
+            .onChange(async (value) => {
+                this.plugin.settings.addSpaceAfterEmoji = value;
+                await this.plugin.saveSettings();
+            }));
+
+        // Add space after emoji setting (multi-select)
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('addSpaceAfterEmojiMulti')),
+            i18n.t('addSpaceAfterEmojiMultiDesc')
+        ).addToggle(toggle => toggle
+            .setValue(this.plugin.settings.addSpaceAfterEmojiInMultiSelect)
+            .onChange(async (value) => {
+                this.plugin.settings.addSpaceAfterEmojiInMultiSelect = value;
+                await this.plugin.saveSettings();
+            }));
+
+        // Custom CSS classes setting
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('customCssClasses')),
+            i18n.t('customCssClassesDesc')
+        ).addText(text => text
+            .setPlaceholder('my-emoji-class another-class')
+            .setValue(this.plugin.settings.customCssClasses)
+            .onChange(async (value) => {
+                this.plugin.settings.customCssClasses = value;
+                await this.plugin.saveSettings();
+            }));
+
+        // Custom emoji template setting
+        const customTemplateSetting = new Setting(containerEl)
+            .setName(i18n.t('customEmojiTemplate'));
+
+        // Set description with HTML support
+        this.setDescWithHtml(customTemplateSetting, i18n.t('customEmojiTemplateDesc'));
+
+        // Add CSS class for multi-line layout
+        customTemplateSetting.settingEl.addClass('emoji-setting-multiline');
+
+        customTemplateSetting.addTextArea(text => text
+            .setPlaceholder('<img src="{url}" alt="{text}" title="{text}" class="{classes}">')
+            .setValue(this.plugin.settings.customEmojiTemplate)
+            .onChange(async (value) => {
+                this.plugin.settings.customEmojiTemplate = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Quick insertion settings section
         containerEl.createEl('h3', { text: i18n.t('quickInsertion') });
 
         // Enable quick insertion setting
-        new Setting(containerEl)
-            .setName(i18n.t('enableQuickInsertion'))
-            .setDesc(i18n.t('enableQuickInsertionDesc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableQuickInsertion)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableQuickInsertion = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        // Advanced search settings section
-        containerEl.createEl('h3', { text: i18n.t('advancedSearch') });
-
-        // Enable regex search setting
-        new Setting(containerEl)
-            .setName(i18n.t('enableRegexSearch'))
-            .setDesc(i18n.t('enableRegexSearchDesc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableRegexSearch)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableRegexSearch = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        // Enable fuzzy search setting
-        new Setting(containerEl)
-            .setName(i18n.t('enableFuzzySearch'))
-            .setDesc(i18n.t('enableFuzzySearchDesc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableFuzzySearch)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableFuzzySearch = value;
-                    await this.plugin.saveSettings();
-                }));
+        this.setDescWithHtml(
+            new Setting(containerEl)
+                .setName(i18n.t('enableQuickInsertion')),
+            i18n.t('enableQuickInsertionDesc')
+        ).addToggle(toggle => toggle
+            .setValue(this.plugin.settings.enableQuickInsertion)
+            .onChange(async (value) => {
+                this.plugin.settings.enableQuickInsertion = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Recent emojis settings section
         containerEl.createEl('h3', { text: i18n.t('recentEmojis') });
@@ -168,7 +223,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         // Enable recent emojis setting
         new Setting(containerEl)
             .setName(i18n.t('enableRecentEmojis'))
-            .setDesc(i18n.t('enableRecentEmojisDesc'))
+            .setDesc(this.formatDescription(i18n.t('enableRecentEmojisDesc')))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.enableRecentEmojis)
                 .onChange(async (value) => {
@@ -179,7 +234,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         // Prefer recent over remembered setting
         new Setting(containerEl)
             .setName(i18n.t('preferRecentOverRemembered'))
-            .setDesc(i18n.t('preferRecentOverRememberedDesc'))
+            .setDesc(this.formatDescription(i18n.t('preferRecentOverRememberedDesc')))
             .addToggle(toggle => toggle
                 .setValue(this.plugin.settings.preferRecentOverRemembered)
                 .onChange(async (value) => {
@@ -190,7 +245,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         // Max recent emojis setting
         new Setting(containerEl)
             .setName(i18n.t('maxRecentEmojis'))
-            .setDesc(i18n.t('maxRecentEmojisDesc'))
+            .setDesc(this.formatDescription(i18n.t('maxRecentEmojisDesc')))
             .addSlider(slider => slider
                 .setLimits(1, 50, 1)
                 .setValue(this.plugin.settings.maxRecentEmojis)
@@ -203,7 +258,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         // Clear recent emojis button
         new Setting(containerEl)
             .setName(i18n.t('clearRecentEmojis'))
-            .setDesc(i18n.t('clearRecentEmojisDesc'))
+            .setDesc(this.formatDescription(i18n.t('clearRecentEmojisDesc')))
             .addButton(button => button
                 .setButtonText(i18n.t('clearRecentEmojisButton'))
                 .setWarning()
@@ -218,58 +273,30 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                     }
                 }));
 
-        // Emoji spacing settings section
-        containerEl.createEl('h3', { text: i18n.t('emojiSpacing') });
+        // Advanced search settings section (moved to the end)
+        containerEl.createEl('h3', { text: i18n.t('advancedSearch') });
 
-        // Add space after emoji setting (single-select)
+        // Enable regex search setting
         new Setting(containerEl)
-            .setName(i18n.t('addSpaceAfterEmojiSingle'))
-            .setDesc(i18n.t('addSpaceAfterEmojiSingleDesc'))
+            .setName(i18n.t('enableRegexSearch'))
+            .setDesc(this.formatDescription(i18n.t('enableRegexSearchDesc')))
             .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.addSpaceAfterEmoji)
+                .setValue(this.plugin.settings.enableRegexSearch)
                 .onChange(async (value) => {
-                    this.plugin.settings.addSpaceAfterEmoji = value;
+                    this.plugin.settings.enableRegexSearch = value;
                     await this.plugin.saveSettings();
                 }));
 
-        // Add space after emoji setting (multi-select)
+        // Enable fuzzy search setting
         new Setting(containerEl)
-            .setName(i18n.t('addSpaceAfterEmojiMulti'))
-            .setDesc(i18n.t('addSpaceAfterEmojiMultiDesc'))
+            .setName(i18n.t('enableFuzzySearch'))
+            .setDesc(this.formatDescription(i18n.t('enableFuzzySearchDesc')))
             .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.addSpaceAfterEmojiInMultiSelect)
+                .setValue(this.plugin.settings.enableFuzzySearch)
                 .onChange(async (value) => {
-                    this.plugin.settings.addSpaceAfterEmojiInMultiSelect = value;
+                    this.plugin.settings.enableFuzzySearch = value;
                     await this.plugin.saveSettings();
                 }));
-
-        // Custom CSS classes setting
-        new Setting(containerEl)
-            .setName(i18n.t('customCssClasses'))
-            .setDesc(i18n.t('customCssClassesDesc'))
-            .addText(text => text
-                .setPlaceholder('my-emoji-class another-class')
-                .setValue(this.plugin.settings.customCssClasses)
-                .onChange(async (value) => {
-                    this.plugin.settings.customCssClasses = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        // Custom emoji template setting
-        const customTemplateSetting = new Setting(containerEl)
-            .setName(i18n.t('customEmojiTemplate'))
-            .setDesc(i18n.t('customEmojiTemplateDesc'));
-
-        // Add CSS class for multi-line layout
-        customTemplateSetting.settingEl.addClass('emoji-setting-multiline');
-
-        customTemplateSetting.addTextArea(text => text
-            .setPlaceholder('<img src="{url}" alt="{text}" title="{text}" class="{classes}">')
-            .setValue(this.plugin.settings.customEmojiTemplate)
-            .onChange(async (value) => {
-                this.plugin.settings.customEmojiTemplate = value;
-                await this.plugin.saveSettings();
-            }));
 
         // Initialize button state
         this.updateButtonState();
@@ -295,7 +322,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Get description with current collection status
      */
     private getCollectionStatusDescription(): string {
-        let statusText = i18n.t('owoJsonUrlsDesc');
+        let statusText = this.formatDescription(i18n.t('owoJsonUrlsDesc'));
 
         if (this.plugin.isEmojiManagerInitialized()) {
             const collectionCount = this.plugin.emojiManager!.getAllCollections().length;

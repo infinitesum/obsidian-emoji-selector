@@ -93,7 +93,7 @@ const EN_STRINGS: I18nStrings = {
     searchPlaceholderDesc: 'Placeholder text shown in the emoji search input',
     advancedSearchTip: 'Advanced search: Use "collection.*pattern" for collection-specific search, regex patterns, or fuzzy matching',
     owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: 'Comma-separated URLs for owo.json files to load emoji collections from. JSON files are cached locally until you click "Update".',
+    owoJsonUrlsDesc: 'Comma-separated URLs for `owo.json` files to load emoji collections from. JSON files are cached locally until you click "Update".',
     updateCollections: 'Update Collections',
     updateCollectionsTooltip: 'Load emoji collections from the URLs above',
     rememberLastCollection: 'Remember last collection',
@@ -106,12 +106,12 @@ const EN_STRINGS: I18nStrings = {
     customCssClasses: 'Custom CSS classes',
     customCssClassesDesc: 'Additional CSS classes to apply to emoji elements (space-separated)',
     customEmojiTemplate: 'Custom emoji template',
-    customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: {url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}. Leave empty for default HTML.',
+    customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: `{url}`, `{name}`, `{text}`, `{category}`, `{type}`, `{classes}`, `{filename}`, `{fullfilename}`. Leave empty for default HTML.',
 
     // Quick insertion
     quickInsertion: 'Quick Insertion',
     enableQuickInsertion: 'Enable quick emoji insertion',
-    enableQuickInsertionDesc: 'Allow typing :emoji_name to show a dropdown with matching emojis for quick insertion',
+    enableQuickInsertionDesc: 'Allow typing `:emoji_name` to show a dropdown with matching emojis for quick insertion',
 
     // Advanced search
     advancedSearch: 'Advanced Search',
@@ -173,7 +173,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     searchPlaceholderDesc: '表情符号搜索输入框中显示的占位符文本',
     advancedSearchTip: '高级搜索：使用"集合名.*模式"进行集合特定搜索，支持正则表达式和模糊匹配',
     owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: '用逗号分隔的 owo.json 文件 URL，用于加载表情符号集合。JSON 文件会在本地缓存，直到您点击"更新"。',
+    owoJsonUrlsDesc: '用逗号分隔的 `owo.json` 文件 URL，用于加载表情符号集合。JSON 文件会在本地缓存，直到您点击"更新"。',
     updateCollections: '更新集合',
     updateCollectionsTooltip: '从上述 URL 加载表情符号集合',
     rememberLastCollection: '记住上次选择的集合',
@@ -186,12 +186,12 @@ const ZH_CN_STRINGS: I18nStrings = {
     customCssClasses: '自定义 CSS 类',
     customCssClassesDesc: '应用于表情符号元素的额外 CSS 类（用空格分隔）',
     customEmojiTemplate: '自定义表情符号模板',
-    customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：{url}, {name}, {text}, {category}, {type}, {classes}, {filename}, {fullfilename}。留空使用默认 HTML。',
+    customEmojiTemplateDesc: '表情符号插入的自定义模板。变量：`{url}`, `{name}`, `{text}`, `{category}`, `{type}`, `{classes}`, `{filename}`, `{fullfilename}`。留空使用默认 HTML。',
 
     // Quick insertion
     quickInsertion: '快速插入',
     enableQuickInsertion: '启用快速表情符号插入',
-    enableQuickInsertionDesc: '允许输入 :表情符号名称 来显示匹配表情符号的下拉框进行快速插入',
+    enableQuickInsertionDesc: '允许输入 `:表情符号名称` 来显示匹配表情符号的下拉框进行快速插入',
 
     // Advanced search
     advancedSearch: '高级搜索',

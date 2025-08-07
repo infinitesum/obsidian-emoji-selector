@@ -289,3 +289,13 @@
   min-height: 80px;
   resize: vertical;
 }
+
+/* Code formatting in settings descriptions */
+.setting-item-description code {
+  background: var(--background-modifier-border);
+  color: var(--text-accent);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-family: var(--font-monospace);
+  font-size: 0.9em;
+}
