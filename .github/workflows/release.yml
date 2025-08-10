@@ -1,17 +1,15 @@
-name: Release Obsidian plugin
+name: Release Emoji Selector
 
 on:
   push:
     tags:
       - "*"
 
-env:
-  PLUGIN_NAME: emoji-selector
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
 
