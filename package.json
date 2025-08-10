@@ -1,7 +1,7 @@
 {
   "name": "obsidian-emoji-selector",
-  "version": "1.0.0",
-  "description": "Advanced emoji selector with custom collections, fast search, and HTML img tag conversion from owo.json files",
+  "version": "1.2.0",
+  "description": "Insert custom emojis from OWO format collections with quick search, auto-suggestions, and customizable templates for Obsidian",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
