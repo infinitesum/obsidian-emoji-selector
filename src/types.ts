@@ -41,12 +41,14 @@ export interface CachedJsonData {
     /** The URL this data was fetched from */
     url: string;
     /** The raw JSON data */
-    data: any;
+    data: unknown;
     /** Timestamp when this data was cached */
     cachedAt: number;
     /** ETag or other cache validation header */
     etag?: string;
 }
+
+// Use Obsidian's App type directly - imported where needed
 
 /**
  * Cache storage for emoji JSON files

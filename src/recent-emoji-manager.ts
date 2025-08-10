@@ -8,15 +8,15 @@ export class RecentEmojiManager {
     private entries: Map<string, RecentEmojiEntry> = new Map();
     private order: string[] = [];
     private maxSize: number;
-    private saveData: (data: any) => Promise<void>;
-    private loadData: () => Promise<any>;
+    private saveData: (data: unknown) => Promise<void>;
+    private loadData: () => Promise<unknown>;
     private isInitialized: boolean = false;
     private saveQueue: Promise<void> = Promise.resolve();
 
     constructor(
         maxSize: number,
-        saveData: (data: any) => Promise<void>,
-        loadData: () => Promise<any>
+        saveData: (data: unknown) => Promise<void>,
+        loadData: () => Promise<unknown>
     ) {
         this.maxSize = maxSize;
         this.saveData = saveData;
@@ -31,7 +31,7 @@ export class RecentEmojiManager {
 
         try {
             const data = await this.loadData();
-            const recentData: RecentEmojisData = data?.recentEmojis;
+            const recentData: RecentEmojisData = (data as Record<string, unknown>)?.recentEmojis as RecentEmojisData;
 
             if (recentData?.entries && recentData?.order) {
                 // Restore entries
@@ -250,7 +250,7 @@ export class RecentEmojiManager {
             };
 
             const updatedData = {
-                ...existingData,
+                ...(existingData as Record<string, unknown>),
                 recentEmojis: recentData
             };
 

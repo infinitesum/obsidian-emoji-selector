@@ -1,4 +1,5 @@
-import { EmojiItem, EmojiCollection, EmojiSelectorSettings } from './types';
+import { App } from 'obsidian';
+import { EmojiItem, EmojiCollection, EmojiSelectorSettings, RecentEmojiEntry } from './types';
 import { EmojiStorage } from './emoji-storage';
 import { OwoFileParser } from './owo-parser';
 import { EmojiCacheManager } from './emoji-cache';
@@ -18,7 +19,7 @@ export class EmojiManager {
     private cacheInitPromise: Promise<void> | null = null;
     private recentManager: RecentEmojiManager;
 
-    constructor(settings: EmojiSelectorSettings, app: any, saveData: (data: any) => Promise<void>, loadData: () => Promise<any>) {
+    constructor(settings: EmojiSelectorSettings, app: App, saveData: (data: unknown) => Promise<void>, loadData: () => Promise<unknown>) {
         this.storage = new EmojiStorage();
         this.settings = settings;
         this.cacheManager = new EmojiCacheManager(app);
@@ -89,7 +90,7 @@ export class EmojiManager {
         // If URLs changed, clear all cache and reload
         if (oldUrls !== settings.owoJsonUrls) {
             // Clear all cache and force reload
-            this.clearCacheAndReload().catch((error: any) => {
+            this.clearCacheAndReload().catch((error: unknown) => {
                 console.error('Failed to clear cache and reload:', error);
             });
         }
@@ -502,8 +503,8 @@ export class EmojiManager {
     async getRecentEmojisStats(): Promise<{
         totalCount: number;
         totalUsage: number;
-        mostUsed: any;
-        oldestEntry: any;
+        mostUsed: RecentEmojiEntry | null;
+        oldestEntry: RecentEmojiEntry | null;
     }> {
         return await this.recentManager.getStats();
     }

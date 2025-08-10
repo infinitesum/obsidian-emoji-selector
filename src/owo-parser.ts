@@ -111,7 +111,7 @@ export class OwoFileParser {
     /**
      * Parse OWO data structure into emoji collections
      */
-    static parseOwoData(data: any, filePath: string): EmojiCollection[] {
+    static parseOwoData(data: unknown, filePath: string): EmojiCollection[] {
         if (!this.validateOwoStructure(data)) {
             throw new Error(`Invalid OWO file structure in ${filePath}`);
         }
@@ -227,7 +227,7 @@ export class OwoFileParser {
     /**
      * Validate the basic structure of an OWO file
      */
-    static validateOwoStructure(data: any): data is OwoFileStructure {
+    static validateOwoStructure(data: unknown): data is OwoFileStructure {
         if (!data || typeof data !== 'object') {
             return false;
         }
@@ -241,10 +241,10 @@ export class OwoFileParser {
                 return false;
             }
 
-            const category = categoryData as any;
+            const category = categoryData as Record<string, unknown>;
 
             // Check required fields
-            if (!['emoticon', 'emoji', 'image'].includes(category.type)) {
+            if (!category.type || !['emoticon', 'emoji', 'image'].includes(category.type as string)) {
                 return false;
             }
 
@@ -258,11 +258,13 @@ export class OwoFileParser {
                     return false;
                 }
 
-                if (typeof item.icon !== 'string' || !item.icon.trim()) {
+                const containerItem = item as Record<string, unknown>;
+
+                if (typeof containerItem.icon !== 'string' || !containerItem.icon.trim()) {
                     return false;
                 }
 
-                if (typeof item.text !== 'string' || !item.text.trim()) {
+                if (typeof containerItem.text !== 'string' || !containerItem.text.trim()) {
                     return false;
                 }
             }

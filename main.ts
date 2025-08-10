@@ -149,11 +149,11 @@ export default class EmojiSelectorPlugin extends Plugin {
 			const data = await this.loadData();
 
 			// Extract all settings fields, ignore user data like recentEmojis and emojiJsonCache
-			const settingsFromData: any = {};
+			const settingsFromData: Partial<EmojiSelectorSettings> = {};
 			if (data) {
 				Object.keys(DEFAULT_SETTINGS).forEach(key => {
 					if (key in data) {
-						settingsFromData[key] = data[key];
+						(settingsFromData as Record<string, unknown>)[key] = (data as Record<string, unknown>)[key];
 					}
 				});
 			}
@@ -195,7 +195,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 			this.emojiManager = new EmojiManager(
 				this.settings,
 				this.app,
-				(data: any) => this.saveEmojiData(data),
+				(data: unknown) => this.saveEmojiData(data),
 				() => this.loadEmojiData()
 			);
 		}
@@ -211,7 +211,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 			if (!data) return {};
 
 			// Only return emoji-related data, not settings
-			const emojiData: any = {};
+			const emojiData: Record<string, unknown> = {};
 			if (data.emojiJsonCache) {
 				emojiData.emojiJsonCache = data.emojiJsonCache;
 			}
@@ -229,12 +229,12 @@ export default class EmojiSelectorPlugin extends Plugin {
 	/**
 	 * Save emoji-related data while preserving settings
 	 */
-	private async saveEmojiData(emojiData: any): Promise<void> {
+	private async saveEmojiData(emojiData: unknown): Promise<void> {
 		try {
 			const existingData = await this.loadData();
 			const updatedData = {
-				...existingData,
-				...emojiData
+				...(existingData as Record<string, unknown>),
+				...(emojiData as Record<string, unknown>)
 			};
 
 			// Explicitly preserve all settings

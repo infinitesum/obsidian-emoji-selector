@@ -849,40 +849,42 @@ export class EmojiValidator {
     /**
      * Validate an EmojiItem object
      */
-    static validateEmojiItem(item: any): item is EmojiItem {
+    static validateEmojiItem(item: unknown): item is EmojiItem {
         if (!item || typeof item !== 'object') {
             return false;
         }
 
+        const emojiItem = item as Record<string, unknown>;
+
         // Check required fields
-        if (typeof item.key !== 'string' || !item.key.trim()) {
+        if (typeof emojiItem.key !== 'string' || !emojiItem.key.trim()) {
             return false;
         }
 
-        if (typeof item.icon !== 'string' || !item.icon.trim()) {
+        if (typeof emojiItem.icon !== 'string' || !emojiItem.icon.trim()) {
             return false;
         }
 
-        if (typeof item.text !== 'string' || !item.text.trim()) {
+        if (typeof emojiItem.text !== 'string' || !emojiItem.text.trim()) {
             return false;
         }
 
-        if (!['emoticon', 'emoji', 'image'].includes(item.type)) {
+        if (!['emoticon', 'emoji', 'image'].includes(emojiItem.type as string)) {
             return false;
         }
 
-        if (typeof item.category !== 'string' || !item.category.trim()) {
+        if (typeof emojiItem.category !== 'string' || !emojiItem.category.trim()) {
             return false;
         }
 
         // For image type, URL should be provided
-        if (item.type === 'image') {
-            if (typeof item.url !== 'string' || !item.url.trim()) {
+        if (emojiItem.type === 'image') {
+            if (typeof emojiItem.url !== 'string' || !emojiItem.url.trim()) {
                 return false;
             }
 
             // Basic URL validation
-            if (!this.isValidUrl(item.url)) {
+            if (!this.isValidUrl(emojiItem.url)) {
                 return false;
             }
         }
@@ -893,30 +895,32 @@ export class EmojiValidator {
     /**
      * Validate an EmojiCollection object
      */
-    static validateEmojiCollection(collection: any): collection is EmojiCollection {
+    static validateEmojiCollection(collection: unknown): collection is EmojiCollection {
         if (!collection || typeof collection !== 'object') {
             return false;
         }
 
+        const emojiCollection = collection as Record<string, unknown>;
+
         // Check required fields
-        if (typeof collection.name !== 'string' || !collection.name.trim()) {
+        if (typeof emojiCollection.name !== 'string' || !emojiCollection.name.trim()) {
             return false;
         }
 
-        if (!['emoticon', 'emoji', 'image'].includes(collection.type)) {
+        if (!['emoticon', 'emoji', 'image'].includes(emojiCollection.type as string)) {
             return false;
         }
 
-        if (!Array.isArray(collection.items)) {
+        if (!Array.isArray(emojiCollection.items)) {
             return false;
         }
 
-        if (typeof collection.source !== 'string' || !collection.source.trim()) {
+        if (typeof emojiCollection.source !== 'string' || !emojiCollection.source.trim()) {
             return false;
         }
 
         // Validate all items in the collection
-        for (const item of collection.items) {
+        for (const item of emojiCollection.items) {
             if (!this.validateEmojiItem(item)) {
                 return false;
             }

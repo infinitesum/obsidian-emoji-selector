@@ -1,3 +1,4 @@
+import { App } from 'obsidian';
 import { EmojiJsonCache } from './types';
 import { logger } from './logger';
 
@@ -6,14 +7,14 @@ import { logger } from './logger';
  */
 export class EmojiCacheManager {
     private cache: EmojiJsonCache = {};
-    private app: any; // Obsidian App instance
+    private app: App;
     private cacheFilePath: string;
     private initializationPromise: Promise<void> | null = null;
     private isInitialized: boolean = false;
     private backgroundWarmingPromise: Promise<void> | null = null;
     private saveQueue: Promise<void> = Promise.resolve();
 
-    constructor(app: any) {
+    constructor(app: App) {
         this.app = app;
         this.cacheFilePath = `${app.vault.configDir}/plugins/emoji-selector/cache.json`;
     }
@@ -130,7 +131,7 @@ export class EmojiCacheManager {
     /**
      * Get cached data for a URL if it exists and is valid
      */
-    getCachedData(url: string): any | null {
+    getCachedData(url: string): unknown | null {
         if (!this.isInitialized) {
             logger.debug('Cache not initialized yet, returning null for URL:', url);
             return null;
@@ -149,7 +150,7 @@ export class EmojiCacheManager {
     /**
      * Cache data for a URL with background saving
      */
-    async setCachedData(url: string, data: any, etag?: string): Promise<void> {
+    async setCachedData(url: string, data: unknown, etag?: string): Promise<void> {
         if (!this.isInitialized) {
             logger.debug('Cache not initialized yet, skipping cache set for URL:', url);
             return;

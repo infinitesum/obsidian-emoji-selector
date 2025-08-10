@@ -260,7 +260,13 @@ export class I18n {
 
     private detectLanguage(): void {
         // Detect language from Obsidian locale or browser
-        const obsidianLang = (window as any).moment?.locale?.() || navigator.language;
+        interface WindowWithMoment extends Window {
+            moment?: {
+                locale?: () => string;
+            };
+        }
+
+        const obsidianLang = (window as WindowWithMoment).moment?.locale?.() || navigator.language;
 
         if (obsidianLang.startsWith('zh')) {
             this.setLanguage('zh-CN');
