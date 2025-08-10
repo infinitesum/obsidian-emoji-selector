@@ -33,20 +33,32 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
     }
 
     /**
-     * Format description text with code formatting support
-     * Converts `code` to <code>code</code>
+     * Set description with code formatting support using DOM API
+     * Safely creates DOM elements instead of using innerHTML
      */
-    private formatDescription(text: string): string {
-        return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    private setDescWithCodeSupport(setting: Setting, text: string): Setting {
+        setting.setDesc(''); // Clear default description
+        this.createFormattedText(setting.descEl, text);
+        return setting;
     }
 
     /**
-     * Set description with HTML support for a setting
+     * Create formatted text with code support using DOM API
+     * Safely parses text with `code` markers and creates proper DOM elements
      */
-    private setDescWithHtml(setting: Setting, text: string): Setting {
-        setting.setDesc(''); // Clear default description
-        setting.descEl.innerHTML = this.formatDescription(text);
-        return setting;
+    private createFormattedText(container: HTMLElement, text: string): void {
+        const parts = text.split(/(`[^`]+`)/);
+
+        parts.forEach(part => {
+            if (part.startsWith('`') && part.endsWith('`')) {
+                // This is a code segment
+                const codeText = part.slice(1, -1); // Remove backticks
+                container.createEl('code', { text: codeText });
+            } else if (part.length > 0) {
+                // This is regular text
+                container.appendText(part);
+            }
+        });
     }
 
     private renderSettings(): void {
@@ -56,10 +68,19 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Made by section
         const madeByEl = containerEl.createDiv('emoji-made-by');
-        madeByEl.innerHTML = 'Made by <a href="https://flyalready.com" target="_blank" rel="noopener noreferrer">Summer</a> with ❤️';
+        madeByEl.appendText('Made by ');
+        madeByEl.createEl('a', {
+            text: 'Summer',
+            href: 'https://flyalready.com',
+            attr: {
+                target: '_blank',
+                rel: 'noopener noreferrer'
+            }
+        });
+        madeByEl.appendText(' with ❤️');
 
         // Emoji size setting
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('emojiHeight')),
             i18n.t('emojiHeightDesc')
@@ -72,7 +93,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Search placeholder setting
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('searchPlaceholder')),
             i18n.t('searchPlaceholderDesc')
@@ -89,8 +110,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setName(i18n.t('owoJsonUrls'))
             .setDesc(''); // Will be set with HTML content below
 
-        // Set description with HTML support
-        owoUrlsSetting.descEl.innerHTML = this.getCollectionStatusDescription();
+        // Set description with code support using DOM API
+        this.createFormattedText(owoUrlsSetting.descEl, this.getCollectionStatusDescription());
 
         // Add CSS class for multi-line layout
         owoUrlsSetting.settingEl.addClass('emoji-setting-multiline');
@@ -126,7 +147,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         this.hasUnsavedChanges = hasUnsavedChanges;
 
         // Remember last collection setting
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('rememberLastCollection')),
             i18n.t('rememberLastCollectionDesc')
@@ -147,7 +168,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setName(i18n.t('emojiSpacing'))
             .setHeading();
         // Add space after emoji setting (single-select)
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('addSpaceAfterEmojiSingle')),
             i18n.t('addSpaceAfterEmojiSingleDesc')
@@ -159,7 +180,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Add space after emoji setting (multi-select)
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('addSpaceAfterEmojiMulti')),
             i18n.t('addSpaceAfterEmojiMultiDesc')
@@ -171,7 +192,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Custom CSS classes setting
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('customCssClasses')),
             i18n.t('customCssClassesDesc')
@@ -187,8 +208,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         const customTemplateSetting = new Setting(containerEl)
             .setName(i18n.t('customEmojiTemplate'));
 
-        // Set description with HTML support
-        this.setDescWithHtml(customTemplateSetting, i18n.t('customEmojiTemplateDesc'));
+        // Set description with code support using DOM API
+        this.setDescWithCodeSupport(customTemplateSetting, i18n.t('customEmojiTemplateDesc'));
 
         // Add CSS class for multi-line layout
         customTemplateSetting.settingEl.addClass('emoji-setting-multiline');
@@ -207,7 +228,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setHeading();
 
         // Enable quick insertion setting
-        this.setDescWithHtml(
+        this.setDescWithCodeSupport(
             new Setting(containerEl)
                 .setName(i18n.t('enableQuickInsertion')),
             i18n.t('enableQuickInsertionDesc')
@@ -224,57 +245,61 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setHeading();
 
         // Enable recent emojis setting
-        new Setting(containerEl)
+        const enableRecentEmojisSetting = new Setting(containerEl)
             .setName(i18n.t('enableRecentEmojis'))
-            .setDesc(this.formatDescription(i18n.t('enableRecentEmojisDesc')))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableRecentEmojis)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableRecentEmojis = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(enableRecentEmojisSetting.descEl, i18n.t('enableRecentEmojisDesc'));
+        enableRecentEmojisSetting.addToggle(toggle => toggle
+            .setValue(this.plugin.settings.enableRecentEmojis)
+            .onChange(async (value) => {
+                this.plugin.settings.enableRecentEmojis = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Prefer recent over remembered setting
-        new Setting(containerEl)
+        const preferRecentSetting = new Setting(containerEl)
             .setName(i18n.t('preferRecentOverRemembered'))
-            .setDesc(this.formatDescription(i18n.t('preferRecentOverRememberedDesc')))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.preferRecentOverRemembered)
-                .onChange(async (value) => {
-                    this.plugin.settings.preferRecentOverRemembered = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(preferRecentSetting.descEl, i18n.t('preferRecentOverRememberedDesc'));
+        preferRecentSetting.addToggle(toggle => toggle
+            .setValue(this.plugin.settings.preferRecentOverRemembered)
+            .onChange(async (value) => {
+                this.plugin.settings.preferRecentOverRemembered = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Max recent emojis setting
-        new Setting(containerEl)
+        const maxRecentEmojisSetting = new Setting(containerEl)
             .setName(i18n.t('maxRecentEmojis'))
-            .setDesc(this.formatDescription(i18n.t('maxRecentEmojisDesc')))
-            .addSlider(slider => slider
-                .setLimits(1, 50, 1)
-                .setValue(this.plugin.settings.maxRecentEmojis)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    this.plugin.settings.maxRecentEmojis = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(maxRecentEmojisSetting.descEl, i18n.t('maxRecentEmojisDesc'));
+        maxRecentEmojisSetting.addSlider(slider => slider
+            .setLimits(1, 50, 1)
+            .setValue(this.plugin.settings.maxRecentEmojis)
+            .setDynamicTooltip()
+            .onChange(async (value) => {
+                this.plugin.settings.maxRecentEmojis = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Clear recent emojis button
-        new Setting(containerEl)
+        const clearRecentEmojisSetting = new Setting(containerEl)
             .setName(i18n.t('clearRecentEmojis'))
-            .setDesc(this.formatDescription(i18n.t('clearRecentEmojisDesc')))
-            .addButton(button => button
-                .setButtonText(i18n.t('clearRecentEmojisButton'))
-                .setWarning()
-                .onClick(async () => {
-                    try {
-                        const emojiManager = await this.plugin.getEmojiManagerForSettings();
-                        await emojiManager.clearRecentEmojis();
-                        new Notice(i18n.t('recentEmojisCleared'));
-                    } catch (error) {
-                        console.error('Failed to clear recent emojis:', error);
-                        new Notice(i18n.t('failedToClearRecentEmojis'));
-                    }
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(clearRecentEmojisSetting.descEl, i18n.t('clearRecentEmojisDesc'));
+        clearRecentEmojisSetting.addButton(button => button
+            .setButtonText(i18n.t('clearRecentEmojisButton'))
+            .setWarning()
+            .onClick(async () => {
+                try {
+                    const emojiManager = await this.plugin.getEmojiManagerForSettings();
+                    await emojiManager.clearRecentEmojis();
+                    new Notice(i18n.t('recentEmojisCleared'));
+                } catch (error) {
+                    console.error('Failed to clear recent emojis:', error);
+                    new Notice(i18n.t('failedToClearRecentEmojis'));
+                }
+            }));
 
         // Advanced search settings section (moved to the end)
         new Setting(containerEl)
@@ -282,26 +307,28 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setHeading();
 
         // Enable regex search setting
-        new Setting(containerEl)
+        const enableRegexSearchSetting = new Setting(containerEl)
             .setName(i18n.t('enableRegexSearch'))
-            .setDesc(this.formatDescription(i18n.t('enableRegexSearchDesc')))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableRegexSearch)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableRegexSearch = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(enableRegexSearchSetting.descEl, i18n.t('enableRegexSearchDesc'));
+        enableRegexSearchSetting.addToggle(toggle => toggle
+            .setValue(this.plugin.settings.enableRegexSearch)
+            .onChange(async (value) => {
+                this.plugin.settings.enableRegexSearch = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Enable fuzzy search setting
-        new Setting(containerEl)
+        const enableFuzzySearchSetting = new Setting(containerEl)
             .setName(i18n.t('enableFuzzySearch'))
-            .setDesc(this.formatDescription(i18n.t('enableFuzzySearchDesc')))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableFuzzySearch)
-                .onChange(async (value) => {
-                    this.plugin.settings.enableFuzzySearch = value;
-                    await this.plugin.saveSettings();
-                }));
+            .setDesc(''); // Clear default description
+        this.createFormattedText(enableFuzzySearchSetting.descEl, i18n.t('enableFuzzySearchDesc'));
+        enableFuzzySearchSetting.addToggle(toggle => toggle
+            .setValue(this.plugin.settings.enableFuzzySearch)
+            .onChange(async (value) => {
+                this.plugin.settings.enableFuzzySearch = value;
+                await this.plugin.saveSettings();
+            }));
 
         // Initialize button state
         this.updateButtonState();
@@ -327,7 +354,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Get description with current collection status
      */
     private getCollectionStatusDescription(): string {
-        let statusText = this.formatDescription(i18n.t('owoJsonUrlsDesc'));
+        let statusText = i18n.t('owoJsonUrlsDesc');
 
         if (this.plugin.isEmojiManagerInitialized()) {
             const collectionCount = this.plugin.emojiManager!.getAllCollections().length;

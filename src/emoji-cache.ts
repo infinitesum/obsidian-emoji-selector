@@ -14,7 +14,7 @@ export class EmojiCacheManager {
 
     constructor(app: any) {
         this.app = app;
-        this.cacheFilePath = '.obsidian/plugins/emoji-selector/cache.json';
+        this.cacheFilePath = `${app.vault.configDir}/plugins/emoji-selector/cache.json`;
     }
 
     /**
@@ -59,7 +59,7 @@ export class EmojiCacheManager {
     private async migrateCacheFromDataJson(): Promise<void> {
         try {
             // This is a one-time migration for existing users
-            const dataPath = '.obsidian/plugins/emoji-selector/data.json';
+            const dataPath = `${this.app.vault.configDir}/plugins/emoji-selector/data.json`;
             const dataExists = await this.app.vault.adapter.exists(dataPath);
             if (dataExists) {
                 const dataContent = await this.app.vault.adapter.read(dataPath);
@@ -111,7 +111,7 @@ export class EmojiCacheManager {
     private async saveCacheToFile(): Promise<void> {
         try {
             // Ensure the plugin directory exists
-            const pluginDir = '.obsidian/plugins/emoji-selector';
+            const pluginDir = `${this.app.vault.configDir}/plugins/emoji-selector`;
             const dirExists = await this.app.vault.adapter.exists(pluginDir);
             if (!dirExists) {
                 await this.app.vault.adapter.mkdir(pluginDir);
