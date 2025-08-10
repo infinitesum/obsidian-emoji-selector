@@ -299,3 +299,32 @@
   font-family: var(--font-monospace);
   font-size: 0.9em;
 }
+/* Emoji Suggestion Styles */
+.emoji-suggest-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.emoji-suggest-text {
+  font-size: 20px;
+}
+
+.emoji-suggest-info {
+  /* Container for emoji suggestion text info */
+}
+
+.emoji-suggest-key {
+  font-weight: bold;
+  color: var(--text-accent);
+}
+
+.emoji-suggest-desc {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+.emoji-suggest-category {
+  font-size: 0.8em;
+  color: var(--text-faint);
+}

@@ -111,35 +111,30 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
                 },
                 cls: 'emoji-suggest-image'
             });
-            img.style.width = '20px';
-            img.style.height = '20px';
-            img.style.objectFit = 'contain';
+            // Styles are now handled by CSS class 'emoji-suggest-image'
         } else {
             const span = emojiPreview.createSpan({
                 text: emoji.icon,
                 cls: 'emoji-suggest-text'
             });
-            span.style.fontSize = '20px';
+            // Styles are now handled by CSS class 'emoji-suggest-text'
         }
 
         // Create text info
         const textInfo = el.createDiv('emoji-suggest-info');
         const keyEl = textInfo.createDiv('emoji-suggest-key');
         keyEl.textContent = `:${emoji.key}:`;
-        keyEl.style.fontWeight = 'bold';
-        keyEl.style.color = 'var(--text-accent)';
+        // Styles are now handled by CSS class 'emoji-suggest-key'
 
         const descEl = textInfo.createDiv('emoji-suggest-desc');
         descEl.textContent = emoji.text;
-        descEl.style.fontSize = '0.9em';
-        descEl.style.color = 'var(--text-muted)';
+        // Styles are now handled by CSS class 'emoji-suggest-desc'
 
         // Add category if available
         if (emoji.category) {
             const categoryEl = textInfo.createDiv('emoji-suggest-category');
             categoryEl.textContent = emoji.category;
-            categoryEl.style.fontSize = '0.8em';
-            categoryEl.style.color = 'var(--text-faint)';
+            // Styles are now handled by CSS class 'emoji-suggest-category'
         }
     }
 
