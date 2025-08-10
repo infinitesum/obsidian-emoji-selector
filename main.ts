@@ -26,7 +26,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 		// Add command to open emoji picker (Requirement 5.1)
 		this.addCommand({
-			id: 'open-picker',
+			id: 'open-emoji-picker',
 			name: i18n.t('openEmojiPicker'),
 			editorCallback: async (editor: Editor) => {
 				await this.openEmojiPicker(editor);

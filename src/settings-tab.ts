@@ -58,9 +58,6 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         const madeByEl = containerEl.createDiv('emoji-made-by');
         madeByEl.innerHTML = 'Made by <a href="https://flyalready.com" target="_blank" rel="noopener noreferrer">Summer</a> with ❤️';
 
-        // Plugin title
-        containerEl.createEl('h3', { text: i18n.t('settingsTitle') });
-
         // Emoji size setting
         this.setDescWithHtml(
             new Setting(containerEl)
@@ -146,7 +143,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Emoji spacing settings section (moved up to general section)
 
-        containerEl.createEl('h3', { text: i18n.t('emojiSpacing') });
+        new Setting(containerEl)
+            .setName(i18n.t('emojiSpacing'))
+            .setHeading();
         // Add space after emoji setting (single-select)
         this.setDescWithHtml(
             new Setting(containerEl)
@@ -203,7 +202,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Quick insertion settings section
-        containerEl.createEl('h3', { text: i18n.t('quickInsertion') });
+        new Setting(containerEl)
+            .setName(i18n.t('quickInsertion'))
+            .setHeading();
 
         // Enable quick insertion setting
         this.setDescWithHtml(
@@ -218,7 +219,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Recent emojis settings section
-        containerEl.createEl('h3', { text: i18n.t('recentEmojis') });
+        new Setting(containerEl)
+            .setName(i18n.t('recentEmojis'))
+            .setHeading();
 
         // Enable recent emojis setting
         new Setting(containerEl)
@@ -274,7 +277,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 }));
 
         // Advanced search settings section (moved to the end)
-        containerEl.createEl('h3', { text: i18n.t('advancedSearch') });
+        new Setting(containerEl)
+            .setName(i18n.t('advancedSearch'))
+            .setHeading();
 
         // Enable regex search setting
         new Setting(containerEl)

@@ -94,11 +94,11 @@ const EN_STRINGS: I18nStrings = {
     advancedSearchTip: 'Advanced search: Use "collection.*pattern" for collection-specific search, regex patterns, or fuzzy matching',
     owoJsonUrls: 'OWO JSON URLs',
     owoJsonUrlsDesc: 'Comma-separated URLs for `owo.json` files to load emoji collections from. JSON files are cached locally until you click "Update".',
-    updateCollections: 'Update Collections',
+    updateCollections: 'Update collections',
     updateCollectionsTooltip: 'Load emoji collections from the URLs above',
     rememberLastCollection: 'Remember last collection',
     rememberLastCollectionDesc: 'Remember the last selected emoji collection and restore it when opening the picker',
-    emojiSpacing: 'Emoji Spacing',
+    emojiSpacing: 'Emoji spacing',
     addSpaceAfterEmojiSingle: 'Add space after emoji (single-select)',
     addSpaceAfterEmojiSingleDesc: 'Automatically add a space after inserting an emoji in single-select mode',
     addSpaceAfterEmojiMulti: 'Add space after emoji (multi-select)',
@@ -109,16 +109,16 @@ const EN_STRINGS: I18nStrings = {
     customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: `{url}`, `{name}`, `{text}`, `{category}`, `{type}`, `{classes}`, `{filename}`, `{fullfilename}`. Leave empty for default HTML.',
 
     // Quick insertion
-    quickInsertion: 'Quick Insertion',
+    quickInsertion: 'Quick insertion',
     enableQuickInsertion: 'Enable quick emoji insertion',
     enableQuickInsertionDesc: 'Allow typing `:emoji_name` to show a dropdown with matching emojis for quick insertion',
 
     // Advanced search
-    advancedSearch: 'Advanced Search',
+    advancedSearch: 'Advanced search',
     enableRegexSearch: 'Enable regex search',
-    enableRegexSearchDesc: 'Support regular expression patterns in search (e.g., ".*heart.*"). Disable to improve performance.',
+    enableRegexSearchDesc: 'Support regular expression patterns in search (e.g., ".*heart.*").',
     enableFuzzySearch: 'Enable fuzzy search',
-    enableFuzzySearchDesc: 'Support fuzzy matching and phonetic similarity in search. Disable to improve performance.',
+    enableFuzzySearchDesc: 'Support fuzzy matching and phonetic similarity in search.',
 
     // Recent emojis
     recentEmojis: 'Recent Emojis',
@@ -196,9 +196,9 @@ const ZH_CN_STRINGS: I18nStrings = {
     // Advanced search
     advancedSearch: '高级搜索',
     enableRegexSearch: '启用正则表达式搜索',
-    enableRegexSearchDesc: '支持在搜索中使用正则表达式模式（如".*heart.*"）。禁用可提升性能。',
+    enableRegexSearchDesc: '支持在搜索中使用正则表达式模式（如".*heart.*"）。',
     enableFuzzySearch: '启用模糊搜索',
-    enableFuzzySearchDesc: '支持模糊匹配和语音相似性搜索。禁用可提升性能。',
+    enableFuzzySearchDesc: '支持模糊匹配和语音相似性搜索。',
 
     // Recent emojis
     recentEmojis: '最近使用的表情符号',
