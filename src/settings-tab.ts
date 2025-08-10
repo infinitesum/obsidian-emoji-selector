@@ -330,6 +330,31 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
             }));
 
+        // Debug logging settings section
+        new Setting(containerEl)
+            .setName('Debug & Troubleshooting')
+            .setHeading();
+
+        // Debug log level setting
+        const debugLogLevelSetting = new Setting(containerEl)
+            .setName('Debug Log Level')
+            .setDesc(''); // Clear default description
+        this.createFormattedText(debugLogLevelSetting.descEl, 'Control how much logging information is shown in the developer console. `WARN` (default) shows only warnings and errors. `DEBUG` shows all logging for troubleshooting.');
+        debugLogLevelSetting.addDropdown(dropdown => dropdown
+            .addOption('0', 'DEBUG (All logs)')
+            .addOption('1', 'INFO (Info and above)')
+            .addOption('2', 'WARN (Warnings and errors only)')
+            .addOption('3', 'ERROR (Errors only)')
+            .addOption('4', 'NONE (No logs)')
+            .setValue(this.plugin.settings.debugLogLevel.toString())
+            .onChange(async (value) => {
+                this.plugin.settings.debugLogLevel = parseInt(value);
+                await this.plugin.saveSettings();
+                // Update logger immediately
+                const { logger } = await import('./logger');
+                logger.setLogLevel(parseInt(value));
+            }));
+
         // Initialize button state
         this.updateButtonState();
     }

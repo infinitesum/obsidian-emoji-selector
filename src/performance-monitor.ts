@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 /**
  * Simple performance monitoring utilities
  * Helps track startup and operation performance
@@ -72,11 +74,11 @@ class PerformanceMonitor {
         const metrics = this.getMetrics();
         if (metrics.length === 0) return;
 
-        console.group('🚀 Emoji Selector Performance Metrics');
-        metrics.forEach(metric => {
-            console.log(`${metric.name}: ${metric.duration!.toFixed(2)}ms`);
+        logger.performanceGroup('🚀 Emoji Selector Performance Metrics', () => {
+            metrics.forEach(metric => {
+                logger.benchmark(`${metric.name}: ${metric.duration!.toFixed(2)}ms`);
+            });
         });
-        console.groupEnd();
     }
 
     /**

@@ -6,6 +6,7 @@ import { EmojiSelectorSettingTab } from './src/settings-tab';
 import { EmojiSuggest } from './src/emoji-suggest';
 import { i18n } from './src/i18n';
 import { perfMonitor } from './src/performance-monitor';
+import { logger, LogLevel } from './src/logger';
 
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
@@ -20,6 +21,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 		// Load only settings on startup (now that cache is separated, data.json is small)
 		await this.loadSettings();
+
+		// Initialize logger with user's preferred level
+		logger.setLogLevel(this.settings.debugLogLevel as LogLevel);
 
 		// Add settings tab (Requirement 5.4) - can be added immediately
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));

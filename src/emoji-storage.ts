@@ -1,4 +1,5 @@
 import { EmojiItem, EmojiCollection } from './types';
+import { logger } from './logger';
 
 /**
  * Optimized in-memory storage for emoji collections with efficient search indexing
@@ -803,38 +804,41 @@ export class EmojiStorage {
      * Run a comprehensive performance benchmark
      */
     runPerformanceBenchmark(): void {
-        console.log('🚀 Starting Emoji Search Performance Benchmark');
-        console.log(`📊 Testing with ${this.getTotalEmojiCount()} emojis across ${this.getCollectionCount()} collections`);
 
-        const testQueries = this.generateTestQueries();
-        console.log(`🔍 Running ${testQueries.length} test queries`);
 
-        const results = this.compareSearchPerformance(testQueries);
+        logger.performanceGroup('🚀 Emoji Search Performance Benchmark', () => {
+            logger.benchmark(`📊 Testing with ${this.getTotalEmojiCount()} emojis across ${this.getCollectionCount()} collections`);
 
-        console.log('\n📈 Performance Results:');
-        console.log(`⚡ Indexed Search: ${results.indexedSearch.totalTime.toFixed(2)}ms total, ${results.indexedSearch.averageTime.toFixed(3)}ms average`);
-        console.log(`🐌 Natural Search: ${results.naturalSearch.totalTime.toFixed(2)}ms total, ${results.naturalSearch.averageTime.toFixed(3)}ms average`);
-        console.log(`🚀 Speedup Factor: ${results.speedupFactor.toFixed(1)}x faster`);
+            const testQueries = this.generateTestQueries();
+            logger.benchmark(`🔍 Running ${testQueries.length} test queries`);
 
-        console.log('\n💾 Memory Usage:');
-        console.log(`📝 Key Index: ${results.memoryUsage.indexSizes.keyIndex} entries`);
-        console.log(`📝 Text Index: ${results.memoryUsage.indexSizes.textIndex} entries`);
-        console.log(`📝 Category Index: ${results.memoryUsage.indexSizes.categoryIndex} entries`);
-        console.log(`📝 Total Index Entries: ${results.memoryUsage.totalIndexEntries}`);
-        console.log(`📝 Memory Overhead: ~${(results.memoryUsage.totalIndexEntries * 50 / 1024).toFixed(1)}KB estimated`);
+            const results = this.compareSearchPerformance(testQueries);
 
-        // Verify results consistency
-        const inconsistencies = results.indexedSearch.results.filter((count, i) =>
-            count !== results.naturalSearch.results[i]
-        ).length;
+            logger.benchmark('📈 Performance Results:');
+            logger.benchmark(`⚡ Indexed Search: ${results.indexedSearch.totalTime.toFixed(2)}ms total, ${results.indexedSearch.averageTime.toFixed(3)}ms average`);
+            logger.benchmark(`🐌 Natural Search: ${results.naturalSearch.totalTime.toFixed(2)}ms total, ${results.naturalSearch.averageTime.toFixed(3)}ms average`);
+            logger.benchmark(`🚀 Speedup Factor: ${results.speedupFactor.toFixed(1)}x faster`);
 
-        if (inconsistencies === 0) {
-            console.log('✅ All search results are consistent between methods');
-        } else {
-            console.log(`❌ Found ${inconsistencies} inconsistencies in search results`);
-        }
+            logger.benchmark('💾 Memory Usage:');
+            logger.benchmark(`📝 Key Index: ${results.memoryUsage.indexSizes.keyIndex} entries`);
+            logger.benchmark(`📝 Text Index: ${results.memoryUsage.indexSizes.textIndex} entries`);
+            logger.benchmark(`📝 Category Index: ${results.memoryUsage.indexSizes.categoryIndex} entries`);
+            logger.benchmark(`📝 Total Index Entries: ${results.memoryUsage.totalIndexEntries}`);
+            logger.benchmark(`📝 Memory Overhead: ~${(results.memoryUsage.totalIndexEntries * 50 / 1024).toFixed(1)}KB estimated`);
 
-        console.log('\n🎯 Benchmark Complete!');
+            // Verify results consistency
+            const inconsistencies = results.indexedSearch.results.filter((count, i) =>
+                count !== results.naturalSearch.results[i]
+            ).length;
+
+            if (inconsistencies === 0) {
+                logger.benchmark('✅ All search results are consistent between methods');
+            } else {
+                logger.benchmark(`❌ Found ${inconsistencies} inconsistencies in search results`);
+            }
+
+            logger.benchmark('🎯 Benchmark Complete!');
+        });
     }
 }
 /**

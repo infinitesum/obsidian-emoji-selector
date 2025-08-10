@@ -112,6 +112,8 @@ export interface EmojiSelectorSettings {
     enableRegexSearch: boolean;
     /** Enable fuzzy search support */
     enableFuzzySearch: boolean;
+    /** Debug logging level (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR, 4=NONE) */
+    debugLogLevel: number;
 }
 
 /**
@@ -132,5 +134,6 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     preferRecentOverRemembered: true,
     enableQuickInsertion: true,
     enableRegexSearch: false,
-    enableFuzzySearch: false
+    enableFuzzySearch: false,
+    debugLogLevel: 2 // Default to WARN level
 };

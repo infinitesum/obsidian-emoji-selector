@@ -1,4 +1,5 @@
 import { EmojiJsonCache } from './types';
+import { logger } from './logger';
 
 /**
  * Manages persistent caching of emoji JSON files using separate cache file
@@ -46,7 +47,7 @@ export class EmojiCacheManager {
             }
             this.isInitialized = true;
         } catch (error) {
-            console.warn('Failed to load emoji cache, starting with empty cache:', error);
+            logger.warn('Failed to load emoji cache, starting with empty cache:', error);
             this.cache = {};
             this.isInitialized = true;
             // Don't throw error - graceful degradation
@@ -71,11 +72,11 @@ export class EmojiCacheManager {
                     // Remove cache from data.json to keep it small
                     delete data.emojiJsonCache;
                     await this.app.vault.adapter.write(dataPath, JSON.stringify(data, null, 2));
-                    console.log('Migrated emoji cache to separate file');
+                    logger.info('Migrated emoji cache to separate file');
                 }
             }
         } catch (error) {
-            console.warn('Failed to migrate cache from data.json:', error);
+            logger.warn('Failed to migrate cache from data.json:', error);
             this.cache = {};
         }
     }
@@ -121,7 +122,7 @@ export class EmojiCacheManager {
             const cacheContent = JSON.stringify(this.cache, null, 2);
             await this.app.vault.adapter.write(this.cacheFilePath, cacheContent);
         } catch (error) {
-            console.error('Failed to save emoji cache to separate file:', error);
+            logger.error('Failed to save emoji cache to separate file:', error);
             // Don't throw error - graceful degradation
         }
     }
@@ -131,7 +132,7 @@ export class EmojiCacheManager {
      */
     getCachedData(url: string): any | null {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, returning null for URL:', url);
+            logger.debug('Cache not initialized yet, returning null for URL:', url);
             return null;
         }
 
@@ -150,7 +151,7 @@ export class EmojiCacheManager {
      */
     async setCachedData(url: string, data: any, etag?: string): Promise<void> {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, skipping cache set for URL:', url);
+            logger.debug('Cache not initialized yet, skipping cache set for URL:', url);
             return;
         }
 
@@ -164,10 +165,10 @@ export class EmojiCacheManager {
 
             // Save to persistent storage in background (non-blocking)
             this.saveCache().catch(error => {
-                console.error('Background cache save failed for URL:', url, error);
+                logger.error('Background cache save failed for URL:', url, error);
             });
         } catch (error) {
-            console.error('Failed to set cached data for URL:', url, error);
+            logger.error('Failed to set cached data for URL:', url, error);
         }
     }
 
@@ -186,7 +187,7 @@ export class EmojiCacheManager {
      */
     async clearUrl(url: string): Promise<void> {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, skipping clear for URL:', url);
+            logger.debug('Cache not initialized yet, skipping clear for URL:', url);
             return;
         }
 
@@ -194,10 +195,10 @@ export class EmojiCacheManager {
             delete this.cache[url];
             // Save to persistent storage in background (non-blocking)
             this.saveCache().catch(error => {
-                console.error('Background cache save failed after clearing URL:', url, error);
+                logger.error('Background cache save failed after clearing URL:', url, error);
             });
         } catch (error) {
-            console.error('Failed to clear cached data for URL:', url, error);
+            logger.error('Failed to clear cached data for URL:', url, error);
         }
     }
 
@@ -206,7 +207,7 @@ export class EmojiCacheManager {
      */
     async clearAll(): Promise<void> {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, skipping clear all');
+            logger.debug('Cache not initialized yet, skipping clear all');
             return;
         }
 
@@ -214,10 +215,10 @@ export class EmojiCacheManager {
             this.cache = {};
             // Save to persistent storage in background (non-blocking)
             this.saveCache().catch(error => {
-                console.error('Background cache save failed after clearing all cache:', error);
+                logger.error('Background cache save failed after clearing all cache:', error);
             });
         } catch (error) {
-            console.error('Failed to clear all cached data:', error);
+            logger.error('Failed to clear all cached data:', error);
         }
     }
 
@@ -253,7 +254,7 @@ export class EmojiCacheManager {
      */
     async cleanupUnusedCache(activeUrls: string[]): Promise<void> {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, skipping cleanup');
+            logger.debug('Cache not initialized yet, skipping cleanup');
             return;
         }
 
@@ -269,11 +270,11 @@ export class EmojiCacheManager {
 
                 // Save to persistent storage in background (non-blocking)
                 this.saveCache().catch(error => {
-                    console.error('Background cache save failed after cleanup:', error);
+                    logger.error('Background cache save failed after cleanup:', error);
                 });
             }
         } catch (error) {
-            console.error('Failed to cleanup unused cache entries:', error);
+            logger.error('Failed to cleanup unused cache entries:', error);
         }
     }
 
@@ -282,7 +283,7 @@ export class EmojiCacheManager {
      */
     async startBackgroundWarming(urls: string[]): Promise<void> {
         if (!this.isInitialized) {
-            console.warn('Cache not initialized yet, skipping background warming');
+            logger.debug('Cache not initialized yet, skipping background warming');
             return;
         }
 
@@ -296,7 +297,7 @@ export class EmojiCacheManager {
         // Don't await - let it run in background
         this.backgroundWarmingPromise
             .catch(error => {
-                console.error('Background cache warming failed:', error);
+                logger.error('Background cache warming failed:', error);
             })
             .finally(() => {
                 this.backgroundWarmingPromise = null;
@@ -331,7 +332,7 @@ export class EmojiCacheManager {
                         await OwoFileParser.loadFromUrl(url);
                         // Cache warmed for URL
                     } catch (error) {
-                        console.warn(`Background warming failed for URL: ${url}`, error);
+                        logger.warn(`Background warming failed for URL: ${url}`, error);
                     }
                 });
 
@@ -345,7 +346,7 @@ export class EmojiCacheManager {
 
             // Background cache warming completed
         } catch (error) {
-            console.error('Background cache warming encountered an error:', error);
+            logger.error('Background cache warming encountered an error:', error);
         }
     }
 
