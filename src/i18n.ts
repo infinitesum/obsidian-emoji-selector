@@ -93,7 +93,7 @@ const EN_STRINGS: I18nStrings = {
     searchPlaceholderDesc: 'Placeholder text shown in the emoji search input',
     advancedSearchTip: 'Advanced search: Use "collection.*pattern" for collection-specific search, regex patterns, or fuzzy matching',
     owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: 'Comma-separated URLs for `owo.json` files to load emoji collections from. JSON files are cached locally until you click "Update".',
+    owoJsonUrlsDesc: 'Supports OWO-format sticker pack URLs; separate multiple URLs with commas. The JSON file will be cached locally until you click "Update" again.',
     updateCollections: 'Update collections',
     updateCollectionsTooltip: 'Load emoji collections from the URLs above',
     rememberLastCollection: 'Remember last collection',
@@ -121,7 +121,7 @@ const EN_STRINGS: I18nStrings = {
     enableFuzzySearchDesc: 'Support fuzzy matching and phonetic similarity in search.',
 
     // Recent emojis
-    recentEmojis: 'Recent Emojis',
+    recentEmojis: 'Recent emojis',
     enableRecentEmojis: 'Enable recent emojis',
     enableRecentEmojisDesc: 'Show recently used emojis in a separate tab',
     maxRecentEmojis: 'Max recent emojis',
@@ -173,7 +173,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     searchPlaceholderDesc: '表情符号搜索输入框中显示的占位符文本',
     advancedSearchTip: '高级搜索：使用"集合名.*模式"进行集合特定搜索，支持正则表达式和模糊匹配',
     owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: '用逗号分隔的 `owo.json` 文件 URL，用于加载表情符号集合。JSON 文件会在本地缓存，直到您点击"更新"。',
+    owoJsonUrlsDesc: '支持 OWO 格式的表情包 URL，多个文件用英文逗号分隔。JSON 文件会在本地缓存，直到您再次点击“更新”。',
     updateCollections: '更新集合',
     updateCollectionsTooltip: '从上述 URL 加载表情符号集合',
     rememberLastCollection: '记住上次选择的集合',

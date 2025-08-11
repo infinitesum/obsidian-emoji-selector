@@ -332,12 +332,12 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Debug logging settings section
         new Setting(containerEl)
-            .setName('Debug & Troubleshooting')
+            .setName('Debug & troubleshooting')
             .setHeading();
 
         // Debug log level setting
         const debugLogLevelSetting = new Setting(containerEl)
-            .setName('Debug Log Level')
+            .setName('Debug log level')
             .setDesc(''); // Clear default description
         this.createFormattedText(debugLogLevelSetting.descEl, 'Control how much logging information is shown in the developer console. `WARN` (default) shows only warnings and errors. `DEBUG` shows all logging for troubleshooting.');
         debugLogLevelSetting.addDropdown(dropdown => dropdown
