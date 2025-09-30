@@ -1,4 +1,4 @@
-### 中文 | [English](./README.md)
+### 中文 | [English](./README-EN.md)
 
 # Emoji Selector 表情选择器
 
