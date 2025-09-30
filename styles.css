@@ -216,7 +216,7 @@
   position: relative; /* 用于定位内部的圆点 */
   width: 40px;
   height: 22px;
-  background-color: #ccc; /* 关闭时的颜色 */
+  background-color: var(--toggle-track-color); /* 关闭时的颜色 */
   border-radius: 11px; /* 圆角 */
   transition: background-color 0.2s; /* 背景色渐变动画 */
 }

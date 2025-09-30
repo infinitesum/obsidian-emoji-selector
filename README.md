@@ -1,87 +1,88 @@
-### [中文](./README-zh.md) | English
+### 中文 | [English](./README.md)
 
-# Emoji Selector
+# Emoji Selector 表情选择器
 
-Insert custom emojis in Obsidian with fast search, auto-suggestion, and support for OWO format emoji collections.
+在 Obsidian 里快速插入自定义表情。支持搜索、自定义样式和插入模板。
 
-## Screenshots
+## 截图
 
-Panel Selection
+面板选择
 
-![Panel Selection](https://io.pari.network/s/gwMTTbgFFYffrNc/download)
+![面板选择](https://io.pari.network/s/gwMTTbgFFYffrNc/download)
 
-Quick Insertion
+快速插入
 
-![Quick Insertion](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
+![快速插入](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
 
-## Features
 
-- **Quick Insertion**: Type `:` to trigger emoji auto-suggestions
-- **Emoji Picker Panel**: Browse and search through emoji collections
-- **OWO Format Support**: Compatible with a vast library of emoji packs
-- **Custom Templates**: Customize how emojis are inserted (HTML, Markdown, custom formats)
-- **Advanced Search**: Supports regex and fuzzy matching
-- **Keyboard Navigation**: Full keyboard support for accessibility
-- **Recent Emojis**: Quick access to recently used emojis
-- **Multi-select Mode**: Insert multiple emojis at once
-- **Custom CSS Classes**: Style emojis with your own CSS
+## 功能特性
 
-## Installation
+- 输入 `:` 快速插入
+- 表情选择器面板
+- 兼容 owo 格式表情包文件，支持大量表情包
+- 自定义插入模板和 CSS 样式
+- 支持正则、模糊搜索
+- 快捷键操作
 
-### Method 1: Community Plugin Store (Recommended)
+## 快速开始
 
-1. Open Obsidian Settings
-2. Navigate to Community Plugins
-3. Search for "Emoji Selector"
-4. Install and enable the plugin
+### 安装
 
-### Method 2: Manual Installation
+#### 方法一：插件市场安装（暂未发布，请使用方法二）
 
-1. Download the latest release from [GitHub Releases](https://github.com/infinitesum/obsidian-emoji-selector/releases)
-2. Extract `main.js`, `manifest.json`, and `styles.css`
-3. Create folder: `.obsidian/plugins/emoji-selector/`
-4. Place the downloaded files in this folder
-5. Restart Obsidian or reload plugins in settings
-6. Enable "Emoji Selector" in Community Plugins
+1. 在 Obsidian 中打开设置
+2. 进入第三方插件
+3. 搜索 “Emoji Selector”
+4. 安装并启用插件
 
-## Quick Start
+#### 方法二：手动安装
+
+1. 前往 [Releases 页面](https://github.com/infinitesum/obsidian-emoji-selector/releases)
+2. 下载最新版本的 `main.js`、`manifest.json` 和 `styles.css`
+3. 在 Obsidian 库文件夹中创建路径：`.obsidian/plugins/emoji-selector/`
+4. 将下载的文件放入该文件夹
+5. 重启 Obsidian 或在设置中重新加载插件
+6. 在第三方插件设置中启用 “Emoji Selector”
+
+### 基础使用
 
 > [!important] 
-> **Configuration Required**: The plugin requires emoji collection files to function. Find emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/).
+> 使用前必须配置表情包：插件需要表情包文件才能正常工作。可以在 [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/) 寻找您喜欢的表情包。
 
-**Initial Setup Steps**:
 
-1. **Add Emoji Collections**: Go to plugin settings, add OWO format JSON URLs in "OWO JSON URLs" field (comma-separated). **Click "Update" after adding URLs**.
-2. **Quick Insertion**: Type `:` followed by emoji name, e.g., `:smile:`
-3. **Emoji Panel**: Click toolbar icon or use Command Palette "Emoji Selector"
+**首次使用配置步骤**：
 
-### Keyboard Shortcuts
+1. **添加表情包**：进入插件设置，在“OWO JSON URLs”中添加 owo 格式的表情包文件链接，多个 URL 用英文逗号分隔。**添加后点击“更新”**
+2. **快速插入**：在编辑器中输入 `:` 后跟表情名称，如 `:smile:`
+3. **表情面板**：点击工具栏图标或使用命令面板搜索 “Emoji Selector”
 
-| Shortcut | Function |
-|----------|----------|
-| `:` | Trigger quick insertion |
-| `Tab` / `Shift+Tab` | Switch between emoji collections in panel |
-| `Ctrl+M` | Toggle multi-select mode (when search is focused) |
-| `↑` / `↓` | Navigate emoji selection |
-| `Enter` | Select emoji |
-| `Esc` | Close panel |
+### 快捷键
 
-## Configuration Guide
+| 快捷键 | 功能 |
+|--------|------|
+| `:` | 触发快速插入 |
+| `Tab` / `Shift+Tab` | 面板切换表情包集合 |
+| `Ctrl+M` | 面板切换多选模式（搜索框聚焦时） |
+| `↑` / `↓` | 导航表情选择 |
+| `Enter` | 选择表情 |
+| `Esc` | 关闭面板 |
 
-### 🔧 Basic Configuration
+## 配置指南
 
-#### Emoji Collection Sources (OWO JSON URLs)
-- **Recommended Source**: [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
-- **Remember to click "Update" after adding URLs**
+### 🔧 基础配置
 
-### 🎨 Custom Emoji Templates
+#### 表情包源 (OWO JSON URLs)
+- **推荐来源**：[https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
+- **添加URL后必须点击“更新”按钮**
 
-The plugin automatically parses OWO format emoji collections:
+### 🎨 自定义表情模板
 
-**OWO File Structure Example**:
+对于 owo 格式的表情包，插件会自动解析和转换：
+
+**OWO文件结构示例**：
 ```json
 {
-    "Cat Collection": {
+    "猫猫虫": {
         "type": "image",
         "container": [
             {
@@ -93,34 +94,34 @@ The plugin automatically parses OWO format emoji collections:
 }
 ```
 
-**Available Template Variables**:
-- `{category}` ← `"Cat Collection"` (collection name)
-- `{text}` ← `"bugcat_bugcat_shock"` (text field)
-- `{url}` ← `"https://emoticons.hzchu.top/emoticons/bugcat/bugcat_shock.png"` (extracted from icon HTML)
-- `{name}` ← `"Cat Collection_0"` (category + index, unique identifier)
-- `{type}` ← `"image"` (type field)
-- `{filename}` ← `"bugcat_shock"` (extracted from URL, no extension)
-- `{fullfilename}` ← `"bugcat_shock.png"` (extracted from URL, with extension)
-- `{classes}` ← `"emoji-image"` (auto-generated CSS classes based on type)
+**变量自动生成规则**：
+- `{category}` ← `"猫猫虫"` (集合名称)
+- `{text}` ← `"bugcat_bugcat_shock"` (text字段)
+- `{url}` ← `"https://emoticons.hzchu.top/emoticons/bugcat/bugcat_shock.png"` (从icon的HTML中提取)
+- `{name}` ← `"猫猫虫_0"` (category + 索引，自动生成唯一标识)
+- `{type}` ← `"image"` (type字段)
+- `{filename}` ← `"bugcat_shock"` (从URL提取，不含扩展名)
+- `{fullfilename}` ← `"bugcat_shock.png"` (从URL提取，含扩展名)
+- `{classes}` ← `"emoji-image"` (根据 type 自动添加 CSS 类，以及用户自定义的 CSS 类)
 
-#### Template Examples
+#### 模板示例
 
-**Default HTML Template**:
+**默认 HTML 模板**：
 ```html
 <img src="{url}" alt="{text}" title="{text}" class="{classes}">
 ```
 
-**Markdown Format**:
+**Markdown 格式**：
 ```markdown
 ![{text}]({url})
 ```
 
-**Stellar Tag Component**:
+**Stellar 标签组件**：
 ```
 {% emoji {category} {fullfilename} %}
 ```
 
-**Custom Styled**:
+**自定义样式**：
 ```html
 <span class="my-emoji {classes}">
   <img src="{url}" alt="{text}" loading="lazy">
@@ -128,88 +129,78 @@ The plugin automatically parses OWO format emoji collections:
 </span>
 ```
 
-#### Usage Tips
-- Leave template empty to use default HTML format
-- Combine with custom CSS classes for advanced styling
-
-## Advanced Search
-
-- **Fuzzy Matching**: `sml` matches "smile" related emojis
-- **Regular Expressions**: Use patterns like `Cat Collection.*a` to search for emojis containing "a" in the "Cat Collection"
-- **Collection Filtering**: Search within specific collections using regex
+#### 使用技巧
+- 留空使用默认 HTML 格式
+- 可结合自定义 CSS 类实现复杂样式
 
 
-## Frequently Asked Questions
+## 高级搜索
+- **模糊匹配**：`sml` 匹配 "smile" 相关表情
+- **正则表达式**：可实现集合特定搜索，如 `活字乱刷.*a` 搜索"活字乱刷"集合中包含"a"的表情
 
-### Q: Slow emoji loading?
-A: The plugin uses caching for improved performance after initial load. Check cache status in settings.
 
-### Q: What are regular expressions?
-A: For a quick tutorial, see [Learn Regex the Easy Way](https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md).
+## 常见问题
 
-### Q: How to add custom emoji collections?
-A: Add OWO format JSON file URLs to "OWO JSON URLs" in settings. Find collections at [emoticons.hzchu.top](https://emoticons.hzchu.top/).
+### Q: 表情包加载缓慢？
+A: 插件使用了缓存机制，首次加载后会显著提升速度。可在设置中查看缓存状态。
 
-### Q: Quick insertion not working?
-A: Ensure "Enable Quick Emoji Insertion" is enabled in settings.
+### Q：正则表达式是什么？
+A：速成推荐阅读 [Learn Regex the Easy Way(中文版)](https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md)。
 
-### Q: Can I use this on mobile?
-A: Yes, the plugin supports both desktop and mobile Obsidian.
+### Q: 如何添加自定义表情包？
+A: 在插件设置中，将表情包 JSON 文件路径添加到“表情包文件”列表中。可在 [这里](https://emoticons.hzchu.top/) 寻找您喜欢的表情包。
 
-## Development
+### Q: 快速插入不工作？
+A: 确保在设置中启用了“启用快速表情符号插入”选项。
 
-### Building the Project
+
+## 开发
+
+### 构建项目
 
 ```bash
-# Install dependencies
-npm install
+# 安装依赖
+pnpm install
 
-# Development mode
-npm run dev
+# 开发模式
+pnpm dev
 
-# Build for production
-npm run build
+# 构建生产版本
+pnpm build
 ```
 
-### Project Structure
+### 项目结构
 
 ```
 src/
-├── emoji-cache.ts           # Emoji caching system
-├── emoji-manager.ts         # Emoji data management
-├── emoji-picker-modal.ts    # Emoji selection interface
-├── emoji-storage.ts         # Data persistence
-├── emoji-suggest.ts         # Quick insertion suggestions
-├── recent-emoji-manager.ts  # Recent emojis tracking
-├── settings-tab.ts          # Settings interface
-├── virtual-emoji-renderer.ts # Virtual scrolling renderer
-└── performance-monitor.ts   # Performance monitoring
+├── emoji-cache.ts           # 表情缓存管理
+├── emoji-manager.ts         # 表情数据管理
+├── emoji-picker-modal.ts    # 表情选择面板
+├── emoji-storage.ts         # 数据存储
+├── emoji-suggest.ts         # 快速插入建议
+├── recent-emoji-manager.ts  # 最近使用管理
+├── settings-tab.ts          # 设置面板
+├── virtual-emoji-renderer.ts # 虚拟渲染
+└── performance-monitor.ts   # 性能监控
 ```
 
-## Contributing
+## 许可证
 
-Contributions are welcome! Please feel free to:
-- ⭐ Star the project
-- 🐛 Report bugs
-- 💡 Suggest features
-- 🤝 Submit pull requests
+MIT License - 详见 [LICENSE](LICENSE) 文件
 
-## License
+## 支持
 
-MIT License - see [LICENSE](LICENSE) file for details.
+如果您觉得这个插件有用，欢迎：
+- ⭐ 给项目点星
+- 🐛 报告问题
+- 💡 提出功能建议
+- 🤝 贡献代码
 
-## Support
-
-If you find this plugin useful:
-- ⭐ Star the repository
-- 🐛 Report issues on GitHub
-- 💡 Share feature suggestions
-- 🤝 Contribute to development
-
-## Author
+## 作者
 
 - **Summer** - [flyalready.com](https://flyalready.com)
 
 ---
 
-*Enjoy using emojis in Obsidian!* 😊
+*享受在 Obsidian 中使用表情的乐趣！* 😊
+
