@@ -223,7 +223,10 @@ export class RecentEmojiManager {
      */
     private async persist(): Promise<void> {
         // Queue save operations to prevent concurrent writes
-        this.saveQueue = this.saveQueue.then(() => this.performSave());
+        this.saveQueue = (async () => {
+            await this.saveQueue;
+            return this.performSave();
+        })();
         return this.saveQueue;
     }
 

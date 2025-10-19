@@ -57,10 +57,14 @@ export class EmojiManager {
             }
         })();
 
-        // Don't await - let it run in background
-        this.cacheInitPromise.catch(error => {
-            console.error('Cache initialization promise failed:', error);
-        });
+        // Don't await - let it run in background (fire and forget)
+        (async () => {
+            try {
+                await this.cacheInitPromise;
+            } catch (error) {
+                console.error('Cache initialization promise failed:', error);
+            }
+        })();
     }
 
     /**
@@ -82,17 +86,25 @@ export class EmojiManager {
 
         // Update recent manager max size if changed
         if (oldMaxRecent !== settings.maxRecentEmojis) {
-            this.recentManager.updateMaxSize(settings.maxRecentEmojis).catch(error => {
-                console.error('Failed to update recent emojis max size:', error);
-            });
+            (async () => {
+                try {
+                    await this.recentManager.updateMaxSize(settings.maxRecentEmojis);
+                } catch (error) {
+                    console.error('Failed to update recent emojis max size:', error);
+                }
+            })();
         }
 
         // If URLs changed, clear all cache and reload
         if (oldUrls !== settings.owoJsonUrls) {
             // Clear all cache and force reload
-            this.clearCacheAndReload().catch((error: unknown) => {
-                console.error('Failed to clear cache and reload:', error);
-            });
+            (async () => {
+                try {
+                    await this.clearCacheAndReload();
+                } catch (error) {
+                    console.error('Failed to clear cache and reload:', error);
+                }
+            })();
         }
     }
 

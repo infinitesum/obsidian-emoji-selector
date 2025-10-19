@@ -409,7 +409,7 @@ export class EmojiPickerModal extends Modal {
     private async loadFreshDataInBackground(): Promise<void> {
         try {
             // Small delay to let UI render first
-            await new Promise(resolve => window.setTimeout(resolve, 50));
+            await sleep(50);
 
             // Load fresh data
             await this.plugin.emojiManager.loadEmojiCollections();
@@ -905,10 +905,14 @@ export class EmojiPickerModal extends Modal {
      * Implements requirement 1.2: insert emoji at current cursor position
      */
     private async handleEmojiClick(emoji: EmojiItem): Promise<void> {
-        // Add to recent emojis (async but don't wait)
-        this.plugin.emojiManager.addToRecent(emoji).catch(error => {
-            console.warn('Failed to add emoji to recent list:', error);
-        });
+        // Add to recent emojis (fire and forget)
+        (async () => {
+            try {
+                await this.plugin.emojiManager.addToRecent(emoji);
+            } catch (error) {
+                console.warn('Failed to add emoji to recent list:', error);
+            }
+        })();
 
         // Call the callback to insert the emoji, passing multi-select mode
         this.onEmojiSelect(emoji, this.isMultiSelectMode);

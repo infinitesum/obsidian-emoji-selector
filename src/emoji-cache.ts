@@ -103,7 +103,10 @@ export class EmojiCacheManager {
      */
     async saveCache(): Promise<void> {
         // Queue save operations to prevent concurrent writes
-        this.saveQueue = this.saveQueue.then(() => this.saveCacheToFile());
+        this.saveQueue = (async () => {
+            await this.saveQueue;
+            return this.saveCacheToFile();
+        })();
         return this.saveQueue;
     }
 
@@ -164,10 +167,14 @@ export class EmojiCacheManager {
                 etag
             };
 
-            // Save to persistent storage in background (non-blocking)
-            this.saveCache().catch(error => {
-                logger.error('Background cache save failed for URL:', url, error);
-            });
+            // Save to persistent storage in background (fire and forget)
+            (async () => {
+                try {
+                    await this.saveCache();
+                } catch (error) {
+                    logger.error('Background cache save failed for URL:', url, error);
+                }
+            })();
         } catch (error) {
             logger.error('Failed to set cached data for URL:', url, error);
         }
@@ -194,10 +201,14 @@ export class EmojiCacheManager {
 
         try {
             delete this.cache[url];
-            // Save to persistent storage in background (non-blocking)
-            this.saveCache().catch(error => {
-                logger.error('Background cache save failed after clearing URL:', url, error);
-            });
+            // Save to persistent storage in background (fire and forget)
+            (async () => {
+                try {
+                    await this.saveCache();
+                } catch (error) {
+                    logger.error('Background cache save failed after clearing URL:', url, error);
+                }
+            })();
         } catch (error) {
             logger.error('Failed to clear cached data for URL:', url, error);
         }
@@ -214,10 +225,14 @@ export class EmojiCacheManager {
 
         try {
             this.cache = {};
-            // Save to persistent storage in background (non-blocking)
-            this.saveCache().catch(error => {
-                logger.error('Background cache save failed after clearing all cache:', error);
-            });
+            // Save to persistent storage in background (fire and forget)
+            (async () => {
+                try {
+                    await this.saveCache();
+                } catch (error) {
+                    logger.error('Background cache save failed after clearing all cache:', error);
+                }
+            })();
         } catch (error) {
             logger.error('Failed to clear all cached data:', error);
         }
@@ -269,10 +284,14 @@ export class EmojiCacheManager {
                     delete this.cache[url];
                 }
 
-                // Save to persistent storage in background (non-blocking)
-                this.saveCache().catch(error => {
-                    logger.error('Background cache save failed after cleanup:', error);
-                });
+                // Save to persistent storage in background (fire and forget)
+                (async () => {
+                    try {
+                        await this.saveCache();
+                    } catch (error) {
+                        logger.error('Background cache save failed after cleanup:', error);
+                    }
+                })();
             }
         } catch (error) {
             logger.error('Failed to cleanup unused cache entries:', error);
@@ -295,14 +314,16 @@ export class EmojiCacheManager {
 
         this.backgroundWarmingPromise = this.performBackgroundWarming(urls);
 
-        // Don't await - let it run in background
-        this.backgroundWarmingPromise
-            .catch(error => {
+        // Don't await - let it run in background (fire and forget)
+        (async () => {
+            try {
+                await this.backgroundWarmingPromise;
+            } catch (error) {
                 logger.error('Background cache warming failed:', error);
-            })
-            .finally(() => {
+            } finally {
                 this.backgroundWarmingPromise = null;
-            });
+            }
+        })();
     }
 
     /**
@@ -341,7 +362,7 @@ export class EmojiCacheManager {
 
                 // Small delay between batches to avoid overwhelming the system
                 if (i + batchSize < uncachedUrls.length) {
-                    await new Promise(resolve => window.setTimeout(resolve, 100));
+                    await sleep(100);
                 }
             }
 

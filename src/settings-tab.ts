@@ -22,14 +22,15 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        // Ensure all settings are loaded when opening settings tab
-        this.plugin.loadSettings().then(() => {
-            // Re-render the settings after loading
-            this.renderSettings();
-        });
-
         // Show loading message initially
         containerEl.createEl('div', { text: 'Loading settings...' });
+
+        // Ensure all settings are loaded when opening settings tab
+        (async () => {
+            await this.plugin.loadSettings();
+            // Re-render the settings after loading
+            this.renderSettings();
+        })();
     }
 
     /**

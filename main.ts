@@ -107,21 +107,24 @@ export default class EmojiSelectorPlugin extends Plugin {
 			this.registerEditorSuggest(this.emojiSuggest);
 		}
 
-		// Then update based on actual settings when they load
-		this.ensureSettingsLoaded().then(() => {
-			// Re-evaluate based on actual settings
-			if (this.settings.enableQuickInsertion) {
-				if (!this.emojiSuggest) {
-					this.emojiSuggest = new EmojiSuggest(this);
-					this.registerEditorSuggest(this.emojiSuggest);
+		// Then update based on actual settings when they load (fire and forget)
+		(async () => {
+			try {
+				await this.ensureSettingsLoaded();
+				// Re-evaluate based on actual settings
+				if (this.settings.enableQuickInsertion) {
+					if (!this.emojiSuggest) {
+						this.emojiSuggest = new EmojiSuggest(this);
+						this.registerEditorSuggest(this.emojiSuggest);
+					}
+				} else {
+					// If disabled in settings, disable it
+					this.emojiSuggest = null;
 				}
-			} else {
-				// If disabled in settings, disable it
-				this.emojiSuggest = null;
+			} catch (error) {
+				console.error('Failed to setup emoji suggest:', error);
 			}
-		}).catch(error => {
-			console.error('Failed to setup emoji suggest:', error);
-		});
+		})();
 	}
 
 
