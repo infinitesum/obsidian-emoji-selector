@@ -332,7 +332,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
         // Debug logging settings section
         new Setting(containerEl)
-            .setName('Debug & troubleshooting')
+            .setName('Debug and troubleshooting')
             .setHeading();
 
         // Debug log level setting

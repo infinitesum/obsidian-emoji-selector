@@ -1,6 +1,6 @@
 {
   "id": "emoji-selector",
-  "name": "Emoji Selector",
+  "name": "Emoji selector",
   "version": "1.2.3",
   "minAppVersion": "0.15.0",
   "description": "Insert custom emojis from OWO format collections with quick search, auto-suggestions, and customizable templates.",

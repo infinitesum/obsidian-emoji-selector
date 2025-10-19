@@ -1,7 +1,3 @@
-/**
- * Internationalization support for Emoji Selector Plugin
- */
-
 export interface I18nStrings {
     // Command
     openEmojiPicker: string;
@@ -84,7 +80,7 @@ export interface I18nStrings {
 
 const EN_STRINGS: I18nStrings = {
     // Command
-    openEmojiPicker: 'Open Emoji Picker',
+    openEmojiPicker: 'Open emoji picker',
     // Settings tab
     settingsTitle: 'General',
     emojiHeight: 'Emoji height',
@@ -138,8 +134,8 @@ const EN_STRINGS: I18nStrings = {
     loaded: 'Loaded',
     update: 'Update',
     loading: 'Loading...',
-    collectionsUpdated: 'Collections Updated!',
-    updateFailed: 'Update Failed',
+    collectionsUpdated: 'Collections updated!',
+    updateFailed: 'Update failed',
 
     // Modal
     multiSelect: 'Multi-select',
