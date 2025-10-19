@@ -1,3 +1,4 @@
+import { requestUrl } from 'obsidian';
 import { EmojiItem, EmojiCollection } from './types';
 import { EmojiValidator } from './emoji-storage';
 import { EmojiCacheManager } from './emoji-cache';
@@ -71,18 +72,14 @@ export class OwoFileParser {
         }
 
         try {
-            const response = await fetch(url);
+            const response = await requestUrl({ url });
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const content = await response.text();
-            const jsonData = JSON.parse(content);
+            // requestUrl throws on 400+ status by default, so we don't need to check response.ok
+            const jsonData = JSON.parse(response.text);
 
             // Cache the parsed JSON data
             if (this.cacheManager) {
-                const etag = response.headers.get('etag') || undefined;
+                const etag = response.headers['etag'] || response.headers['ETag'] || undefined;
                 await this.cacheManager.setCachedData(url, jsonData, etag);
             }
 
