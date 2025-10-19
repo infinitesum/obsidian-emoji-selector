@@ -296,7 +296,7 @@ export class VirtualEmojiRenderer {
             return;
         }
 
-        const fragment = document.createDocumentFragment();
+        const fragment = createFragment();
         const gap = 8;
 
         // Render visible items
@@ -315,10 +315,13 @@ export class VirtualEmojiRenderer {
      * Create a single emoji element with absolute positioning
      */
     private createEmojiElement(emoji: EmojiItem, index: number): HTMLElement {
-        const emojiElement = document.createElement('div');
-        emojiElement.className = 'emoji-item emoji-clickable';
-        emojiElement.setAttribute('data-emoji-key', emoji.key);
-        emojiElement.setAttribute('title', emoji.text);
+        const emojiElement = createDiv({
+            cls: 'emoji-item emoji-clickable',
+            attr: {
+                'data-emoji-key': emoji.key,
+                'title': emoji.text
+            }
+        });
 
         // Calculate position
         const row = Math.floor(index / this.itemsPerRow);
@@ -338,16 +341,20 @@ export class VirtualEmojiRenderer {
         });
 
         // Create emoji display
-        const emojiIcon = document.createElement('span');
-        emojiIcon.className = 'emoji-icon';
+        const emojiIcon = createSpan({
+            cls: 'emoji-icon'
+        });
 
         if (emoji.type === 'image' && emoji.url) {
-            const img = document.createElement('img');
-            img.src = emoji.url;
-            img.alt = emoji.text;
-            img.title = emoji.text;
-            img.className = `emoji-image ${this.customCssClasses}`.trim();
-            emojiIcon.appendChild(img);
+            createEl('img', {
+                cls: `emoji-image ${this.customCssClasses}`.trim(),
+                attr: {
+                    'src': emoji.url,
+                    'alt': emoji.text,
+                    'title': emoji.text
+                },
+                parent: emojiIcon
+            });
         } else {
             emojiIcon.textContent = emoji.icon;
             emojiIcon.className = `emoji-icon emoji-text ${this.customCssClasses}`.trim();

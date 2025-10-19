@@ -473,11 +473,10 @@ export default class EmojiSelectorPlugin extends Plugin {
 			existingStyle.remove();
 		}
 
-		// Create new dynamic style
-		const style = document.createElement('style');
-		style.id = 'emoji-selector-dynamic-styles';
-
-		// CSS that applies to all existing and new emojis - only dynamic sizing
+	// Create new dynamic style
+	const style = createEl('style', {
+		attr: { id: 'emoji-selector-dynamic-styles' }
+	});		// CSS that applies to all existing and new emojis - only dynamic sizing
 		style.textContent = `
 			/* Dynamic emoji sizing - overrides base styles */
 			.emoji-image {
