@@ -143,7 +143,7 @@ export class VirtualEmojiRenderer {
         this.scrollToEmoji(index);
 
         // Add selection to new emoji (after a brief delay to ensure rendering)
-        setTimeout(() => {
+        window.setTimeout(() => {
             const emoji = this.emojis[index];
             const emojiElement = this.container.querySelector(`[data-emoji-key="${emoji.key}"]`);
             if (emojiElement) {

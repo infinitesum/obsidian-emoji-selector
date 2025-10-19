@@ -452,7 +452,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
             new Notice(i18n.t('collectionsUpdateSuccess', collectionCount.toString(), emojiCount.toString()));
 
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.updateButtonState();
             }, 2000);
 
@@ -466,7 +466,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             new Notice(i18n.t('collectionsUpdateFailed', errorMessage));
 
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.updateButtonState();
             }, 3000);
         }

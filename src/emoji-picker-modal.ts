@@ -172,7 +172,7 @@ export class EmojiPickerModal extends Modal {
      * Set up optimized search input handling with mobile-friendly debouncing
      */
     private setupOptimizedSearchHandling(): void {
-        let searchTimeout: NodeJS.Timeout;
+        let searchTimeout: number;
         let lastSearchValue: string = '';
 
         // Simple, mobile-friendly search handler
@@ -190,7 +190,7 @@ export class EmojiPickerModal extends Modal {
             const value = target.value;
 
             // Clear previous timeout
-            clearTimeout(searchTimeout);
+            window.clearTimeout(searchTimeout);
 
             // Immediate response for empty search (clearing)
             if (value === '') {
@@ -205,15 +205,15 @@ export class EmojiPickerModal extends Modal {
             }
 
             // Very short debounce for multi-character searches - optimized for mobile
-            searchTimeout = setTimeout(async () => {
+            searchTimeout = window.setTimeout(async () => {
                 await performSearch(value);
             }, 50); // Reduced from 100ms to 50ms for better mobile responsiveness
         });
 
         // Handle paste events with minimal delay
         this.searchInput.addEventListener('paste', () => {
-            clearTimeout(searchTimeout);
-            setTimeout(async () => {
+            window.clearTimeout(searchTimeout);
+            window.setTimeout(async () => {
                 await performSearch(this.searchInput.value);
             }, 50);
         });
@@ -223,12 +223,12 @@ export class EmojiPickerModal extends Modal {
      * Set up enhanced keyboard navigation with better performance
      */
     private setupEnhancedKeyboardNavigation(): void {
-        let navigationTimeout: NodeJS.Timeout;
+        let navigationTimeout: number;
 
         // Throttled navigation to prevent excessive updates
         const throttledNavigation = (handler: () => void) => {
-            clearTimeout(navigationTimeout);
-            navigationTimeout = setTimeout(handler, 16); // ~60fps
+            window.clearTimeout(navigationTimeout);
+            navigationTimeout = window.setTimeout(handler, 16); // ~60fps
         };
 
         this.searchInput.addEventListener('keydown', (event) => {
@@ -409,7 +409,7 @@ export class EmojiPickerModal extends Modal {
     private async loadFreshDataInBackground(): Promise<void> {
         try {
             // Small delay to let UI render first
-            await new Promise(resolve => setTimeout(resolve, 50));
+            await new Promise(resolve => window.setTimeout(resolve, 50));
 
             // Load fresh data
             await this.plugin.emojiManager.loadEmojiCollections();
@@ -476,7 +476,7 @@ export class EmojiPickerModal extends Modal {
         indicator.textContent = i18n.t('usingCachedData');
 
         // Auto-remove after 2 seconds
-        setTimeout(() => {
+        window.setTimeout(() => {
             if (indicator.parentNode) {
                 indicator.remove();
             }
@@ -929,7 +929,7 @@ export class EmojiPickerModal extends Modal {
         }
 
         // Use setTimeout to ensure the modal is fully rendered
-        setTimeout(() => {
+        window.setTimeout(() => {
             this.searchInput.focus();
         }, 100);
     }

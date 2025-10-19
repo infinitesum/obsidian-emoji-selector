@@ -369,7 +369,7 @@ export class EmojiManager {
      */
     private startBackgroundCacheWarming(): void {
         // Use setTimeout to defer this until after constructor completes
-        setTimeout(async () => {
+        window.setTimeout(async () => {
             try {
                 // Wait for cache to be initialized first
                 await this.ensureCacheInitialized();
