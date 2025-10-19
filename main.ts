@@ -49,10 +49,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 			}
 		});
 
-		// Inject base CSS immediately so existing emojis look good
-		// Dynamic sizing CSS will be injected later when settings are loaded
-		this.injectBaseCss();
-
 		// Register emoji suggest for quick insertion immediately with default settings
 		// This ensures it works right after plugin loads, then gets updated when settings load
 		this.setupEmojiSuggestImmediate();
@@ -62,13 +58,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 	}
 
 	onunload() {
-
-		// Clean up injected CSS
-		const baseStyle = document.getElementById('emoji-selector-base-styles');
-		if (baseStyle) {
-			baseStyle.remove();
-		}
-
 		const dynamicStyle = document.getElementById('emoji-selector-dynamic-styles');
 		if (dynamicStyle) {
 			dynamicStyle.remove();
@@ -246,183 +235,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 		} catch (error) {
 			console.error('Failed to save emoji data:', error);
 		}
-	}
-
-	/**
-	 * Inject base CSS immediately for existing emojis
-	 */
-	private injectBaseCss(): void {
-		// Check if base CSS is already injected
-		if (document.getElementById('emoji-selector-base-styles')) {
-			return;
-		}
-
-		const style = document.createElement('style');
-		style.id = 'emoji-selector-base-styles';
-
-		// Base CSS that makes emojis look good regardless of settings
-		style.textContent = `
-			/* Base emoji styles - applied to all emoji elements */
-			.emoji-image,
-			.emoji-text {
-				display: inline;
-				vertical-align: text-bottom;
-				line-height: 1;
-				margin: 0 0.05em;
-				user-select: none;
-				-webkit-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-			}
-
-			/* Image emoji specific styles */
-			.emoji-image {
-				object-fit: contain;
-				border-radius: var(--radius-xs);
-				background: transparent;
-				border: none;
-				outline: none;
-				max-width: none;
-				width: auto;
-				height: 1.2em; /* Default size, will be overridden by dynamic CSS */
-				pointer-events: none;
-				-webkit-user-drag: none;
-				-khtml-user-drag: none;
-				-moz-user-drag: none;
-				-o-user-drag: none;
-			}
-
-			/* Text emoji specific styles */
-			.emoji-text {
-				font-style: normal;
-				font-weight: normal;
-				text-decoration: none;
-				font-size: 1.2em; /* Default size, will be overridden by dynamic CSS */
-				font-family: var(--font-text), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-			}
-
-			/* Ensure proper alignment in different contexts */
-			.cm-editor .emoji-image,
-			.cm-editor .emoji-text {
-				display: inline;
-				vertical-align: text-bottom;
-				position: relative;
-				top: 0;
-			}
-
-			.markdown-preview-view .emoji-image,
-			.markdown-preview-view .emoji-text,
-			.markdown-reading-view .emoji-image,
-			.markdown-reading-view .emoji-text,
-			.markdown-source-view.mod-cm6 .emoji-image,
-			.markdown-source-view.mod-cm6 .emoji-text {
-				vertical-align: middle;
-			}
-
-			/* Fallback for broken images */
-			.emoji-image[alt]:after {
-				content: attr(alt);
-				font-size: 0.8em;
-				color: var(--text-muted);
-				background: var(--background-secondary);
-				padding: 0.1em 0.3em;
-				border-radius: var(--radius-xs);
-				border: 1px solid var(--background-modifier-border);
-				display: inline-block;
-				vertical-align: middle;
-			}
-
-			.emoji-image {
-				color: transparent;
-				display: inline !important;
-			}
-
-			/* Optimized event handling styles */
-			.emoji-container {
-				outline: none;
-			}
-
-			.emoji-container:focus {
-				outline: 2px solid var(--interactive-accent);
-				outline-offset: 2px;
-			}
-
-			.emoji-item {
-				cursor: pointer;
-				border-radius: var(--radius-s);
-				transition: background-color 0.1s ease;
-			}
-
-			.emoji-item:hover {
-				background-color: var(--background-modifier-hover);
-			}
-
-			.emoji-item.emoji-selected {
-				background-color: var(--interactive-accent);
-				color: var(--text-on-accent);
-			}
-
-			.emoji-item.emoji-selected .emoji-text {
-				color: var(--text-on-accent);
-			}
-
-			/* Emoji suggest dropdown styles */
-			.emoji-suggest-item {
-				display: flex;
-				align-items: center;
-				gap: 8px;
-				padding: 8px 12px;
-				cursor: pointer;
-				border-radius: var(--radius-s);
-				transition: background-color 0.1s ease;
-			}
-
-			.emoji-suggest-item:hover,
-			.emoji-suggest-item.is-selected {
-				background-color: var(--background-modifier-hover);
-			}
-
-			.emoji-suggest-preview {
-				flex-shrink: 0;
-				width: 24px;
-				height: 24px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			.emoji-suggest-image {
-				max-width: 100%;
-				max-height: 100%;
-				object-fit: contain;
-			}
-
-			.emoji-suggest-text {
-				font-size: 18px;
-				line-height: 1;
-			}
-
-			.emoji-suggest-info {
-				flex: 1;
-				min-width: 0;
-			}
-
-			.emoji-suggest-key {
-				font-family: var(--font-monospace);
-				font-size: 0.9em;
-				margin-bottom: 2px;
-			}
-
-			.emoji-suggest-desc {
-				margin-bottom: 1px;
-			}
-
-			.emoji-suggest-category {
-				font-style: italic;
-			}
-		`;
-
-		document.head.appendChild(style);
 	}
 
 	/**
