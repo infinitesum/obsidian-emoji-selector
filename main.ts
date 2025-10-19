@@ -205,7 +205,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 	/**
 	 * Load only emoji-related data (cache, recent emojis) without settings
 	 */
-	private async loadEmojiData(): Promise<any> {
+	private async loadEmojiData(): Promise<Record<string, unknown>> {
 		try {
 			const data = await this.loadData();
 			if (!data) return {};

@@ -49,7 +49,7 @@ export class Logger {
     /**
      * Debug level logging - for development only
      */
-    debug(message: string, ...args: any[]): void {
+    debug(message: string, ...args: unknown[]): void {
         if (this.logLevel <= LogLevel.DEBUG) {
             console.log(`${this.prefix} [DEBUG]`, message, ...args);
         }
@@ -58,7 +58,7 @@ export class Logger {
     /**
      * Info level logging - for general information
      */
-    info(message: string, ...args: any[]): void {
+    info(message: string, ...args: unknown[]): void {
         if (this.logLevel <= LogLevel.INFO) {
             console.log(`${this.prefix} [INFO]`, message, ...args);
         }
@@ -67,7 +67,7 @@ export class Logger {
     /**
      * Warning level logging - for non-critical issues
      */
-    warn(message: string, ...args: any[]): void {
+    warn(message: string, ...args: unknown[]): void {
         if (this.logLevel <= LogLevel.WARN) {
             console.warn(`${this.prefix} [WARN]`, message, ...args);
         }
@@ -76,7 +76,7 @@ export class Logger {
     /**
      * Error level logging - for critical issues
      */
-    error(message: string, ...args: any[]): void {
+    error(message: string, ...args: unknown[]): void {
         if (this.logLevel <= LogLevel.ERROR) {
             console.error(`${this.prefix} [ERROR]`, message, ...args);
         }
@@ -96,7 +96,7 @@ export class Logger {
     /**
      * Benchmark logging - only shows in debug mode
      */
-    benchmark(message: string, ...args: any[]): void {
+    benchmark(message: string, ...args: unknown[]): void {
         if (this.logLevel <= LogLevel.DEBUG) {
             console.log(`${this.prefix} [BENCHMARK]`, message, ...args);
         }
