@@ -8,49 +8,40 @@ import EmojiSelectorPlugin from '../main';
  */
 export class EmojiSuggest extends EditorSuggest<EmojiItem> {
     private plugin: EmojiSelectorPlugin;
+    private triggerRegex: RegExp | null = null;
+    private lastConfig: string = '';
 
     constructor(plugin: EmojiSelectorPlugin) {
         super(plugin.app);
         this.plugin = plugin;
-        this.limit = 50; // Show up to 10 suggestions
+        this.limit = 50;
     }
 
-    /**
-     * Determine if the suggest should be triggered based on cursor position
-     * Supports multiple trigger alternatives separated by |
-     */
     onTrigger(cursor: EditorPosition, editor: Editor, file: TFile | null): EditorSuggestTriggerInfo | null {
         if (!this.plugin.settings.enableQuickInsertion) {
             return null;
         }
 
-        const line = editor.getLine(cursor.line);
-        const beforeCursor = line.substring(0, cursor.ch);
-        
-        const triggerConfig = this.plugin.settings.quickInsertionTrigger || '::|：：';
-        
-        // Split by | to get alternative triggers
-        const triggers = triggerConfig.split('|').map(t => t.trim()).filter(t => t.length > 0);
-        
-        // Try each trigger alternative
-        for (const trigger of triggers) {
-            // Escape special regex characters
-            const escapedTrigger = trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            
-            // Match: trigger string + query (no spaces in query)
-            const pattern = `${escapedTrigger}([^\\s]*)$`;
-            const match = beforeCursor.match(new RegExp(pattern));
+        // Build/update regex only when config changes
+        const config = this.plugin.settings.quickInsertionTrigger || '::|：：';
+        if (config !== this.lastConfig) {
+            this.lastConfig = config;
+            // Escape special regex chars and build pattern: (trigger1|trigger2|...)([^\s]*)$
+            const escaped = config.replace(/[.*+?^${}()[\]\\]/g, '\\$&');
+            this.triggerRegex = new RegExp(`(${escaped})([^\\s]*)$`);
+        }
 
-            if (match) {
-                const query = match[1];
-                const startPos = cursor.ch - match[0].length;
+        if (!this.triggerRegex) return null;
 
-                return {
-                    start: { line: cursor.line, ch: startPos },
-                    end: { line: cursor.line, ch: cursor.ch },
-                    query: query
-                };
-            }
+        const beforeCursor = editor.getLine(cursor.line).substring(0, cursor.ch);
+        const match = beforeCursor.match(this.triggerRegex);
+
+        if (match) {
+            return {
+                start: { line: cursor.line, ch: cursor.ch - match[0].length },
+                end: { line: cursor.line, ch: cursor.ch },
+                query: match[2]
+            };
         }
 
         return null;
