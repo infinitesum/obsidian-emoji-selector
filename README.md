@@ -16,7 +16,7 @@ Quick Insertion
 
 ## Features
 
-- **Quick Insertion**: Type `:` to trigger emoji auto-suggestions
+- **Quick Insertion**: Type trigger string (default `::` or `：：`) to insert emojis
 - **Emoji Picker Panel**: Browse and search through emoji collections
 - **OWO Format Support**: Compatible with a vast library of emoji packs
 - **Custom Templates**: Customize how emojis are inserted (HTML, Markdown, custom formats)
@@ -53,6 +53,7 @@ Quick Insertion
 | `::` or `：：` | Trigger quick insertion (default, customizable in settings) |
 | `Tab` / `Shift+Tab` | Switch between emoji collections in panel |
 | `Ctrl+M` | Toggle multi-select mode (when search is focused) |
+| `Shift+Click` | Add/remove from favorites |
 | `↑` / `↓` | Navigate emoji selection |
 | `Enter` | Select emoji |
 | `Esc` | Close panel |
