@@ -43,14 +43,14 @@ Quick Insertion
 **Initial Setup Steps**:
 
 1. **Add Emoji Collections**: Go to plugin settings, add OWO format JSON URLs in "OWO JSON URLs" field (comma-separated). **Click "Update" after adding URLs**.
-2. **Quick Insertion**: Type `:` followed by emoji name, e.g., `:smile:`
+2. **Quick Insertion**: Type the trigger string (default `::` or `：：`) followed by emoji name, e.g., `::smile` or `：：smile`
 3. **Emoji Panel**: Click toolbar icon or use Command Palette "Emoji Selector"
 
 ### Keyboard Shortcuts
 
 | Shortcut | Function |
 |----------|----------|
-| `:` | Trigger quick insertion |
+| `::` or `：：` | Trigger quick insertion (default, customizable in settings) |
 | `Tab` / `Shift+Tab` | Switch between emoji collections in panel |
 | `Ctrl+M` | Toggle multi-select mode (when search is focused) |
 | `↑` / `↓` | Navigate emoji selection |
@@ -64,6 +64,20 @@ Quick Insertion
 #### Emoji Collection Sources (OWO JSON URLs)
 - **Recommended Source**: [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
 - **Remember to click "Update" after adding URLs**
+
+#### Quick Insertion Configuration
+- **Trigger String(s)**: Supports multiple alternative triggers separated by `|`
+- **Default Config**: `::|：：` (both English and Chinese double colons work)
+- **Common Configuration Examples**:
+  - `::|：：` - Double colon (supports both English and Chinese, recommended)
+  - `:|：` - Single colon (supports both, faster but may trigger accidentally)
+  - `::` - English double colon only (strict mode)
+  - `@@|##|//` - Multiple custom triggers
+  - `,,|，，` - Both English and Chinese commas
+- **Usage Examples**:
+  - With `::|：：`: Type `::smile` or `：：smile` to trigger
+  - With `@@|##`: Type `@@smile` or `##smile` to trigger
+  - With `::`: Only `::smile` triggers
 
 ### 🎨 Custom Emoji Templates
 

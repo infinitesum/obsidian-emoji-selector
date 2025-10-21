@@ -17,33 +17,43 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
 
     /**
      * Determine if the suggest should be triggered based on cursor position
-     * Triggers when user types : followed by at least one character
+     * Supports multiple trigger alternatives separated by |
      */
     onTrigger(cursor: EditorPosition, editor: Editor, file: TFile | null): EditorSuggestTriggerInfo | null {
-        // Check if quick insertion is enabled
         if (!this.plugin.settings.enableQuickInsertion) {
             return null;
         }
-        // Get the current line text
+
         const line = editor.getLine(cursor.line);
         const beforeCursor = line.substring(0, cursor.ch);
+        
+        const triggerConfig = this.plugin.settings.quickInsertionTrigger || '::|：：';
+        
+        // Split by | to get alternative triggers
+        const triggers = triggerConfig.split('|').map(t => t.trim()).filter(t => t.length > 0);
+        
+        // Try each trigger alternative
+        for (const trigger of triggers) {
+            // Escape special regex characters
+            const escapedTrigger = trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            
+            // Match: trigger string + query (no spaces in query)
+            const pattern = `${escapedTrigger}([^\\s]*)$`;
+            const match = beforeCursor.match(new RegExp(pattern));
 
-        // Look for pattern like ":cry" or ":smile" or ":.*heart.*"
-        // Match : followed by at least one character (support regex and special chars)
-        const match = beforeCursor.match(/:([^\s:]+)$/);
+            if (match) {
+                const query = match[1];
+                const startPos = cursor.ch - match[0].length;
 
-        if (!match) {
-            return null;
+                return {
+                    start: { line: cursor.line, ch: startPos },
+                    end: { line: cursor.line, ch: cursor.ch },
+                    query: query
+                };
+            }
         }
 
-        const query = match[1]; // The text after ":"
-        const startPos = cursor.ch - match[0].length; // Position of ":"
-
-        return {
-            start: { line: cursor.line, ch: startPos },
-            end: { line: cursor.line, ch: cursor.ch },
-            query: query
-        };
+        return null;
     }
 
     /**

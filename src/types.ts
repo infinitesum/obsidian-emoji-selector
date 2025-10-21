@@ -110,6 +110,8 @@ export interface EmojiSelectorSettings {
     preferRecentOverRemembered: boolean;
     /** Enable quick emoji insertion with :emoji_name syntax */
     enableQuickInsertion: boolean;
+    /** Trigger string(s) for quick insertion. Use | to separate multiple alternatives (e.g., "::|：：" matches both :: and ：：) */
+    quickInsertionTrigger: string;
     /** Enable regex search support */
     enableRegexSearch: boolean;
     /** Enable fuzzy search support */
@@ -135,6 +137,7 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     enableRecentEmojis: true,
     preferRecentOverRemembered: true,
     enableQuickInsertion: true,
+    quickInsertionTrigger: '::|：：',
     enableRegexSearch: false,
     enableFuzzySearch: false,
     debugLogLevel: 2 // Default to WARN level

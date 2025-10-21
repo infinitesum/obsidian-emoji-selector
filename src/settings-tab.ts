@@ -240,6 +240,19 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
             }));
 
+        // Quick insertion trigger string setting
+        this.setDescWithCodeSupport(
+            new Setting(containerEl)
+                .setName(i18n.t('quickInsertionTrigger')),
+            i18n.t('quickInsertionTriggerDesc')
+        ).addText(text => text
+            .setPlaceholder('::|：：')
+            .setValue(this.plugin.settings.quickInsertionTrigger)
+            .onChange(async (value) => {
+                this.plugin.settings.quickInsertionTrigger = value || '::|：：';
+                await this.plugin.saveSettings();
+            }));
+
         // Recent emojis settings section
         new Setting(containerEl)
             .setName(i18n.t('recentEmojis'))

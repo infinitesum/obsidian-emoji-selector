@@ -28,6 +28,8 @@ export interface I18nStrings {
     quickInsertion: string;
     enableQuickInsertion: string;
     enableQuickInsertionDesc: string;
+    quickInsertionTrigger: string;
+    quickInsertionTriggerDesc: string;
 
     // Advanced search
     advancedSearch: string;
@@ -107,7 +109,9 @@ const EN_STRINGS: I18nStrings = {
     // Quick insertion
     quickInsertion: 'Quick insertion',
     enableQuickInsertion: 'Enable quick emoji insertion',
-    enableQuickInsertionDesc: 'Allow typing `:emoji_name` to show a dropdown with matching emojis for quick insertion',
+    enableQuickInsertionDesc: 'Allow typing trigger string followed by emoji name to show a dropdown with matching emojis',
+    quickInsertionTrigger: 'Trigger string(s)',
+    quickInsertionTriggerDesc: 'Use `|` to separate alternatives. Examples: `::|：：` (both work), `:` (single), `@@|##` (custom). Leave empty for default trigger',
 
     // Advanced search
     advancedSearch: 'Advanced search',
@@ -187,7 +191,9 @@ const ZH_CN_STRINGS: I18nStrings = {
     // Quick insertion
     quickInsertion: '快速插入',
     enableQuickInsertion: '启用快速表情符号插入',
-    enableQuickInsertionDesc: '允许输入 `:表情符号名称` 来显示匹配表情符号的下拉框进行快速插入',
+    enableQuickInsertionDesc: '允许输入触发字符串后跟表情符号名称来显示匹配的下拉框',
+    quickInsertionTrigger: '触发字符串',
+    quickInsertionTriggerDesc: '使用 `|` 分隔多个选项。示例：`::|：：` (两个都生效)、`:` (单个)、`@@|##` (自定义)。留空使用默认。',
 
     // Advanced search
     advancedSearch: '高级搜索',
