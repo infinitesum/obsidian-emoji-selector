@@ -28,21 +28,12 @@ Quick Insertion
 
 ## Installation
 
-### Method 1: Community Plugin Store (Coming Soon, please refer to Method 2 for now)
-
+### Method 1: Community Plugin Store
 1. Open Obsidian Settings
 2. Navigate to Community Plugins
-3. Search for "Emoji Selector"
+3. Search for "Emoji selector"
 4. Install and enable the plugin
 
-### Method 2: Manual Installation
-
-1. Download the latest release from [GitHub Releases](https://github.com/infinitesum/obsidian-emoji-selector/releases)
-2. Extract `main.js`, `manifest.json`, and `styles.css`
-3. Create folder: `.obsidian/plugins/emoji-selector/`
-4. Place the downloaded files in this folder
-5. Restart Obsidian or reload plugins in settings
-6. Enable "Emoji Selector" in Community Plugins
 
 ## Quick Start
 

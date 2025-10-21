@@ -28,21 +28,11 @@
 
 ### 安装
 
-#### 方法一：插件市场安装（暂未发布，请使用方法二）
-
+#### 方法一：插件市场安装
 1. 在 Obsidian 中打开设置
 2. 进入第三方插件
-3. 搜索 “Emoji Selector”
+3. 搜索 “Emoji selector”
 4. 安装并启用插件
-
-#### 方法二：手动安装
-
-1. 前往 [Releases 页面](https://github.com/infinitesum/obsidian-emoji-selector/releases)
-2. 下载最新版本的 `main.js`、`manifest.json` 和 `styles.css`
-3. 在 Obsidian 库文件夹中创建路径：`.obsidian/plugins/emoji-selector/`
-4. 将下载的文件放入该文件夹
-5. 重启 Obsidian 或在设置中重新加载插件
-6. 在第三方插件设置中启用 “Emoji Selector”
 
 ### 基础使用
 
