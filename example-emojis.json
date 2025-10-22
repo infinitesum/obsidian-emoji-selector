@@ -1,33 +1,307 @@
 {
-  "basic-emojis": {
-    "type": "emoji",
-    "emojis": {
-      "smile": {
-        "icon": "😀",
-        "text": "grinning face",
-        "category": "smileys"
-      },
-      "heart": {
-        "icon": "❤️",
-        "text": "red heart",
-        "category": "symbols"
-      },
-      "thumbs-up": {
-        "icon": "👍",
-        "text": "thumbs up",
-        "category": "people"
-      }
-    }
-  },
-  "custom-images": {
+  "blobcatplus": {
     "type": "image",
-    "emojis": {
-      "custom-smile": {
-        "icon": "😊",
-        "text": "custom smiling face",
-        "category": "custom",
-        "url": "https://example.com/custom-smile.png"
+    "container": [
+      {
+        "text": "cats",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/cats.png'>"
+      },
+      {
+        "text": "meow_blush",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/meow_blush.png'>"
+      },
+      {
+        "text": "affect",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/affect.png'>"
+      },
+      {
+        "text": "t",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatt.png'>"
+      },
+      {
+        "text": "dizzy",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatdizzy.png'>"
+      },
+      {
+        "text": "acry",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatcry.png'>"
+      },
+      {
+        "text": "adead",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatdead.png'>"
+      },
+      {
+        "text": "blobbanhammerr",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobbanhammerr.png'>"
+      },
+      {
+        "text": "-aww",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcat-aww.png'>"
+      },
+      {
+        "text": "aknitsweats",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatknitsweats.png'>"
+      },
+      {
+        "text": "a__reeee",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/A_BlobCat_REEEE.png'>"
+      },
+      {
+        "text": "a__nervous",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/A_BlobCat_Nervous.png'>"
+      },
+      {
+        "text": "a__code",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/A_BlobCat_Code.png'>"
+      },
+      {
+        "text": "bouncefast",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/bouncefast.png'>"
+      },
+      {
+        "text": "comfyuee",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/comfyuee.png'>"
+      },
+      {
+        "text": "comfyslep",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/comfyslep.png'>"
+      },
+      {
+        "text": "comfynight",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/comfynight.png'>"
+      },
+      {
+        "text": "yandere",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatyandere.png'>"
+      },
+      {
+        "text": "verified",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatverified.png'>"
+      },
+      {
+        "text": "umm",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatumm.png'>"
+      },
+      {
+        "text": "triumph",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcattriumph.png'>"
+      },
+      {
+        "text": "think",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatthink.png'>"
+      },
+      {
+        "text": "snuggle",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatsnuggle.png'>"
+      },
+      {
+        "text": "snapped",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatsnapped.png'>"
+      },
+      {
+        "text": "sipsweat",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatsipsweat.png'>"
+      },
+      {
+        "text": "shocked",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatshocked.png'>"
+      },
+      {
+        "text": "scared",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatscared.png'>"
+      },
+      {
+        "text": "saitama",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatsaitama.png'>"
+      },
+      {
+        "text": "sadreach",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatsadreach.png'>"
+      },
+      {
+        "text": "read",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatread.png'>"
+      },
+      {
+        "text": "presentred",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatpresentred.png'>"
+      },
+      {
+        "text": "police",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatpolice.png'>"
+      },
+      {
+        "text": "photo",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatphoto.png'>"
+      },
+      {
+        "text": "peekaboo",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatpeekaboo.png'>"
+      },
+      {
+        "text": "peek2",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatpeek2.png'>"
+      },
+      {
+        "text": "openmouth",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatopenmouth.png'>"
+      },
+      {
+        "text": "notlikethis",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatnotlikethis.png'>"
+      },
+      {
+        "text": "nom",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatnomblobcat.png'>"
+      },
+      {
+        "text": "neutral",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatneutral.png'>"
+      },
+      {
+        "text": "meltthumb",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatmeltthumb.png'>"
+      },
+      {
+        "text": "melt",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatmelt.png'>"
+      },
+      {
+        "text": "love",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatlove.png'>"
+      },
+      {
+        "text": "kissheart",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatkissheart.png'>"
+      },
+      {
+        "text": "highfive",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcathighfive.png'>"
+      },
+      {
+        "text": "heartpride",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatheartpride.png'>"
+      },
+      {
+        "text": "heart",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatheart.png'>"
+      },
+      {
+        "text": "headphones",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatheadphones.png'>"
+      },
+      {
+        "text": "googlytrash",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatgooglytrash.png'>"
+      },
+      {
+        "text": "googlycry",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatgooglycry.png'>"
+      },
+      {
+        "text": "gay",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatgay.png'>"
+      },
+      {
+        "text": "flower",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatflower.png'>"
+      },
+      {
+        "text": "flip",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatflip.png'>"
+      },
+      {
+        "text": "fingerguns",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatfingerguns.png'>"
+      },
+      {
+        "text": "fearful",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatfearful.png'>"
+      },
+      {
+        "text": "facepalm",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatfacepalm.png'>"
+      },
+      {
+        "text": "disturbed",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatdisturbed.png'>"
+      },
+      {
+        "text": "died",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatdied.png'>"
+      },
+      {
+        "text": "dead",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatdead.png'>"
+      },
+      {
+        "text": "cry",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcry.png'>"
+      },
+      {
+        "text": "comfysweat",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcomfysweat.png'>"
+      },
+      {
+        "text": "comfy",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcomfy.png'>"
+      },
+      {
+        "text": "comftears",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcomftears.png'>"
+      },
+      {
+        "text": "coffee",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcoffee.png'>"
+      },
+      {
+        "text": "caged",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatcaged.png'>"
+      },
+      {
+        "text": "box",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatbox.png'>"
+      },
+      {
+        "text": "blush",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatblush.png'>"
+      },
+      {
+        "text": "angry",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatangry.png'>"
+      },
+      {
+        "text": "alt",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcatalt.png'>"
+      },
+      {
+        "text": "0_0",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/blobcat0_0.png'>"
+      },
+      {
+        "text": "awave",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatwave.png'>"
+      },
+      {
+        "text": "areachrev",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatreachrev.png'>"
+      },
+      {
+        "text": "arainbow",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatrainbow.png'>"
+      },
+      {
+        "text": "aheartbroken",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatheartbroken.png'>"
+      },
+      {
+        "text": "aheart",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatheart.png'>"
+      },
+      {
+        "text": "aattentionreverse",
+        "icon": "<img src='https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/ablobcatattentionreverse.png'>"
       }
-    }
+    ]
   }
 }
