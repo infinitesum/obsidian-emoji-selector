@@ -193,7 +193,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     enableQuickInsertion: '开启快捷输入',
     enableQuickInsertionDesc: '输入触发词 + 表情名显示快速插入候选框',
     quickInsertionTrigger: '触发词',
-    quickInsertionTriggerDesc: '用 `|` 分隔多个触发词。比如：`::|：：`（中英文冒号都行）、`:` (单个冒号)、`@@|##`（自定义符号）。不填就用默认的',
+    quickInsertionTriggerDesc: '用 `|` 分隔多个触发词。比如：`::|：：`（中英文冒号都行）、`:` (单个冒号)、`@@|##`（自定义符号）。留空使用默认',
 
     // Advanced search
     advancedSearch: '高级搜索',
