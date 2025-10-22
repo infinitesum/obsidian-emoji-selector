@@ -127,7 +127,7 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     emojiSize: '2rem',
     searchPlaceholder: '',
     customCssClasses: '',
-    owoJsonUrls: '',
+    owoJsonUrls: 'https://raw.githubusercontent.com/infinitesum/Twikoo-emoji/refs/heads/main/capoo.json',
     rememberLastCollection: true,
     lastSelectedCollection: 'all',
     addSpaceAfterEmoji: true,
