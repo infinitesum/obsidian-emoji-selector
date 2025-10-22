@@ -44,8 +44,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
     }
 
     /**
-     * Create formatted text with code support using DOM API
-     * Safely parses text with `code` markers and creates proper DOM elements
+     * Create formatted text with code support and clickable links using DOM API
+     * Safely parses text with `code` markers and URLs, creates proper DOM elements
      */
     private createFormattedText(container: HTMLElement, text: string): void {
         const parts = text.split(/(`[^`]+`)/);
@@ -56,8 +56,26 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 const codeText = part.slice(1, -1); // Remove backticks
                 container.createEl('code', { text: codeText });
             } else if (part.length > 0) {
-                // This is regular text
-                container.appendText(part);
+                // Parse URLs in regular text and make them clickable
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                const segments = part.split(urlRegex);
+                
+                segments.forEach(segment => {
+                    if (segment.match(urlRegex)) {
+                        // This is a URL, create a clickable link
+                        container.createEl('a', {
+                            text: segment,
+                            href: segment,
+                            attr: {
+                                target: '_blank',
+                                rel: 'noopener noreferrer'
+                            }
+                        });
+                    } else if (segment.length > 0) {
+                        // Regular text
+                        container.appendText(segment);
+                    }
+                });
             }
         });
     }
