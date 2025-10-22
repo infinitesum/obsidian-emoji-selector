@@ -19,6 +19,7 @@ Quick Insertion
 - **Quick Insertion**: Type trigger string (default `::` or `：：`) to insert emojis
 - **Emoji Picker Panel**: Browse and search through emoji collections
 - **OWO Format Support**: Compatible with a vast library of emoji packs
+- **Local File Support**: Use local JSON files from your Vault
 - **Custom Templates**: Customize how emojis are inserted (HTML, Markdown, custom formats)
 - **Advanced Search**: Supports regex and fuzzy matching
 - **Keyboard Navigation**: Full keyboard support for accessibility
@@ -42,7 +43,10 @@ Quick Insertion
 
 **Initial Setup Steps**:
 
-1. **Add Emoji Collections**: Go to plugin settings, add OWO format JSON URLs in "OWO JSON URLs" field (comma-separated). **Click "Update" after adding URLs**.
+1. **Add Emoji Collections**: Go to plugin settings, add sources in "OWO JSON URLs or local paths":
+   - Remote URLs: `https://emoticons.hzchu.top/...`
+   - Local files: `emojis/my-collection.json` (relative to Vault root)
+   - Separate multiple sources with commas. **Click "Update" after adding**.
 2. **Quick Insertion**: Type the trigger string (default `::` or `：：`) followed by emoji name, e.g., `::smile` or `：：smile`
 3. **Emoji Panel**: Click toolbar icon or use Command Palette "Emoji Selector"
 
@@ -53,7 +57,6 @@ Quick Insertion
 | `::` or `：：` | Trigger quick insertion (default, customizable in settings) |
 | `Tab` / `Shift+Tab` | Switch between emoji collections in panel |
 | `Ctrl+M` | Toggle multi-select mode (when search is focused) |
-| `Shift+Click` | Add/remove from favorites |
 | `↑` / `↓` | Navigate emoji selection |
 | `Enter` | Select emoji |
 | `Esc` | Close panel |
@@ -62,9 +65,25 @@ Quick Insertion
 
 ### 🔧 Basic Configuration
 
-#### Emoji Collection Sources (OWO JSON URLs)
-- **Recommended Source**: [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
-- **Remember to click "Update" after adding URLs**
+#### Emoji Collection Sources (OWO JSON URLs or local paths)
+
+Two ways to add emoji collections:
+
+1. **Remote URLs**
+   - Recommended: [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
+   - Format: `https://example.com/emojis.json`
+
+2. **Local File Paths**
+   - Place JSON files in your Vault, e.g., `emojis/my-collection.json`
+   - Paths are relative to Vault root
+   - See `local-emoji-example.json` in the project for reference
+
+**Remember to click "Update" after adding sources.**
+
+**Example configuration**:
+```
+https://emoticons.hzchu.top/owo.json, emojis/local.json
+```
 
 #### Quick Insertion Configuration
 - **Trigger String(s)**: Supports multiple alternative triggers separated by `|`

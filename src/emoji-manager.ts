@@ -29,8 +29,9 @@ export class EmojiManager {
             loadData
         );
 
-        // Set the cache manager in the parser
+        // Set the cache manager and app in the parser
         OwoFileParser.setCacheManager(this.cacheManager);
+        OwoFileParser.setApp(app);
 
         // Defer ALL heavy initialization to first use
         // This improves plugin startup time significantly

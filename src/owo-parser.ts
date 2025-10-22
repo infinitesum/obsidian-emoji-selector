@@ -1,4 +1,4 @@
-import { requestUrl } from 'obsidian';
+import { requestUrl, App } from 'obsidian';
 import { EmojiItem, EmojiCollection } from './types';
 import { EmojiValidator } from './emoji-storage';
 import { EmojiCacheManager } from './emoji-cache';
@@ -21,12 +21,20 @@ interface OwoFileStructure {
  */
 export class OwoFileParser {
     private static cacheManager: EmojiCacheManager | null = null;
+    private static app: App | null = null;
 
     /**
      * Set the cache manager instance
      */
     static setCacheManager(cacheManager: EmojiCacheManager): void {
         this.cacheManager = cacheManager;
+    }
+
+    /**
+     * Set the app instance for vault access
+     */
+    static setApp(app: App): void {
+        this.app = app;
     }
 
     /**
@@ -49,11 +57,19 @@ export class OwoFileParser {
     }
 
     /**
-     * Load and parse a single OWO.json file from URL with caching
+     * Load and parse a single OWO.json file from URL or local path with caching
      */
     static async loadFromUrl(url: string, forceRefresh: boolean = false): Promise<EmojiCollection[]> {
         if (!url || !url.trim()) {
             return [];
+        }
+
+        // Check if it's a URL or local file path
+        const isUrl = url.startsWith('http://') || url.startsWith('https://');
+
+        if (!isUrl) {
+            // Load from local file in vault
+            return this.loadFromLocalFile(url, forceRefresh);
         }
 
         // Validate URL format
@@ -89,6 +105,37 @@ export class OwoFileParser {
                 throw new Error(`Network error loading ${url}: ${error.message}`);
             }
             throw error;
+        }
+    }
+
+    /**
+     * Load and parse a local file from vault
+     */
+    private static async loadFromLocalFile(filePath: string, forceRefresh: boolean = false): Promise<EmojiCollection[]> {
+        if (!this.app) {
+            throw new Error('App instance not set. Cannot load local files.');
+        }
+
+        // Check cache first (unless force refresh)
+        if (!forceRefresh && this.cacheManager) {
+            const cachedData = this.cacheManager.getCachedData(filePath);
+            if (cachedData) {
+                return this.parseOwoData(cachedData, filePath);
+            }
+        }
+
+        try {
+            const content = await this.app.vault.adapter.read(filePath);
+            const jsonData = JSON.parse(content);
+
+            // Cache the data
+            if (this.cacheManager) {
+                await this.cacheManager.setCachedData(filePath, jsonData);
+            }
+
+            return this.parseOwoData(jsonData, filePath);
+        } catch (error) {
+            throw new Error(`Failed to load local file ${filePath}: ${error.message}`);
         }
     }
 

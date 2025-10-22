@@ -20,6 +20,7 @@
 - 输入触发字符（默认 `::` 或 `：：`）快速插入
 - 表情选择器面板
 - 兼容 owo 格式表情包文件，支持大量表情包
+- **支持本地 JSON 文件**（可将表情包文件放在 Vault 中）
 - 自定义插入模板和 CSS 样式
 - 支持正则、模糊搜索
 - 快捷键操作
@@ -42,7 +43,10 @@
 
 **首次使用配置步骤**：
 
-1. **添加表情包**：进入插件设置，在"OWO JSON URLs"中添加 owo 格式的表情包文件链接，多个 URL 用英文逗号分隔。**添加后点击"更新"**
+1. **添加表情包**：进入插件设置，在"OWO JSON URLs 或本地路径"中添加表情包来源：
+   - 在线表情包：`https://emoticons.hzchu.top/...`
+   - 本地文件：`emojis/my-collection.json`（相对于 Vault 根目录）
+   - 多个来源用逗号分隔。**添加后点击"更新"**
 2. **快速插入**：在编辑器中输入触发字符串（默认 `::` 或 `：：`）后跟表情名称，如 `::smile` 或 `：：smile`
 3. **表情面板**：点击工具栏图标或使用命令面板搜索 "Emoji Selector"
 
@@ -53,7 +57,6 @@
 | `::` 或 `：：` | 触发快速插入（默认，可在设置中自定义） |
 | `Tab` / `Shift+Tab` | 面板切换表情包集合 |
 | `Ctrl+M` | 面板切换多选模式（搜索框聚焦时） |
-| `Shift+点击` | 添加/移除收藏 |
 | `↑` / `↓` | 导航表情选择 |
 | `Enter` | 选择表情 |
 | `Esc` | 关闭面板 |
@@ -62,9 +65,25 @@
 
 ### 🔧 基础配置
 
-#### 表情包源 (OWO JSON URLs)
-- **推荐来源**：[https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
-- **添加URL后必须点击"更新"按钮**
+#### 表情包源 (OWO JSON URLs 或本地路径)
+
+支持两种方式添加表情包：
+
+1. **在线表情包 URL**
+   - 推荐来源：[https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
+   - 格式：`https://example.com/emojis.json`
+
+2. **本地文件路径**
+   - 将 JSON 文件放在 Vault 中，如 `emojis/my-collection.json`
+   - 路径相对于 Vault 根目录
+   - 参见项目中的 `local-emoji-example.json` 示例
+
+**添加后必须点击"更新"按钮加载。**
+
+**配置示例**：
+```
+https://emoticons.hzchu.top/owo.json, emojis/local.json
+```
 
 #### 快速插入配置
 - **触发字符串**：支持多个等效触发器，用 `|` 分隔

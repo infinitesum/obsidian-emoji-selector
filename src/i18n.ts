@@ -90,8 +90,8 @@ const EN_STRINGS: I18nStrings = {
     searchPlaceholder: 'Search placeholder',
     searchPlaceholderDesc: 'Placeholder text shown in the emoji search input',
     advancedSearchTip: 'Advanced search: Use "collection.*pattern" for collection-specific search, regex patterns, or fuzzy matching',
-    owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: 'Supports OWO-format sticker pack URLs; separate multiple URLs with commas. The JSON file will be cached locally until you click "Update" again.',
+    owoJsonUrls: 'OWO JSON URLs or local paths',
+    owoJsonUrlsDesc: 'Add remote URLs or local file paths (e.g., `emojis/my-collection.json`); separate multiple entries with commas. Files will be cached until you click "Update".',
     updateCollections: 'Update collections',
     updateCollectionsTooltip: 'Load emoji collections from the URLs above',
     rememberLastCollection: 'Remember last collection',
@@ -156,7 +156,7 @@ const EN_STRINGS: I18nStrings = {
     recent: 'Recent',
 
     // Notices
-    invalidUrls: 'Please enter valid URLs separated by commas',
+    invalidUrls: 'Please enter valid URLs or local file paths (.json) separated by commas',
     collectionsUpdateSuccess: 'Emoji collections updated! Loaded {0} collections with {1} emojis.',
     collectionsUpdateFailed: 'Failed to update emoji collections: {0}',
     noActiveCollection: 'No active editor found. Please open a note to use the emoji picker.'
@@ -172,8 +172,8 @@ const ZH_CN_STRINGS: I18nStrings = {
     searchPlaceholder: '搜索占位符',
     searchPlaceholderDesc: '表情符号搜索输入框中显示的占位符文本',
     advancedSearchTip: '高级搜索：使用"集合名.*模式"进行集合特定搜索，支持正则表达式和模糊匹配',
-    owoJsonUrls: 'OWO JSON URLs',
-    owoJsonUrlsDesc: '支持 OWO 格式的表情包 URL，多个文件用英文逗号分隔。JSON 文件会在本地缓存，直到您再次点击“更新”。',
+    owoJsonUrls: 'OWO JSON URLs 或本地路径',
+    owoJsonUrlsDesc: '添加远程 URL 或本地文件路径（如 `emojis/my-collection.json`），多个文件用逗号分隔。文件会缓存直到点击"更新"。',
     updateCollections: '更新集合',
     updateCollectionsTooltip: '从上述 URL 加载表情符号集合',
     rememberLastCollection: '记住上次选择的集合',
@@ -238,7 +238,7 @@ const ZH_CN_STRINGS: I18nStrings = {
     recent: '最近',
 
     // Notices
-    invalidUrls: '请输入用逗号分隔的有效 URL',
+    invalidUrls: '请输入用逗号分隔的有效 URL 或本地文件路径（.json）',
     collectionsUpdateSuccess: '表情符号集合已更新！加载了 {0} 个集合，共 {1} 个表情符号。',
     collectionsUpdateFailed: '更新表情符号集合失败：{0}',
     noActiveCollection: '未找到活动编辑器。请打开一个笔记使用表情符号选择器。'

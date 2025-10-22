@@ -374,17 +374,19 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
     }
 
     /**
-     * Validate URL format
+     * Validate URL or local file path format
      */
     private validateUrls(urlString: string): boolean {
         const urls = urlString.split(',').map(url => url.trim()).filter(url => url.length > 0);
 
         return urls.length > 0 && urls.every(url => {
+            // Check if it's a URL
             try {
                 const parsedUrl = new URL(url);
                 return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
             } catch {
-                return false;
+                // If not a URL, check if it's a valid file path (ends with .json)
+                return url.endsWith('.json');
             }
         });
     }
