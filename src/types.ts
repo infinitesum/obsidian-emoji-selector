@@ -135,10 +135,10 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     customEmojiTemplate: '',
     maxRecentEmojis: 20,
     enableRecentEmojis: true,
-    preferRecentOverRemembered: true,
+    preferRecentOverRemembered: false,
     enableQuickInsertion: true,
     quickInsertionTrigger: '::|：：',
-    enableRegexSearch: false,
+    enableRegexSearch: true,
     enableFuzzySearch: false,
     debugLogLevel: 2 // Default to WARN level
 };

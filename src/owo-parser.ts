@@ -239,11 +239,11 @@ export class OwoFileParser {
         if (type === 'image') {
             const extractedUrl = this.extractUrlFromHtml(item.icon);
             if (extractedUrl) {
-                url = extractedUrl;
+                url = this.convertToResourcePath(extractedUrl);
                 processedIcon = extractedUrl; // Use the URL as the icon for consistency
             } else {
                 // If no HTML tag, treat the icon as direct URL
-                url = item.icon;
+                url = this.convertToResourcePath(item.icon);
             }
         }
 
@@ -257,6 +257,34 @@ export class OwoFileParser {
         };
 
         return emojiItem;
+    }
+
+    /**
+     * Convert local vault path to resource path
+     */
+    private static convertToResourcePath(path: string): string {
+        // If it's already a remote URL, return as-is
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+            return path;
+        }
+
+        // Handle Wiki-link format
+        let cleanPath = path;
+        if (path.startsWith('[[') && path.endsWith(']]')) {
+            cleanPath = path.slice(2, -2);
+        }
+
+        cleanPath = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
+
+        // For local paths, convert to resource path
+        if (this.app) {
+            const file = this.app.vault.getFileByPath(cleanPath);
+            if (file) {
+                return this.app.vault.getResourcePath(file);
+            }
+        }
+
+        return path;
     }
 
     /**

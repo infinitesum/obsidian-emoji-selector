@@ -380,18 +380,21 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Sanitize URL to prevent XSS attacks
 	 */
 	private sanitizeUrl(url: string): string {
-		// Basic URL validation and sanitization
-		try {
-			const parsedUrl = new URL(url);
-			// Only allow http and https protocols
-			if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-				return parsedUrl.toString();
+		// Validate remote URLs
+		if (url.startsWith('http://') || url.startsWith('https://')) {
+			try {
+				const parsedUrl = new URL(url);
+				if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+					return parsedUrl.toString();
+				}
+			} catch (error) {
+				console.warn('Invalid emoji URL:', url);
+				return '';
 			}
-		} catch (error) {
-			console.warn('Invalid emoji URL:', url);
 		}
-		// Return empty string for invalid URLs (will cause img to show alt text)
-		return '';
+		
+		// For local paths, return as-is
+		return url;
 	}
 
 	/**

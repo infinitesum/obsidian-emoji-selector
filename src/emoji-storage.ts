@@ -949,6 +949,16 @@ export class EmojiValidator {
      * Basic URL validation
      */
     private static isValidUrl(url: string): boolean {
+        if (!url || !url.trim()) {
+            return false;
+        }
+        
+        // Allow local paths (relative paths for vault files)
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            return true;
+        }
+        
+        // Validate remote URLs
         try {
             const urlObj = new URL(url);
             return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
