@@ -1,6 +1,7 @@
 import { EditorSuggest, Editor, EditorPosition, TFile, EditorSuggestTriggerInfo, EditorSuggestContext } from 'obsidian';
 import { EmojiItem } from './types';
 import EmojiSelectorPlugin from '../main';
+import { EmojiFormatter } from './emoji-formatter';
 
 /**
  * EditorSuggest implementation for quick emoji insertion
@@ -147,8 +148,8 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
 
         const { editor } = this.context;
 
-        // Generate the emoji HTML
-        const emojiHtml = this.generateEmojiHtml(emoji);
+        // Generate the emoji HTML using EmojiFormatter
+        const emojiHtml = EmojiFormatter.generateEmojiHtml(emoji, this.plugin.settings);
 
         // Add space after emoji if enabled in single-select mode setting
         const shouldAddSpace = this.plugin.settings.addSpaceAfterEmoji;
@@ -167,94 +168,5 @@ export class EmojiSuggest extends EditorSuggest<EmojiItem> {
 
         // Close the suggestion popup
         this.close();
-    }
-
-    /**
-     * Generate HTML for emoji insertion (reuse from main plugin)
-     */
-    private generateEmojiHtml(emoji: EmojiItem): string {
-        // Use custom template if provided
-        if (this.plugin.settings.customEmojiTemplate && this.plugin.settings.customEmojiTemplate.trim()) {
-            return this.applyEmojiTemplate(emoji, this.plugin.settings.customEmojiTemplate);
-        }
-
-        // Default HTML generation
-        const customClasses = this.plugin.settings.customCssClasses;
-
-        if (emoji.type === 'image' && emoji.url) {
-            // Generate HTML img tag for image emojis
-            const classes = `emoji-image ${customClasses}`.trim();
-            return `<img src="${this.sanitizeUrl(emoji.url)}" alt="${this.escapeHtml(emoji.text)}" title="${this.escapeHtml(emoji.text)}" class="${classes}">`;
-        } else {
-            // For text-based emojis, wrap in span for consistent styling
-            const classes = `emoji-text ${customClasses}`.trim();
-            return `<span class="${classes}" title="${this.escapeHtml(emoji.text)}">${emoji.icon}</span>`;
-        }
-    }
-
-    /**
-     * Apply custom emoji template with variable substitution
-     */
-    private applyEmojiTemplate(emoji: EmojiItem, template: string): string {
-        const customClasses = this.plugin.settings.customCssClasses;
-        const classes = emoji.type === 'image'
-            ? `emoji-image ${customClasses}`.trim()
-            : `emoji-text ${customClasses}`.trim();
-
-        // Get filename from url
-        const fullfilename = emoji.url ? emoji.url.substring(emoji.url.lastIndexOf('/') + 1) : '';
-        const dotIndex = fullfilename.lastIndexOf('.');
-        const filename = dotIndex !== -1
-            ? fullfilename.substring(0, dotIndex)
-            : fullfilename;
-
-        // Create variables map
-        const variables: Record<string, string> = {
-            url: emoji.url ? this.sanitizeUrl(emoji.url) : '',
-            name: emoji.key,
-            text: this.escapeHtml(emoji.text),
-            category: this.escapeHtml(emoji.category),
-            type: emoji.type,
-            classes: classes,
-            icon: emoji.icon,
-            filename: filename,
-            fullfilename: fullfilename
-        };
-
-        // Replace variables in template
-        let result = template;
-        for (const [key, value] of Object.entries(variables)) {
-            const regex = new RegExp(`\\{${key}\\}`, 'g');
-            result = result.replace(regex, value);
-        }
-
-        return result;
-    }
-
-    /**
-     * Sanitize URL to prevent XSS attacks
-     */
-    private sanitizeUrl(url: string): string {
-        try {
-            const parsedUrl = new URL(url);
-            if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-                return parsedUrl.toString();
-            }
-        } catch (error) {
-            console.warn('Invalid emoji URL:', url);
-        }
-        return '';
-    }
-
-    /**
-     * Escape HTML characters to prevent XSS
-     */
-    private escapeHtml(text: string): string {
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
     }
 }

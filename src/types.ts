@@ -16,8 +16,10 @@ export interface EmojiItem {
     type: 'emoticon' | 'emoji' | 'image';
     /** Collection category this emoji belongs to */
     category: string;
-    /** Optional URL for image type emojis */
+    /** Optional URL for image type emojis (app:// protocol for display) */
     url?: string;
+    /** Original path from JSON (for document insertion) */
+    originalPath?: string;
 }
 
 /**
@@ -100,8 +102,10 @@ export interface EmojiSelectorSettings {
     addSpaceAfterEmoji: boolean;
     /** Add space after emoji insertion in multi-select mode */
     addSpaceAfterEmojiInMultiSelect: boolean;
-    /** Custom emoji insertion template with variables */
+    /** Custom emoji insertion template for remote images/emojis with variables */
     customEmojiTemplate: string;
+    /** Custom emoji insertion template for local vault images (defaults to customEmojiTemplate if empty) */
+    customLocalEmojiTemplate: string;
     /** Maximum number of recent emojis to keep */
     maxRecentEmojis: number;
     /** Enable recent emojis feature */
@@ -133,6 +137,7 @@ export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     addSpaceAfterEmoji: true,
     addSpaceAfterEmojiInMultiSelect: false,
     customEmojiTemplate: '',
+    customLocalEmojiTemplate: '',
     maxRecentEmojis: 20,
     enableRecentEmojis: true,
     preferRecentOverRemembered: false,

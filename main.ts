@@ -4,6 +4,7 @@ import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types'
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
 import { EmojiSuggest } from './src/emoji-suggest';
+import { EmojiFormatter } from './src/emoji-formatter';
 import { i18n } from './src/i18n';
 import { perfMonitor } from './src/performance-monitor';
 import { logger, LogLevel } from './src/logger';
@@ -336,7 +337,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Insert selected emoji into the editor
 	 */
 	private insertEmoji(editor: Editor, emoji: EmojiItem, isMultiSelectMode: boolean = false): void {
-		const emojiHtml = this.generateEmojiHtml(emoji);
+		const emojiHtml = EmojiFormatter.generateEmojiHtml(emoji, this.settings);
 
 		// Determine if space should be added based on mode and settings
 		const shouldAddSpace = isMultiSelectMode
@@ -347,105 +348,6 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 		// Insert at current cursor position
 		editor.replaceSelection(textToInsert);
-	}
-
-	/**
-	 * Generate HTML for emoji insertion
-	 * Handles both image and text-based emojis according to requirements 3.1 and 3.2
-	 */
-	private generateEmojiHtml(emoji: EmojiItem): string {
-		// Use custom template if provided
-		if (this.settings.customEmojiTemplate && this.settings.customEmojiTemplate.trim()) {
-			return this.applyEmojiTemplate(emoji, this.settings.customEmojiTemplate);
-		}
-
-		// Default HTML generation
-		const customClasses = this.settings.customCssClasses;
-
-		if (emoji.type === 'image' && emoji.url) {
-			// Generate HTML img tag for image emojis (Requirement 3.1)
-			// Include proper alt text for accessibility (Requirement 3.2)
-			// Size is controlled by dynamic CSS, no inline styles needed
-			const classes = `emoji-image ${customClasses}`.trim();
-			return `<img src="${this.sanitizeUrl(emoji.url)}" alt="${this.escapeHtml(emoji.text)}" title="${this.escapeHtml(emoji.text)}" class="${classes}">`;
-		} else {
-			// For text-based emojis, wrap in span for consistent styling
-			// Size is controlled by dynamic CSS, no inline styles needed
-			const classes = `emoji-text ${customClasses}`.trim();
-			return `<span class="${classes}" title="${this.escapeHtml(emoji.text)}">${emoji.icon}</span>`;
-		}
-	}
-
-	/**
-	 * Sanitize URL to prevent XSS attacks
-	 */
-	private sanitizeUrl(url: string): string {
-		// Validate remote URLs
-		if (url.startsWith('http://') || url.startsWith('https://')) {
-			try {
-				const parsedUrl = new URL(url);
-				if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-					return parsedUrl.toString();
-				}
-			} catch (error) {
-				console.warn('Invalid emoji URL:', url);
-				return '';
-			}
-		}
-		
-		// For local paths, return as-is
-		return url;
-	}
-
-	/**
-	 * Escape HTML characters to prevent XSS
-	 */
-	private escapeHtml(text: string): string {
-		return text
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;')
-			.replace(/"/g, '&quot;')
-			.replace(/'/g, '&#39;');
-	}
-
-	/**
-	 * Apply custom emoji template with variable substitution
-	 */
-	private applyEmojiTemplate(emoji: EmojiItem, template: string): string {
-		const customClasses = this.settings.customCssClasses;
-		const classes = emoji.type === 'image'
-			? `emoji-image ${customClasses}`.trim()
-			: `emoji-text ${customClasses}`.trim();
-
-		// Get filename from url
-		const fullfilename = emoji.url ? emoji.url.substring(emoji.url.lastIndexOf('/') + 1) : '';
-
-		const dotIndex = fullfilename.lastIndexOf('.');
-		const filename = dotIndex !== -1
-			? fullfilename.substring(0, dotIndex)
-			: fullfilename;
-		// Create variables map
-		const variables: Record<string, string> = {
-			url: emoji.url ? this.sanitizeUrl(emoji.url) : '',
-			name: emoji.key,
-			text: this.escapeHtml(emoji.text),
-			category: this.escapeHtml(emoji.category),
-			type: emoji.type,
-			classes: classes,
-			icon: emoji.icon,
-			filename: filename,
-			fullfilename: fullfilename
-		};
-
-		// Replace variables in template
-		let result = template;
-		for (const [key, value] of Object.entries(variables)) {
-			const regex = new RegExp(`\\{${key}\\}`, 'g');
-			result = result.replace(regex, value);
-		}
-
-		return result;
 	}
 
 	/**

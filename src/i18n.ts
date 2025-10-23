@@ -23,6 +23,9 @@ export interface I18nStrings {
     customCssClassesDesc: string;
     customEmojiTemplate: string;
     customEmojiTemplateDesc: string;
+    customLocalEmojiTemplate: string;
+    customLocalEmojiTemplateDesc: string;
+    customLocalEmojiTemplatePlaceholder: string;
 
     // Quick insertion
     quickInsertion: string;
@@ -91,7 +94,7 @@ const EN_STRINGS: I18nStrings = {
     searchPlaceholderDesc: 'Placeholder text shown in the emoji search input',
     advancedSearchTip: 'Advanced search: Use "collection.*pattern" for collection-specific search, regex patterns, or fuzzy matching',
     owoJsonUrls: 'OWO JSON URLs or local paths',
-    owoJsonUrlsDesc: 'OWO emoji packs are supported; separate multiple entries with commas. Find more emoji packs at: https://emoticons.hzchu.top/ `JSON` OWO Files will be cached until you click "Update". ',
+    owoJsonUrlsDesc: 'OWO emoji packs are supported; separate multiple entries with commas. Find more emoji packs at: https://emoticons.hzchu.top/. `JSON` OWO Files will be cached until you click "Update". ',
     updateCollections: 'Update collections',
     updateCollectionsTooltip: 'Load emoji collections from the URLs above',
     rememberLastCollection: 'Remember last collection',
@@ -103,8 +106,11 @@ const EN_STRINGS: I18nStrings = {
     addSpaceAfterEmojiMultiDesc: 'Automatically add a space after inserting an emoji in multi-select mode',
     customCssClasses: 'Custom CSS classes',
     customCssClassesDesc: 'Additional CSS classes to apply to emoji elements (space-separated)',
-    customEmojiTemplate: 'Custom emoji template',
-    customEmojiTemplateDesc: 'Custom template for emoji insertion. Variables: `{url}`, `{name}`, `{text}`, `{category}`, `{type}`, `{classes}`, `{filename}`, `{fullfilename}`. Leave empty for default HTML.',
+    customEmojiTemplate: 'Custom emoji template (remote images)',
+    customEmojiTemplateDesc: 'Customize how emojis are inserted. Available variables: `{url}`、`{name}`、`{text}`、`{category}`、`{type}`、`{classes}`、`{filename}`、`{fullfilename}`. Leave empty to use default HTML.',
+    customLocalEmojiTemplate: 'Custom local image template',
+    customLocalEmojiTemplateDesc: 'Template for inserting local vault images. Available variables: `{path}`、`{name}`、`{text}`、`{category}`、`{classes}`、`{filename}`、`{fullfilename}`. Leave empty to use default HTML.',
+    customLocalEmojiTemplatePlaceholder: '<img src="{path}" alt="{text}" title="{text}" class="{classes}">',
 
     // Quick insertion
     quickInsertion: 'Quick insertion',
@@ -185,8 +191,11 @@ const ZH_CN_STRINGS: I18nStrings = {
     addSpaceAfterEmojiMultiDesc: '选多个表情插入后，自动在后面加入空格',
     customCssClasses: '自定义样式类名',
     customCssClassesDesc: '给表情添加额外的 CSS 类名（多个用空格隔开）',
-    customEmojiTemplate: '自定义插入模板',
-    customEmojiTemplateDesc: '自定义表情插入的格式。可用变量：`{url}`、`{name}`、`{text}`、`{category}`、`{type}`、`{classes}`、`{filename}`、`{fullfilename}`。留空使用默认 HTML。',
+    customEmojiTemplate: '远程图片插入模板',
+    customEmojiTemplateDesc: '自定义远程图片和文本表情的插入格式。可用变量：`{url}`、`{name}`、`{text}`、`{category}`、`{type}`、`{classes}`、`{filename}`、`{fullfilename}`。留空使用默认 HTML。',
+    customLocalEmojiTemplate: '本地图片插入模板',
+    customLocalEmojiTemplateDesc: '自定义本地库中图片的插入格式。可用变量：`{path}`（相对路径）、`{name}`、`{text}`、`{category}`、`{classes}`、`{filename}`、`{fullfilename}`。留空使用默认 HTML。',
+    customLocalEmojiTemplatePlaceholder: '<img src="{path}" alt="{text}" title="{text}" class="{classes}">',
 
     // Quick insertion
     quickInsertion: '快捷输入',

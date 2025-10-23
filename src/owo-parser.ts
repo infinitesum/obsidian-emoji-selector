@@ -234,17 +234,19 @@ export class OwoFileParser {
 
         let processedIcon = item.icon;
         let url: string | undefined;
+        let originalPath: string | undefined;
 
         // For image type, extract URL from HTML img tag if present
         if (type === 'image') {
             const extractedUrl = this.extractUrlFromHtml(item.icon);
-            if (extractedUrl) {
-                url = this.convertToResourcePath(extractedUrl);
-                processedIcon = extractedUrl; // Use the URL as the icon for consistency
-            } else {
-                // If no HTML tag, treat the icon as direct URL
-                url = this.convertToResourcePath(item.icon);
-            }
+            const rawPath = extractedUrl || item.icon;
+            
+            // Store original path for document insertion
+            originalPath = rawPath;
+            
+            // Convert to resource path for picker display
+            url = this.convertToResourcePath(rawPath);
+            processedIcon = rawPath;
         }
 
         const emojiItem: EmojiItem = {
@@ -253,7 +255,8 @@ export class OwoFileParser {
             text: item.text,
             type,
             category,
-            url
+            url,
+            originalPath
         };
 
         return emojiItem;

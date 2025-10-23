@@ -223,7 +223,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
             }));
 
-        // Custom emoji template setting
+        // Custom emoji template setting (for remote images and text emojis)
         const customTemplateSetting = new Setting(containerEl)
             .setName(i18n.t('customEmojiTemplate'));
 
@@ -238,6 +238,24 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setValue(this.plugin.settings.customEmojiTemplate)
             .onChange(async (value) => {
                 this.plugin.settings.customEmojiTemplate = value;
+                await this.plugin.saveSettings();
+            }));
+
+        // Custom local emoji template setting (for vault images)
+        const customLocalTemplateSetting = new Setting(containerEl)
+            .setName(i18n.t('customLocalEmojiTemplate'));
+
+        // Set description with code support using DOM API
+        this.setDescWithCodeSupport(customLocalTemplateSetting, i18n.t('customLocalEmojiTemplateDesc'));
+
+        // Add CSS class for multi-line layout
+        customLocalTemplateSetting.settingEl.addClass('emoji-setting-multiline');
+
+        customLocalTemplateSetting.addTextArea(text => text
+            .setPlaceholder(i18n.t('customLocalEmojiTemplatePlaceholder'))
+            .setValue(this.plugin.settings.customLocalEmojiTemplate)
+            .onChange(async (value) => {
+                this.plugin.settings.customLocalEmojiTemplate = value;
                 await this.plugin.saveSettings();
             }));
 

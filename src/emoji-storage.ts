@@ -977,7 +977,8 @@ export class EmojiValidator {
             text: item.text.trim(),
             type: item.type,
             category: item.category.trim(),
-            url: item.url?.trim()
+            url: item.url?.trim(),
+            originalPath: item.originalPath?.trim()
         };
     }
 
