@@ -1,8 +1,8 @@
-### [中文](./README-CN.md) | English
+### Chinese | [English](./README.md)
 
 # Emoji Selector
 
-Insert custom emojis in Obsidian with fast search, auto-suggestion, and support for OWO format emoji collections.
+Quickly insert custom emojis in Obsidian. Supports search, custom styles, and insertion templates.
 
 ## Screenshots
 
@@ -10,103 +10,87 @@ Panel Selection
 
 ![Panel Selection](https://io.pari.network/s/gwMTTbgFFYffrNc/download)
 
-Quick Insertion
+Quick Insert
 
-![Quick Insertion](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
+![Quick Insert](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
+
 
 ## Features
 
-- **Quick Insertion**: Type trigger string (default `::` or `：：`) to insert emojis
-- **Emoji Picker Panel**: Browse and search through emoji collections
-- **OWO Format Support**: Compatible with a vast library of emoji packs
-- **Local File Support**: Use local JSON files from your Vault
-- **Custom Templates**: Customize how emojis are inserted (HTML, Markdown, custom formats)
-- **Advanced Search**: Supports regex and fuzzy matching
-- **Keyboard Navigation**: Full keyboard support for accessibility
-- **Recent Emojis**: Quick access to recently used emojis
-- **Multi-select Mode**: Insert multiple emojis at once
-- **Custom CSS Classes**: Style emojis with your own CSS
+- Quick insert by typing trigger characters (default `::` or `：：`)
+- Emoji selector panel
+- Compatible with OWO format emoji pack files, supports numerous emoji packs
+- Custom insertion templates and CSS styles
+- Supports regex and fuzzy search
 
-## Installation
 
-### Method 1: Community Plugin Store
-1. Open Obsidian Settings
-2. Navigate to Community Plugins
+## Install from Obsidian Community plugins
+1. Open Settings in Obsidian
+2. Go to Community plugins
 3. Search for "Emoji selector"
 4. Install and enable the plugin
-
 
 ## Quick Start
 
 > [!important] 
-> **Configuration Required**: The plugin requires emoji collection files to function. Find emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/).
+> You must configure emoji packs before use: The plugin requires emoji pack files to work properly. You can find your favorite emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/).
 
-**Initial Setup Steps**:
+### Three-Step Configuration
+**Step 1: Add Emoji Packs**
 
-1. **Add Emoji Collections**: Go to plugin settings, add sources in "OWO JSON URLs or local paths":
-   - Remote URLs: `https://emoticons.hzchu.top/...`
-   - Local files: `emojis/my-collection.json` (relative to Vault root)
-   - Separate multiple sources with commas. **Click "Update" after adding**.
-2. **Quick Insertion**: Type the trigger string (default `::` or `：：`) followed by emoji name, e.g., `::smile` or `：：smile`
-3. **Emoji Panel**: Click toolbar icon or use Command Palette "Emoji Selector"
+Go to plugin settings, add emoji packs in "OWO JSON URLs or Local Paths":
+
+- Online emoji packs: Copy the OWO link from "引用链接" on https://emoticons.hzchu.top/
+  ![](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-10-qn3wO.png)
+- ~~Local files: Enter relative path (relative to Vault root)~~
+- Separate multiple sources with commas
+- Click "Update" button after adding
+
+**Step 2: Quick Insertion**
+
+Type trigger character + emoji name in the editor:
+
+- ::smile or ：：smile
+
+**Step 3: Use Emoji Panel**
+
+Click the toolbar icon or use command palette to search for "Emoji Selector"
+
 
 ### Keyboard Shortcuts
 
 | Shortcut | Function |
-|----------|----------|
-| `::` or `：：` | Trigger quick insertion (default, customizable in settings) |
-| `Tab` / `Shift+Tab` | Switch between emoji collections in panel |
-| `Ctrl+M` | Toggle multi-select mode (when search is focused) |
+|--------|------|
+| `::` or `：：` | Trigger quick insert (default, customizable in settings) |
+| `Tab` / `Shift+Tab` | Switch emoji pack collections in panel |
+| `Ctrl+M` | Toggle multi-select mode in panel (when search box is focused) |
 | `↑` / `↓` | Navigate emoji selection |
 | `Enter` | Select emoji |
 | `Esc` | Close panel |
 
 ## Configuration Guide
 
-### 🔧 Basic Configuration
+### Trigger Character Configuration
 
-#### Emoji Collection Sources (OWO JSON URLs or local paths)
+Supports multiple triggers, separated by `|`.
 
-Two ways to add emoji collections:
+**Configuration Examples:**
 
-1. **Remote URLs**
-   - Recommended: [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/)
-   - Format: `https://example.com/emojis.json`
+|Configuration|Description|Usage Example|
+|---|---|---|
+|`::\|：：`|Chinese and English double colons (recommended)|`::smile` or `：：smile`|
+|`:\|：`|Chinese and English single colons|`:smile` or `：smile`|
+|`::`|English double colons only|`::smile`|
 
-2. **Local File Paths**
-   - Place JSON files in your Vault, e.g., `emojis/my-collection.json`
-   - Paths are relative to Vault root
-   - See `local-emoji-example.json` in the project for reference
-
-**Remember to click "Update" after adding sources.**
-
-**Example configuration**:
-```
-https://emoticons.hzchu.top/owo.json, emojis/local.json
-```
-
-#### Quick Insertion Configuration
-- **Trigger String(s)**: Supports multiple alternative triggers separated by `|`
-- **Default Config**: `::|：：` (both English and Chinese double colons work)
-- **Common Configuration Examples**:
-  - `::|：：` - Double colon (supports both English and Chinese, recommended)
-  - `:|：` - Single colon (supports both, faster but may trigger accidentally)
-  - `::` - English double colon only (strict mode)
-  - `@@|##|//` - Multiple custom triggers
-  - `,,|，，` - Both English and Chinese commas
-- **Usage Examples**:
-  - With `::|：：`: Type `::smile` or `：：smile` to trigger
-  - With `@@|##`: Type `@@smile` or `##smile` to trigger
-  - With `::`: Only `::smile` triggers
 
 ### 🎨 Custom Emoji Templates
 
-The plugin automatically parses OWO format emoji collections:
+For owo format emoji packs, the plugin automatically parses and converts:
 
 **OWO File Structure Example**:
 ```json
 {
-    "Cat Collection": {
+    "猫猫虫": {
         "type": "image",
         "container": [
             {
@@ -118,15 +102,29 @@ The plugin automatically parses OWO format emoji collections:
 }
 ```
 
-**Available Template Variables**:
-- `{category}` ← `"Cat Collection"` (collection name)
+- `{category}` ← `"猫猫虫"` (collection name)
 - `{text}` ← `"bugcat_bugcat_shock"` (text field)
 - `{url}` ← `"https://emoticons.hzchu.top/emoticons/bugcat/bugcat_shock.png"` (extracted from icon HTML)
-- `{name}` ← `"Cat Collection_0"` (category + index, unique identifier)
+- `{name}` ← `"猫猫虫_0"` (category + index, auto-generated unique identifier)
 - `{type}` ← `"image"` (type field)
-- `{filename}` ← `"bugcat_shock"` (extracted from URL, no extension)
+- `{filename}` ← `"bugcat_shock"` (extracted from URL, without extension)
 - `{fullfilename}` ← `"bugcat_shock.png"` (extracted from URL, with extension)
-- `{classes}` ← `"emoji-image"` (auto-generated CSS classes based on type)
+- `{classes}` ← `"emoji-image"` (CSS classes automatically added based on type, plus user-defined CSS classes)
+
+
+
+**Available Variables:**
+
+|Variable|Description|Example Value|
+|---|---|---|
+|`{category}`|Collection name|`猫猫虫`|
+|`{text}`|`text` field|`bugcat_bugcat_shock`|
+|`{url}`|Image URL extracted from icon field HTML|`"https://emoticons.hzchu.top/emoticons/bugcat/bugcat_shock.png"`|
+|`{name}`|category + index, auto-generated unique identifier|`猫猫虫_0`|
+|`{type}`|`type` field|`image`|
+|`{filename}`|Filename without extension, extracted from URL|`bugcat_shock`|
+|`{fullfilename}`|Complete filename with extension, extracted from URL|`bugcat_shock.png`|
+|`{classes}`|CSS classes automatically added based on type field, plus user-defined CSS classes|`emoji-image`|
 
 #### Template Examples
 
@@ -145,7 +143,7 @@ The plugin automatically parses OWO format emoji collections:
 {% emoji {category} {fullfilename} %}
 ```
 
-**Custom Styled**:
+**Custom Styles**:
 ```html
 <span class="my-emoji {classes}">
   <img src="{url}" alt="{text}" loading="lazy">
@@ -153,83 +151,53 @@ The plugin automatically parses OWO format emoji collections:
 </span>
 ```
 
-#### Usage Tips
-- Leave template empty to use default HTML format
-- Combine with custom CSS classes for advanced styling
-
 ## Advanced Search
-
 - **Fuzzy Matching**: `sml` matches "smile" related emojis
-- **Regular Expressions**: Use patterns like `Cat Collection.*a` to search for emojis containing "a" in the "Cat Collection"
-- **Collection Filtering**: Search within specific collections using regex
+- **Regular Expressions**: Enables collection-specific searches, e.g., `活字乱刷.*a` searches for emojis containing "a" in the "活字乱刷" collection
 
 
-## Frequently Asked Questions
+## FAQ
 
-### Q: Slow emoji loading?
-A: The plugin uses caching for improved performance after initial load. Check cache status in settings.
+### Q: Emoji packs loading slowly?
+A: The plugin uses a caching mechanism. Speed will significantly improve after the first load. You can check cache status in settings.
 
 ### Q: What are regular expressions?
-A: For a quick tutorial, see [Learn Regex the Easy Way](https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md).
+A: For a quick introduction, recommended reading: [Learn Regex the Easy Way](https://github.com/ziishaned/learn-regex).
 
-### Q: How to add custom emoji collections?
-A: Add OWO format JSON file URLs to "OWO JSON URLs" in settings. Find collections at [emoticons.hzchu.top](https://emoticons.hzchu.top/).
+### Q: How to add custom emoji packs?
+A: In plugin settings, add the emoji pack JSON file path to "OWL Emoji Pack Address". Find emoji packs at [emoticons.hzchu.top](https://emoticons.hzchu.top/).
 
-### Q: Quick insertion not working?
-A: Ensure "Enable Quick Emoji Insertion" is enabled in settings.
+### Q: Quick insert not working?
+A: Make sure "Enable Quick Input" is enabled in settings.
 
-### Q: Can I use this on mobile?
-A: Yes, the plugin supports both desktop and mobile Obsidian.
 
 ## Development
 
-### Building the Project
+### Build Project
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Development mode
-npm run dev
+pnpm dev
 
-# Build for production
-npm run build
+# Build production version
+pnpm build
 ```
 
-### Project Structure
-
-```
-src/
-├── emoji-cache.ts           # Emoji caching system
-├── emoji-manager.ts         # Emoji data management
-├── emoji-picker-modal.ts    # Emoji selection interface
-├── emoji-storage.ts         # Data persistence
-├── emoji-suggest.ts         # Quick insertion suggestions
-├── recent-emoji-manager.ts  # Recent emojis tracking
-├── settings-tab.ts          # Settings interface
-├── virtual-emoji-renderer.ts # Virtual scrolling renderer
-└── performance-monitor.ts   # Performance monitoring
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to:
-- ⭐ Star the project
-- 🐛 Report bugs
-- 💡 Suggest features
-- 🤝 Submit pull requests
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - See [LICENSE](LICENSE) file for details
 
 ## Support
 
-If you find this plugin useful:
-- ⭐ Star the repository
-- 🐛 Report issues on GitHub
-- 💡 Share feature suggestions
-- 🤝 Contribute to development
+If you find this plugin useful, feel free to:
+- ⭐ Star the project
+- 🐛 Report issues
+- 💡 Suggest features
+- 🤝 Contribute code
 
 ## Author
 
