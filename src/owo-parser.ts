@@ -273,9 +273,11 @@ export class OwoFileParser {
     }
 
     /**
-     * Convert local vault path to resource path
+     * Convert local vault path to resource path for display
+     * Generates temporary blob URLs that are valid for the current session
+     * Public static method to allow regeneration from recent emoji manager
      */
-    private static convertToResourcePath(path: string): string {
+    static convertToResourcePath(path: string): string {
         // If it's already a remote URL, return as-is
         if (path.startsWith('http://') || path.startsWith('https://')) {
             return path;
@@ -293,6 +295,8 @@ export class OwoFileParser {
         if (this.app) {
             const file = this.app.vault.getFileByPath(cleanPath);
             if (file) {
+                // Generate temporary resource path (blob URL) for display
+                // Note: This URL is temporary and only valid in current session
                 return this.app.vault.getResourcePath(file);
             }
             // File doesn't exist - increment counter

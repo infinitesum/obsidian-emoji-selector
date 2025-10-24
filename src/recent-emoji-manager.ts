@@ -1,4 +1,5 @@
 import { EmojiItem, RecentEmojiEntry, RecentEmojisData } from './types';
+import { OwoFileParser } from './owo-parser';
 
 /**
  * High-performance recent emoji manager using LRU algorithm
@@ -74,9 +75,12 @@ export class RecentEmojiManager {
             // Move to front of order (O(1) amortized)
             this.moveToFront(emoji.key);
         } else {
+            // Normalize emoji before storing
+            const normalizedEmoji = this.normalizeEmojiForStorage(emoji);
+            
             // Add new entry
             const entry: RecentEmojiEntry = {
-                emoji,
+                emoji: normalizedEmoji,
                 lastUsed: now,
                 count: 1
             };
@@ -105,7 +109,8 @@ export class RecentEmojiManager {
         for (const key of this.order) {
             const entry = this.entries.get(key);
             if (entry) {
-                result.push(entry.emoji);
+                // Restore emoji from storage (regenerate resource paths if needed)
+                result.push(this.restoreEmojiFromStorage(entry.emoji));
             }
         }
         return result;
@@ -121,7 +126,11 @@ export class RecentEmojiManager {
         for (const key of this.order) {
             const entry = this.entries.get(key);
             if (entry) {
-                result.push(entry);
+                // Restore emoji from storage
+                result.push({
+                    ...entry,
+                    emoji: this.restoreEmojiFromStorage(entry.emoji)
+                });
             }
         }
         return result;
@@ -202,6 +211,46 @@ export class RecentEmojiManager {
             mostUsed,
             oldestEntry
         };
+    }
+
+    /**
+     * Normalize emoji for storage by clearing temporary blob URLs
+     * Only handles local vault images; remote URLs (http/https) are kept as-is
+     */
+    private normalizeEmojiForStorage(emoji: EmojiItem): EmojiItem {
+        // Only process local image files (not remote http/https URLs)
+        if (emoji.type === 'image' && emoji.originalPath && 
+            !emoji.originalPath.startsWith('http://') && 
+            !emoji.originalPath.startsWith('https://')) {
+            // Clear the temporary blob URL for local files, keep only originalPath
+            return {
+                ...emoji,
+                url: undefined // Clear temporary URL
+            };
+        }
+        // Remote URLs and other types can be stored as-is
+        return emoji;
+    }
+
+    /**
+     * Restore emoji from storage by regenerating temporary blob URLs
+     * Only handles local vault images; remote URLs are already persistent
+     */
+    private restoreEmojiFromStorage(emoji: EmojiItem): EmojiItem {
+        // Only regenerate URL for local image files without a valid URL
+        if (emoji.type === 'image' && emoji.originalPath && !emoji.url &&
+            !emoji.originalPath.startsWith('http://') && 
+            !emoji.originalPath.startsWith('https://')) {
+            // Regenerate the temporary blob URL from originalPath for local files
+            const regeneratedUrl = OwoFileParser.convertToResourcePath(emoji.originalPath);
+            
+            return {
+                ...emoji,
+                url: regeneratedUrl
+            };
+        }
+        // Remote URLs are already valid, return as-is
+        return emoji;
     }
 
     /**
