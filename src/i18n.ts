@@ -81,6 +81,7 @@ export interface I18nStrings {
     collectionsUpdateSuccess: string;
     collectionsUpdateFailed: string;
     noActiveCollection: string;
+    invalidLocalPaths: string;
 }
 
 const EN_STRINGS: I18nStrings = {
@@ -165,7 +166,8 @@ const EN_STRINGS: I18nStrings = {
     invalidUrls: 'Please enter valid URLs or local file paths (.json) separated by commas',
     collectionsUpdateSuccess: 'Emoji collections updated! Loaded {0} collections with {1} emojis.',
     collectionsUpdateFailed: 'Failed to update emoji collections: {0}',
-    noActiveCollection: 'No active editor found. Please open a note to use the emoji picker.'
+    noActiveCollection: 'No active editor found. Please open a note to use the emoji picker.',
+    invalidLocalPaths: 'Warning: {0} local image path(s) not found in vault'
 };
 
 const ZH_CN_STRINGS: I18nStrings = {
@@ -250,7 +252,8 @@ const ZH_CN_STRINGS: I18nStrings = {
     invalidUrls: '请输入正确的网址或本地文件路径（.json 文件），多个用逗号隔开',
     collectionsUpdateSuccess: '表情包更新成功！加载了 {0} 个表情包，一共 {1} 个表情',
     collectionsUpdateFailed: '表情包更新失败：{0}',
-    noActiveCollection: '没有打开的笔记。请先打开一个笔记再使用表情选择器'
+    noActiveCollection: '没有打开的笔记。请先打开一个笔记再使用表情选择器',
+    invalidLocalPaths: '警告：有 {0} 个本地图片路径无效'
 };
 
 export class I18n {

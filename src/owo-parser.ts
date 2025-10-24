@@ -22,6 +22,7 @@ interface OwoFileStructure {
 export class OwoFileParser {
     private static cacheManager: EmojiCacheManager | null = null;
     private static app: App | null = null;
+    private static invalidPathCount: number = 0;
 
     /**
      * Set the cache manager instance
@@ -35,6 +36,15 @@ export class OwoFileParser {
      */
     static setApp(app: App): void {
         this.app = app;
+    }
+
+    /**
+     * Get and reset invalid path count
+     */
+    static getAndResetInvalidPathCount(): number {
+        const count = this.invalidPathCount;
+        this.invalidPathCount = 0;
+        return count;
     }
 
     /**
@@ -279,12 +289,14 @@ export class OwoFileParser {
 
         cleanPath = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
 
-        // For local paths, convert to resource path
+        // For local paths, check if file exists and convert to resource path
         if (this.app) {
             const file = this.app.vault.getFileByPath(cleanPath);
             if (file) {
                 return this.app.vault.getResourcePath(file);
             }
+            // File doesn't exist - increment counter
+            this.invalidPathCount++;
         }
 
         return path;

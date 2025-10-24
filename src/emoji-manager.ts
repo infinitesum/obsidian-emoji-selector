@@ -1,9 +1,10 @@
-import { App } from 'obsidian';
+import { App, Notice } from 'obsidian';
 import { EmojiItem, EmojiCollection, EmojiSelectorSettings, RecentEmojiEntry } from './types';
 import { EmojiStorage } from './emoji-storage';
 import { OwoFileParser } from './owo-parser';
 import { EmojiCacheManager } from './emoji-cache';
 import { RecentEmojiManager } from './recent-emoji-manager';
+import { i18n } from './i18n';
 
 /**
  * Manages emoji collections and provides search functionality
@@ -168,7 +169,9 @@ export class EmojiManager {
             this.storage.addCollections(collections);
 
             this.lastLoadTime = now;
-            // Collections loaded successfully
+            
+            // Check for invalid local paths
+            this.checkInvalidPaths();
 
         } catch (error) {
             console.error('Failed to load emoji collections:', error);
@@ -295,7 +298,9 @@ export class EmojiManager {
             this.storage.addCollections(collections);
 
             this.lastLoadTime = Date.now();
-            // Collections force reloaded successfully
+            
+            // Check for invalid local paths
+            this.checkInvalidPaths();
 
         } catch (error) {
             console.error('Failed to force reload emoji collections:', error);
@@ -375,6 +380,16 @@ export class EmojiManager {
             .split(',')
             .map(url => url.trim())
             .filter(url => url.length > 0);
+    }
+
+    /**
+     * Check for invalid local paths and show warning if any
+     */
+    private checkInvalidPaths(): void {
+        const invalidCount = OwoFileParser.getAndResetInvalidPathCount();
+        if (invalidCount > 0) {
+            new Notice(i18n.t('invalidLocalPaths', String(invalidCount)));
+        }
     }
 
     /**
