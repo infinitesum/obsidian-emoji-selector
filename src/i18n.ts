@@ -108,7 +108,7 @@ const EN_STRINGS: I18nStrings = {
     customCssClassesDesc: 'Additional CSS classes to apply to emoji elements (space-separated)',
     customEmojiTemplate: 'Custom emoji template (remote images)',
     customEmojiTemplateDesc: 'Customize how emojis are inserted. Available variables: `{url}`、`{name}`、`{text}`、`{category}`、`{type}`、`{classes}`、`{filename}`、`{fullfilename}`. Leave empty to use default HTML.',
-    customLocalEmojiTemplate: 'Custom local image template',
+    customLocalEmojiTemplate: 'Custom emoji template (local images)',
     customLocalEmojiTemplateDesc: 'Template for inserting local vault images. Available variables: `{path}`、`{name}`、`{text}`、`{category}`、`{classes}`、`{filename}`、`{fullfilename}`. Leave empty to use default HTML.',
     customLocalEmojiTemplatePlaceholder: '<img src="{path}" alt="{text}" title="{text}" class="{classes}">',
 
