@@ -154,7 +154,7 @@ A: The plugin uses a caching mechanism. Speed will significantly improve after t
 A: For a quick introduction, recommended reading: [Learn Regex the Easy Way](https://github.com/ziishaned/learn-regex).
 
 ### Q: How to add custom emoji packs?
-A: In plugin settings, add the emoji pack JSON file path to "OWL Emoji Pack Address". Find emoji packs at [emoticons.hzchu.top](https://emoticons.hzchu.top/).
+A: In plugin settings, add the emoji pack JSON file path to "OWO Emoji Pack Address". Find emoji packs at [emoticons.hzchu.top](https://emoticons.hzchu.top/).
 
 ### Q: Quick insert not working?
 A: Make sure "Enable Quick Input" is enabled in settings.

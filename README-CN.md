@@ -155,7 +155,7 @@ A: 插件使用了缓存机制，首次加载后会显著提升速度。可在�
 A：速成推荐阅读 [Learn Regex the Easy Way(中文版)](https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md)。
 
 ### Q: 如何添加自定义表情包？
-A: 在插件设置中，将表情包 JSON 文件路径添加到“OWL 表情包地址”中。推荐从 https://emoticons.hzchu.top/ 寻找表情包。
+A: 在插件设置中，将表情包 JSON 文件路径添加到“OWO 表情包地址”中。推荐从 https://emoticons.hzchu.top/ 寻找表情包。
 
 ### Q: 快速插入不工作？
 A: 确保在设置中启用了“开启快捷输入”选项。

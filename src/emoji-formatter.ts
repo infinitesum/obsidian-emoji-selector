@@ -9,8 +9,13 @@ export class EmojiFormatter {
      * Generate HTML/Wiki-link for emoji insertion
      */
     public static generateEmojiHtml(emoji: EmojiItem, settings: EmojiSelectorSettings): string {
+        // 判断是否为本地图片：有 originalPath 且不是远程 URL
+        const isLocalImage = emoji.originalPath && 
+            !emoji.originalPath.startsWith('http://') && 
+            !emoji.originalPath.startsWith('https://');
+        
         // 本地图片使用本地模板,留空则使用默认模板
-        if (emoji.originalPath) {
+        if (isLocalImage) {
             const localTemplate = settings.customLocalEmojiTemplate || 
                 '<img src="{path}" alt="{text}" title="{text}" class="{classes}">';
             return this.applyEmojiTemplate(emoji, localTemplate);
