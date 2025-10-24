@@ -18,19 +18,19 @@ export class EmojiFormatter {
         if (isLocalImage) {
             const localTemplate = settings.customLocalEmojiTemplate || 
                 '<img src="{path}" alt="{text}" title="{text}" class="{classes}">';
-            return this.applyEmojiTemplate(emoji, localTemplate);
+            return this.applyEmojiTemplate(emoji, localTemplate, settings);
         }
         
         // 远程图片使用远程模板,留空则使用标准 HTML
         const remoteTemplate = settings.customEmojiTemplate || 
             '<img src="{url}" alt="{text}" title="{text}" class="{classes}">';
-        return this.applyEmojiTemplate(emoji, remoteTemplate);
+        return this.applyEmojiTemplate(emoji, remoteTemplate, settings);
     }
 
     /**
      * Apply custom emoji template with variable substitution
      */
-    private static applyEmojiTemplate(emoji: EmojiItem, template: string): string {
+    private static applyEmojiTemplate(emoji: EmojiItem, template: string, settings: EmojiSelectorSettings): string {
         // Only calculate filename if template uses these variables (performance optimization)
         let filename = '', fullfilename = '';
         if (template.includes('{filename}') || template.includes('{fullfilename}')) {
@@ -43,6 +43,11 @@ export class EmojiFormatter {
                 : fullfilename;
         }
 
+        // Build classes: base class + custom classes
+        const baseClass = emoji.type === 'image' ? 'emoji-image' : 'emoji-text';
+        const customClasses = settings.customCssClasses ? ` ${settings.customCssClasses}` : '';
+        const allClasses = `${baseClass}${customClasses}`;
+
         // Create variables map
         const variables: Record<string, string> = {
             url: emoji.url ? this.sanitizeUrl(emoji.url) : '',
@@ -51,7 +56,7 @@ export class EmojiFormatter {
             text: this.escapeHtml(emoji.text),
             category: this.escapeHtml(emoji.category),
             type: emoji.type,
-            classes: emoji.type === 'image' ? 'emoji-image' : 'emoji-text',
+            classes: allClasses,
             icon: emoji.icon,
             filename: filename,
             fullfilename: fullfilename
@@ -82,7 +87,6 @@ export class EmojiFormatter {
             }
         }
         
-        // For local paths (app:// or relative), return as-is
         return url;
     }
 
