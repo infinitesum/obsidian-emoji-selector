@@ -8,11 +8,11 @@
 
 面板选择
 
-![面板选择](https://io.pari.network/s/gwMTTbgFFYffrNc/download)
+![面板选择](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-0uRPkibD.gif) 
 
 快速插入
 
-![快速插入](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
+![快速插入](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-rzt22Jjs.gif)
 
 
 ## 功能特性
@@ -42,8 +42,7 @@
 
 - 在线表情包：从 https://emoticons.hzchu.top/ 挑选你喜欢的表情包，复制「引用链接」的 OWO 链接
   ![](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-10-qn3wO.png)
-- ~~本地文件：填入相对路径，如 emojis/my-collection.json（相对于 Vault 根目录）~~
-- icon 字段填写表情图片相对于 Vault 内的路径
+- ~~本地文件：填入相对路径，如 emojis/my-collection.json（相对于 Vault 根目录），icon 字段填写表情图片相对于 Vault 内的路径~~
 - 多个来源用英文逗号分隔
 - 添加后点击「更新」按钮
 

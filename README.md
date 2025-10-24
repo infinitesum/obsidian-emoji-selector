@@ -1,4 +1,4 @@
-### Chinese | [English](./README.md)
+### [中文](./README-CN.md) | English
 
 # Emoji Selector
 
@@ -101,16 +101,6 @@ For owo format emoji packs, the plugin automatically parses and converts:
     }
 }
 ```
-
-- `{category}` ← `"猫猫虫"` (collection name)
-- `{text}` ← `"bugcat_bugcat_shock"` (text field)
-- `{url}` ← `"https://emoticons.hzchu.top/emoticons/bugcat/bugcat_shock.png"` (extracted from icon HTML)
-- `{name}` ← `"猫猫虫_0"` (category + index, auto-generated unique identifier)
-- `{type}` ← `"image"` (type field)
-- `{filename}` ← `"bugcat_shock"` (extracted from URL, without extension)
-- `{fullfilename}` ← `"bugcat_shock.png"` (extracted from URL, with extension)
-- `{classes}` ← `"emoji-image"` (CSS classes automatically added based on type, plus user-defined CSS classes)
-
 
 
 **Available Variables:**
