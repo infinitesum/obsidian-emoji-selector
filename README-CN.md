@@ -2,7 +2,7 @@
 
 # Emoji Selector
 
-在 Obsidian 里快速插入自定义表情。支持搜索、自定义样式和插入模板。
+在 Obsidian 里快速插入自定义表情。支持搜索、自定义样式和插入模板。<img src="https://eu-federal-media.pari.network/pari/88231cbf-7ba8-4c72-8065-b76148e45773.webp" alt="rxy_giveuflower" title="rxy_giveuflower" height="32"> <img src="https://eu-federal-media.pari.network/pari/ba4d1bff-b3f4-4923-b664-3c03f42f92c5.webp" alt="rxy_bukuishiwo" title="rxy_bukuishiwo" height="32"> <img src="https://eu-federal-media.pari.network/pari/97d1f66f-239a-46c6-8ab5-70cfb4eb92f9.gif" alt="ablobcat_fukifuki" title="ablobcat_fukifuki" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/cats.png" alt="cats" title="cats" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/nobeko/nobeko-hope.png" alt="nobeko-hope" title="nobeko-hope" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/color.gif" alt="color" title="color" height="32"><img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/love.gif" alt="love" title="love" height="32"><img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/whimper.gif" alt="whimper" title="whimper" height="32">
 
 ## 截图
 
@@ -35,14 +35,13 @@
 > [!important] 
 > 使用前必须配置表情包：插件需要表情包文件才能正常工作。可以在 [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/) 寻找您喜欢的表情包。
 
-### 三步配置
 **第 1 步：添加表情包**
 
-进入插件设置，在「OWO JSON URLs 或本地路径」中添加表情包：
+插件支持远程/本地 JSON OWO 表情包文件以及远程/本地图片。进入插件设置，在「OWO JSON URLs 或本地路径」中添加表情包：
 
 - 在线表情包：从 https://emoticons.hzchu.top/ 挑选你喜欢的表情包，复制「引用链接」的 OWO 链接
   ![](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-10-qn3wO.png)
-- ~~本地文件：填入相对路径，如 emojis/my-collection.json（相对于 Vault 根目录），icon 字段填写表情图片相对于 Vault 内的路径~~
+- 或使用本地文件：填入 JSON 文件相对与 vault 根目录的路径，JSON 内的 `icon` 字段填写表情图片相对于 Vault 内的路径
 - 多个来源用英文逗号分隔
 - 添加后点击「更新」按钮
 

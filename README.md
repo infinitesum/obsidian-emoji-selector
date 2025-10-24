@@ -2,7 +2,7 @@
 
 # Emoji Selector
 
-Quickly insert custom emojis in Obsidian. Supports search, custom styles, and insertion templates.
+Quickly insert custom emojis in Obsidian. Supports search, custom styles, and insertion templates. <img src="https://eu-federal-media.pari.network/pari/88231cbf-7ba8-4c72-8065-b76148e45773.webp" alt="rxy_giveuflower" title="rxy_giveuflower" height="32"> <img src="https://eu-federal-media.pari.network/pari/ba4d1bff-b3f4-4923-b664-3c03f42f92c5.webp" alt="rxy_bukuishiwo" title="rxy_bukuishiwo" height="32"> <img src="https://eu-federal-media.pari.network/pari/97d1f66f-239a-46c6-8ab5-70cfb4eb92f9.gif" alt="ablobcat_fukifuki" title="ablobcat_fukifuki" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/Blob/cats.png" alt="cats" title="cats" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/nobeko/nobeko-hope.png" alt="nobeko-hope" title="nobeko-hope" height="32"> <img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/color.gif" alt="color" title="color" height="32"><img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/love.gif" alt="love" title="love" height="32"><img src="https://cdn.jsdelivr.net/gh/infinitesum/Twikoo-emoji@master/capoo/whimper.gif" alt="whimper" title="whimper" height="32">
 
 ## Screenshots
 
@@ -35,14 +35,13 @@ Quick Insert
 > [!important] 
 > You must configure emoji packs before use: The plugin requires emoji pack files to work properly. You can find your favorite emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/).
 
-### Three-Step Configuration
 **Step 1: Add Emoji Packs**
 
-Go to plugin settings, add emoji packs in "OWO JSON URLs or Local Paths":
+Supports both remote and local JSON OWO emoji pack files as well as remote and local images. Go to plugin settings, add emoji packs in "OWO JSON URLs or Local Paths":
 
 - Online emoji packs: Copy the OWO link from "引用链接" on https://emoticons.hzchu.top/
   ![](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-10-qn3wO.png)
-- ~~Local files: Enter relative path (relative to Vault root)~~
+- (Alternatively) Local files: Enter relative path (relative to Vault root) to the JSON file, with `icon` fields in the JSON pointing to image paths relative to the Vault
 - Separate multiple sources with commas
 - Click "Update" button after adding
 
