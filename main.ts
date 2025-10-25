@@ -12,21 +12,17 @@ import { logger, LogLevel } from './src/logger';
 export default class EmojiSelectorPlugin extends Plugin {
 	settings: EmojiSelectorSettings;
 	emojiManager: EmojiManager | null = null;
-	private settingsLoaded: boolean = false;
-	private settingsLoadPromise: Promise<void> | null = null;
-	private cssInjected: boolean = false;
 	private emojiSuggest: EmojiSuggest | null = null;
+	private dataCache: Record<string, unknown> | null = null;
 
 	async onload() {
 		perfMonitor.start('plugin-onload');
 
-		// Load only settings on startup (now that cache is separated, data.json is small)
 		await this.loadSettings();
 
-		// Initialize logger with user's preferred level
 		logger.setLogLevel(this.settings.debugLogLevel as LogLevel);
 
-		// Add settings tab (Requirement 5.4) - can be added immediately
+		// Add settings tab (Requirement 5.4) 
 		this.addSettingTab(new EmojiSelectorSettingTab(this.app, this));
 
 		// Add command to open emoji picker (Requirement 5.1)
@@ -45,14 +41,12 @@ export default class EmojiSelectorPlugin extends Plugin {
 			if (activeView && activeView.editor) {
 				await this.openEmojiPicker(activeView.editor);
 			} else {
-				// Show notice if no active editor
 				new Notice(i18n.t('noActiveCollection'));
 			}
 		});
 
-		// Register emoji suggest for quick insertion immediately with default settings
-		// This ensures it works right after plugin loads, then gets updated when settings load
-		this.setupEmojiSuggestImmediate();
+		// Register emoji suggest for quick insertion based on settings
+		this.setupEmojiSuggest();
 
 		perfMonitor.end('plugin-onload');
 		perfMonitor.logMetrics();
@@ -66,24 +60,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 	}
 
 	/**
-	 * Load plugin settings asynchronously (non-blocking) - kept for compatibility
-	 */
-	private loadSettingsAsync(): void {
-		if (this.settingsLoadPromise) {
-			return;
-		}
-
-		this.settingsLoadPromise = this.loadSettings();
-	}
-
-	/**
 	 * Setup emoji suggest based on settings
 	 */
-	private async setupEmojiSuggest(): Promise<void> {
-		// Wait for settings to load
-		await this.ensureSettingsLoaded();
-
-		// Register or unregister based on settings
+	private setupEmojiSuggest(): void {
 		if (this.settings.enableQuickInsertion) {
 			if (!this.emojiSuggest) {
 				this.emojiSuggest = new EmojiSuggest(this);
@@ -91,55 +70,19 @@ export default class EmojiSelectorPlugin extends Plugin {
 			}
 		} else {
 			if (this.emojiSuggest) {
-				// Note: Obsidian doesn't provide unregisterEditorSuggest, 
-				// so we'll just disable it by setting it to null
 				this.emojiSuggest = null;
 			}
 		}
 	}
 
 	/**
-	 * Setup emoji suggest immediately with default settings, then update when settings load
-	 */
-	private setupEmojiSuggestImmediate(): void {
-		// Register with default settings immediately to ensure it works on startup
-		if (DEFAULT_SETTINGS.enableQuickInsertion && !this.emojiSuggest) {
-			this.emojiSuggest = new EmojiSuggest(this);
-			this.registerEditorSuggest(this.emojiSuggest);
-		}
-
-		// Then update based on actual settings when they load (fire and forget)
-		(async () => {
-			try {
-				await this.ensureSettingsLoaded();
-				// Re-evaluate based on actual settings
-				if (this.settings.enableQuickInsertion) {
-					if (!this.emojiSuggest) {
-						this.emojiSuggest = new EmojiSuggest(this);
-						this.registerEditorSuggest(this.emojiSuggest);
-					}
-				} else {
-					// If disabled in settings, disable it
-					this.emojiSuggest = null;
-				}
-			} catch (error) {
-				console.error('Failed to setup emoji suggest:', error);
-			}
-		})();
-	}
-
-
-
-	/**
 	 * Load all plugin settings (deferred until needed)
 	 */
 	async loadSettings() {
-		if (this.settingsLoaded) {
-			return; // Already loaded
-		}
-
 		try {
 			const data = await this.loadData();
+			// Cache the complete data
+			this.dataCache = data || {};
 
 			// Extract all settings fields, ignore user data like recentEmojis and emojiJsonCache
 			const settingsFromData: Partial<EmojiSelectorSettings> = {};
@@ -152,26 +95,16 @@ export default class EmojiSelectorPlugin extends Plugin {
 			}
 
 			this.settings = Object.assign({}, DEFAULT_SETTINGS, settingsFromData);
-			this.settingsLoaded = true;
 
 			// Apply dynamic CSS now that all settings are loaded
 			this.updateEmojiSizeCSS();
 		} catch (error) {
 			console.error('Failed to load emoji selector settings:', error);
 			this.settings = { ...DEFAULT_SETTINGS };
-			this.settingsLoaded = true;
+			this.dataCache = {};
 
 			// Apply default CSS even on error
 			this.updateEmojiSizeCSS();
-		}
-	}
-
-	/**
-	 * Ensure settings are loaded before proceeding
-	 */
-	private async ensureSettingsLoaded(): Promise<void> {
-		if (!this.settingsLoaded) {
-			await this.loadSettings();
 		}
 	}
 
@@ -180,11 +113,7 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 */
 	private async getEmojiManager(): Promise<EmojiManager> {
 		if (!this.emojiManager) {
-			// Load settings now if not already loaded (first time accessing emoji functionality)
-			await this.ensureSettingsLoaded();
-
 			// Initialize emoji manager with cache support
-			// Use specialized data access functions that only load what's needed
 			this.emojiManager = new EmojiManager(
 				this.settings,
 				this.app,
@@ -197,10 +126,16 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 	/**
 	 * Load only emoji-related data (cache, recent emojis) without settings
+	 * Uses cached data to avoid repeated disk reads
 	 */
 	private async loadEmojiData(): Promise<Record<string, unknown>> {
 		try {
-			const data = await this.loadData();
+			const data = this.dataCache || await this.loadData();
+			
+			if (!this.dataCache) {
+				this.dataCache = data || {};
+			}
+			
 			if (!data) return {};
 
 			// Only return emoji-related data, not settings
@@ -221,10 +156,13 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 	/**
 	 * Save emoji-related data while preserving settings
+	 * Uses cached data to avoid repeated disk reads
 	 */
 	private async saveEmojiData(emojiData: unknown): Promise<void> {
 		try {
-			const existingData = await this.loadData();
+			
+			const existingData = this.dataCache || await this.loadData();
+			
 			const updatedData = {
 				...(existingData as Record<string, unknown>),
 				...(emojiData as Record<string, unknown>)
@@ -236,18 +174,10 @@ export default class EmojiSelectorPlugin extends Plugin {
 			});
 
 			await this.saveData(updatedData);
+			// Update cache after successful save
+			this.dataCache = updatedData;
 		} catch (error) {
 			console.error('Failed to save emoji data:', error);
-		}
-	}
-
-	/**
-	 * Ensure CSS is injected when needed
-	 */
-	private ensureCSSInjected(): void {
-		if (!this.cssInjected) {
-			this.updateEmojiSizeCSS();
-			this.cssInjected = true;
 		}
 	}
 
@@ -255,12 +185,9 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Get emoji manager for settings tab (safe access)
 	 */
 	async getEmojiManagerForSettings(): Promise<EmojiManager> {
-		// Ensure settings are loaded before creating emoji manager
-		await this.ensureSettingsLoaded();
 		const manager = await this.getEmojiManager();
 
-		// Force update settings to ensure the manager has the latest settings
-		// This is important because settings might have been changed after the manager was created
+		// Force update settings
 		manager.updateSettings(this.settings);
 
 		return manager;
@@ -275,10 +202,11 @@ export default class EmojiSelectorPlugin extends Plugin {
 
 	/**
 	 * Save plugin settings
+	 * Uses cached data to avoid repeated disk reads
 	 */
 	async saveSettings() {
-		// Load existing data to preserve cache and other data
-		const existingData = await this.loadData();
+		// Use cached data if available, otherwise load from disk
+		const existingData = this.dataCache || await this.loadData();
 
 		// Check if URLs changed to clear cache
 		const oldUrls = existingData?.owoJsonUrls;
@@ -301,27 +229,25 @@ export default class EmojiSelectorPlugin extends Plugin {
 		});
 
 		await this.saveData(updatedData);
+		// Update cache after successful save
+		this.dataCache = updatedData;
+		
 		// Update emoji manager with new settings (always update if it exists)
 		if (this.emojiManager) {
 			this.emojiManager.updateSettings(this.settings);
 		}
 		// Note: If emojiManager doesn't exist yet, it will use the updated settings when created
-		// because getEmojiManager() calls ensureSettingsLoaded() which loads the latest settings
 
 		// Update dynamic CSS for emoji sizing
 		this.updateEmojiSizeCSS();
 		// Update emoji suggest registration
-		await this.setupEmojiSuggest();
+		this.setupEmojiSuggest();
 	}
 
 	/**
 	 * Open the emoji picker modal
 	 */
 	private async openEmojiPicker(editor: Editor): Promise<void> {
-		// Ensure settings are loaded and CSS is injected before opening modal
-		await this.ensureSettingsLoaded();
-		this.ensureCSSInjected();
-
 		// Get emoji manager (lazy initialization)
 		await this.getEmojiManager();
 
@@ -354,34 +280,21 @@ export default class EmojiSelectorPlugin extends Plugin {
 	 * Update dynamic CSS for emoji sizing
 	 */
 	private updateEmojiSizeCSS(): void {
-		// Ensure settings are loaded before applying CSS
-		if (!this.settingsLoaded) {
-			// If settings aren't loaded yet, use default values
-			const emojiSize = DEFAULT_SETTINGS.emojiSize;
-			const customClasses = DEFAULT_SETTINGS.customCssClasses;
-			this.applyCSSWithValues(emojiSize, customClasses);
-			return;
-		}
-
-		const emojiSize = this.settings.emojiSize;
-		const customClasses = this.settings.customCssClasses;
-		this.applyCSSWithValues(emojiSize, customClasses);
-	}
-
-	/**
-	 * Apply CSS with specific values
-	 */
-	private applyCSSWithValues(emojiSize: string, customClasses: string): void {
 		// Remove existing dynamic style
 		const existingStyle = document.getElementById('emoji-selector-dynamic-styles');
 		if (existingStyle) {
 			existingStyle.remove();
 		}
 
-	// Create new dynamic style
-	const style = createEl('style', {
-		attr: { id: 'emoji-selector-dynamic-styles' }
-	});		// CSS that applies to all existing and new emojis - only dynamic sizing
+		// Create new dynamic style
+		const style = createEl('style', {
+			attr: { id: 'emoji-selector-dynamic-styles' }
+		});
+		
+		const emojiSize = this.settings.emojiSize;
+		const customClasses = this.settings.customCssClasses;
+		
+		// CSS that applies to all existing and new emojis - only dynamic sizing
 		style.textContent = `
 			/* Dynamic emoji sizing - overrides base styles */
 			.emoji-image {
@@ -401,6 +314,5 @@ export default class EmojiSelectorPlugin extends Plugin {
 		`;
 
 		document.head.appendChild(style);
-		this.cssInjected = true;
 	}
 }
