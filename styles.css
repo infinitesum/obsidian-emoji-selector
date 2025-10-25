@@ -277,7 +277,7 @@
   position: relative; /* 用于定位内部的圆点 */
   width: 40px;
   height: 22px;
-  background-color: var(--toggle-track-color); /* 关闭时的颜色 */
+  background-color: var(--background-modifier-border-hover); /* 关闭时的颜色 */
   border-radius: 11px; /* 圆角 */
   transition: background-color 0.2s; /* 背景色渐变动画 */
 }
@@ -290,7 +290,7 @@
   height: 18px;
   left: 2px;
   top: 2px;
-  background-color: white; /* 圆点的颜色 */
+  background-color: var(--toggle-thumb-color); /* 圆点的颜色 */
   border-radius: 50%; /* 让它变成圆形 */
   transition: transform 0.1s; /* 位移动画 */
 }
