@@ -8,11 +8,11 @@ Quickly insert custom emojis in Obsidian. Supports search, custom styles, and in
 
 Panel Selection
 
-![Panel Selection](https://io.pari.network/s/gwMTTbgFFYffrNc/download)
+![Panel Selection](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-0uRPkibD.gif)
 
 Quick Insert
 
-![Quick Insert](https://io.pari.network/s/RsXtTqLe8rmnwFW/download)
+![Quick Insert](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-rzt22Jjs.gif)
 
 
 ## Features
