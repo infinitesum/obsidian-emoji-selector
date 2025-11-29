@@ -82,6 +82,29 @@ export interface I18nStrings {
     collectionsUpdateFailed: string;
     noActiveCollection: string;
     invalidLocalPaths: string;
+    // URL management
+    addUrl: string;
+    addUrlPlaceholder: string;
+    urlAdded: string;
+    urlRemoved: string;
+    urlPreview: string;
+    emojiCount: string;
+    moveUp: string;
+    moveDown: string;
+    remove: string;
+    editRawConfig: string;
+    editRawConfigDesc: string;
+    showEditor: string;
+    hideEditor: string;
+    cancel: string;
+    urlExists: string;
+    noUrlsConfigured: string;
+    duplicateWarning: string;
+    addUrlTitle: string;
+    addUrlDesc1: string;
+    addUrlDesc2: string;
+    addUrlInputHint: string;
+    confirm: string;
 }
 
 const EN_STRINGS: I18nStrings = {
@@ -167,7 +190,30 @@ const EN_STRINGS: I18nStrings = {
     collectionsUpdateSuccess: 'Emoji collections updated! Loaded {0} collections with {1} emojis.',
     collectionsUpdateFailed: 'Failed to update emoji collections: {0}',
     noActiveCollection: 'No active editor found. Please open a note to use the emoji picker.',
-    invalidLocalPaths: 'Warning: {0} local image path(s) not found in vault'
+    invalidLocalPaths: 'Warning: {0} local image path(s) not found in vault',
+    // URL management
+    addUrl: 'Add',
+    addUrlPlaceholder: 'Enter URL(s), comma or newline separated',
+    urlAdded: 'Added {0} collection(s)',
+    urlRemoved: 'Removed',
+    urlPreview: 'Collections Preview',
+    emojiCount: '{0} emojis',
+    moveUp: '↑',
+    moveDown: '↓',
+    remove: '×',
+    editRawConfig: 'Edit raw config',
+    editRawConfigDesc: 'Manually edit the URL list',
+    showEditor: 'Show',
+    hideEditor: 'Hide',
+    cancel: 'Cancel',
+    urlExists: 'URL already exists',
+    noUrlsConfigured: 'No URLs configured',
+    duplicateWarning: 'Found {0} duplicate URL(s), will be auto-removed on save',
+    addUrlTitle: 'Add Emoji Pack',
+    addUrlDesc1: 'Get OWO format emoji packs from ',
+    addUrlDesc2: ' or paste your own JSON URLs.',
+    addUrlInputHint: 'One URL per line, or comma separated',
+    confirm: 'Add'
 };
 
 const ZH_CN_STRINGS: I18nStrings = {
@@ -253,7 +299,30 @@ const ZH_CN_STRINGS: I18nStrings = {
     collectionsUpdateSuccess: '表情包更新成功！加载了 {0} 个表情包，一共 {1} 个表情',
     collectionsUpdateFailed: '表情包更新失败：{0}',
     noActiveCollection: '没有打开的笔记。请先打开一个笔记再使用表情选择器',
-    invalidLocalPaths: '警告：有 {0} 个本地图片路径无效'
+    invalidLocalPaths: '警告：有 {0} 个本地图片路径无效',
+    // URL management
+    addUrl: '添加',
+    addUrlPlaceholder: '输入 URL，逗号或换行分隔',
+    urlAdded: '已添加 {0} 个表情包',
+    urlRemoved: '已移除',
+    urlPreview: '表情包预览',
+    emojiCount: '{0} 个表情',
+    moveUp: '↑',
+    moveDown: '↓',
+    remove: '×',
+    editRawConfig: '编辑配置',
+    editRawConfigDesc: '手动编辑 URL 列表',
+    showEditor: '展开',
+    hideEditor: '收起',
+    cancel: '取消',
+    urlExists: 'URL 已存在',
+    noUrlsConfigured: '暂无表情包',
+    duplicateWarning: '发现 {0} 个重复 URL，保存时会自动去重',
+    addUrlTitle: '添加表情包',
+    addUrlDesc1: '从 ',
+    addUrlDesc2: ' 获取 OWO 格式表情包，或粘贴你自己的 JSON 地址。',
+    addUrlInputHint: '每行一个 URL，或用英文逗号分隔',
+    confirm: '添加'
 };
 
 export class I18n {

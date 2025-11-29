@@ -490,6 +490,82 @@ export class EmojiManager {
     }
 
     /**
+     * Add URLs incrementally (only load new ones, don't reload existing)
+     */
+    async addUrlsIncremental(urls: string[]): Promise<{ loaded: number; failed: string[] }> {
+        await this.ensureCacheInitialized();
+        const failed: string[] = [];
+        const allCollections: EmojiCollection[] = [];
+        
+        // 批量加载所有 URL 的 collections
+        for (const url of urls) {
+            try {
+                const collections = await OwoFileParser.loadFromUrl(url);
+                allCollections.push(...collections);
+            } catch (e) {
+                failed.push(url);
+            }
+        }
+        
+        // 一次性添加所有 collections（只触发一次 rebuildIndexes）
+        if (allCollections.length > 0) {
+            this.storage.addCollections(allCollections);
+        }
+        
+        this.lastLoadTime = Date.now();
+        return { loaded: allCollections.length, failed };
+    }
+
+    /**
+     * Remove URL and its collections/cache
+     */
+    async removeUrl(url: string): Promise<void> {
+        await this.ensureCacheInitialized();
+        this.storage.removeCollectionsBySource(url);
+        await this.cacheManager.clearUrl(url);
+    }
+
+    /**
+     * Reorder collections in storage based on URL order
+     */
+    reorderByUrls(urls: string[]): void {
+        this.storage.reorderByUrls(urls);
+    }
+
+    /**
+     * Get collection info for preview (name, emoji count, random preview image)
+     * Groups by source URL, handling merged collections
+     */
+    getCollectionPreviews(): Array<{ url: string; name: string; count: number; preview?: string }> {
+        // 按 source URL 分组（source 可能包含多个逗号分隔的 URL）
+        const urlMap = new Map<string, { names: string[]; count: number; images: string[] }>();
+        
+        for (const c of this.storage.getAllCollections()) {
+            // source 可能是 "url1, url2" 的格式（合并后）
+            const sources = c.source.split(',').map(s => s.trim());
+            const images = c.items.filter(e => e.type === 'image' && e.url).map(e => e.url!);
+            
+            for (const src of sources) {
+                const existing = urlMap.get(src);
+                if (existing) {
+                    existing.names.push(c.name);
+                    existing.count += c.items.length;
+                    existing.images.push(...images);
+                } else {
+                    urlMap.set(src, { names: [c.name], count: c.items.length, images: [...images] });
+                }
+            }
+        }
+        
+        const result: Array<{ url: string; name: string; count: number; preview?: string }> = [];
+        for (const [url, data] of urlMap) {
+            const preview = data.images.length > 0 ? data.images[Math.floor(Math.random() * data.images.length)] : undefined;
+            result.push({ url, name: data.names.join(', '), count: data.count, preview });
+        }
+        return result;
+    }
+
+    /**
      * Add emoji to recent list
      */
     async addToRecent(emoji: EmojiItem): Promise<void> {

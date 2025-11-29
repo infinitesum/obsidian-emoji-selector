@@ -47,6 +47,36 @@ export class EmojiStorage {
     }
 
     /**
+     * Remove collections by source URL
+     */
+    removeCollectionsBySource(source: string): void {
+        for (const [name, collection] of this.collections) {
+            if (collection.source === source) {
+                this.collections.delete(name);
+            }
+        }
+        this.rebuildIndexes();
+    }
+
+    /**
+     * Reorder collections based on URL order (for syncing with settings)
+     */
+    reorderByUrls(urls: string[]): void {
+        const urlOrder = new Map(urls.map((url, i) => [url, i]));
+        const sorted = Array.from(this.collections.values()).sort((a, b) => {
+            const orderA = urlOrder.get(a.source) ?? Infinity;
+            const orderB = urlOrder.get(b.source) ?? Infinity;
+            return orderA - orderB;
+        });
+        this.collections.clear();
+        for (const c of sorted) {
+            this.collections.set(c.name, c);
+        }
+        // 不需要 rebuildIndexes，只是顺序变了
+        this.allEmojisCache = null;
+    }
+
+    /**
      * Get a collection by name
      */
     getCollection(name: string): EmojiCollection | undefined {

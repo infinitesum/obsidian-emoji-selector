@@ -307,7 +307,7 @@ export class EmojiPickerModal extends Modal {
         this.isLoading = true;
 
         try {
-            // Check if we have cached data first
+            // 检查是否需要加载数据
             const hasCachedData = this.plugin.emojiManager.getTotalEmojiCount() > 0;
 
             if (!hasCachedData) {
