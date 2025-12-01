@@ -11,6 +11,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
     private urlTextArea: HTMLTextAreaElement;
     private updateButton: HTMLButtonElement;
     private hasUnsavedChanges: boolean = false;
+    private previewCache: Map<string, { name: string; count: number; preview?: string }> | null = null;
 
     constructor(app: App, plugin: EmojiSelectorPlugin) {
         super(app, plugin);
@@ -21,6 +22,7 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
+        this.previewCache = null; // 每次打开设置页面时清空缓存，重新随机
 
         // Show loading message initially
         containerEl.createEl('div', { text: 'Loading settings...' });
@@ -492,16 +494,13 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
      * Render URL management section: add input, preview list, collapsible raw editor
      */
     private renderUrlManagement(containerEl: HTMLElement): void {
-        // Section heading with add button
-        const headingSetting = new Setting(containerEl)
+        // Add URL button row
+        const addUrlSetting = new Setting(containerEl)
             .setName(i18n.t('owoJsonUrls'))
-            .setHeading();
-        
-        // Add URL button (opens input modal)
-        headingSetting.addButton(btn => btn
-            .setButtonText(i18n.t('addUrl'))
-            .setCta()
-            .onClick(() => this.showAddUrlModal()));
+            .addButton(btn => btn
+                .setButtonText(i18n.t('addUrl'))
+                .setCta()
+                .onClick(() => this.showAddUrlModal()));
 
         // Preview list container with scroll
         const previewContainer = containerEl.createDiv({ cls: 'emoji-url-preview-list' });
@@ -644,32 +643,50 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             return;
         }
 
-        // Get preview data from manager (no need to reload - use existing cache)
-        const previews = new Map<string, { name: string; count: number; preview?: string }>();
-        try {
-            const mgr = await this.plugin.getEmojiManagerForSettings();
-            // 仅在没有数据时才加载，否则直接用缓存
-            if (mgr.getTotalEmojiCount() === 0) {
-                await mgr.loadEmojiCollections();
-            }
-            for (const p of mgr.getCollectionPreviews()) {
-                previews.set(p.url, p);
-            }
-        } catch (e) {
-            // Ignore - show URLs without preview
+        // 在首次加载时获取预览数据（包含随机图片）
+        if (!this.previewCache) {
+            this.previewCache = new Map();
+            try {
+                const mgr = await this.plugin.getEmojiManagerForSettings();
+                if (mgr.getTotalEmojiCount() === 0) {
+                    await mgr.loadEmojiCollections();
+                }
+                for (const p of mgr.getCollectionPreviews()) {
+                    this.previewCache.set(p.url, p);
+                }
+            } catch (e) {}
         }
 
         for (let i = 0; i < urls.length; i++) {
             const url = urls[i];
-            const info = previews.get(url);
-            const row = container.createDiv({ cls: 'emoji-url-row' });
+            const info = this.previewCache.get(url);
+            const row = container.createDiv({ cls: 'emoji-url-row', attr: { draggable: 'true', 'data-index': String(i) } });
 
-            // Preview image with error handling - encode URL for special chars like Chinese
+            // 拖拽排序
+            row.ondragstart = (e) => { e.dataTransfer?.setData('text/plain', String(i)); row.addClass('dragging'); };
+            row.ondragend = () => row.removeClass('dragging');
+            row.ondragover = (e) => { e.preventDefault(); row.addClass('drag-over'); };
+            row.ondragleave = () => row.removeClass('drag-over');
+            row.ondrop = async (e) => {
+                e.preventDefault();
+                row.removeClass('drag-over');
+                const from = parseInt(e.dataTransfer?.getData('text/plain') || '-1');
+                if (from >= 0 && from !== i) {
+                    const arr = this.parseUrls(this.plugin.settings.owoJsonUrls);
+                    const [item] = arr.splice(from, 1);
+                    arr.splice(i, 0, item);
+                    this.plugin.settings.owoJsonUrls = arr.join(',');
+                    await this.plugin.saveSettings();
+                    try { (await this.plugin.getEmojiManagerForSettings()).reorderByUrls(arr); } catch {}
+                    if (this.urlTextArea) this.urlTextArea.value = this.plugin.settings.owoJsonUrls;
+                    await this.renderPreviewList(container);
+                }
+            };
+
+            // Preview image
             const thumbEl = row.createDiv({ cls: 'emoji-url-thumb-wrap' });
             if (info?.preview) {
-                // 对 URL 进行编码，但保留已编码的部分
-                const imgSrc = this.encodeImageUrl(info.preview);
-                const img = thumbEl.createEl('img', { cls: 'emoji-url-thumb', attr: { src: imgSrc } });
+                const img = thumbEl.createEl('img', { cls: 'emoji-url-thumb', attr: { src: this.encodeImageUrl(info.preview) } });
                 img.onerror = () => { img.remove(); thumbEl.createDiv({ cls: 'emoji-url-thumb-placeholder', text: '📦' }); };
             } else {
                 thumbEl.createDiv({ cls: 'emoji-url-thumb-placeholder', text: info ? '📦' : '⏳' });
@@ -677,19 +694,11 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
 
             // Info: name and count
             const infoDiv = row.createDiv({ cls: 'emoji-url-info' });
-            infoDiv.createDiv({ cls: 'emoji-url-name', text: info?.name || this.extractName(url) });
-            const metaText = info ? i18n.t('emojiCount', info.count.toString()) : url;
-            infoDiv.createDiv({ cls: 'emoji-url-meta', text: metaText, attr: { title: url } });
+            infoDiv.createDiv({ cls: 'emoji-url-name', text: info?.name || this.extractName(url), attr: { title: url } });
+            if (info) infoDiv.createDiv({ cls: 'emoji-url-meta', text: i18n.t('emojiCount', info.count.toString()) });
 
-            // Actions: up, down, delete
-            const actions = row.createDiv({ cls: 'emoji-url-actions' });
-            if (i > 0) {
-                actions.createEl('button', { text: '↑', cls: 'emoji-url-btn', attr: { title: i18n.t('moveUp') } }).onclick = () => this.moveUrl(urls, i, -1, container);
-            }
-            if (i < urls.length - 1) {
-                actions.createEl('button', { text: '↓', cls: 'emoji-url-btn', attr: { title: i18n.t('moveDown') } }).onclick = () => this.moveUrl(urls, i, 1, container);
-            }
-            actions.createEl('button', { text: '✕', cls: 'emoji-url-btn emoji-url-btn-danger', attr: { title: i18n.t('remove') } }).onclick = () => this.removeUrlAt(urls, i, url, container);
+            // Delete button only
+            row.createEl('button', { text: '✕', cls: 'emoji-url-btn emoji-url-btn-danger', attr: { title: i18n.t('remove') } }).onclick = () => this.removeUrlAt(container, i, url);
         }
     }
 
@@ -700,34 +709,17 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         } catch { return url; }
     }
 
-    private async moveUrl(urls: string[], i: number, dir: number, container: HTMLElement): Promise<void> {
-        [urls[i], urls[i + dir]] = [urls[i + dir], urls[i]];
-        await this.saveUrlsOrder(urls, container);
-    }
-
-    private async removeUrlAt(urls: string[], i: number, url: string, container: HTMLElement): Promise<void> {
+    private async removeUrlAt(container: HTMLElement, i: number, url: string): Promise<void> {
+        const scrollTop = container.scrollTop;
+        const urls = this.parseUrls(this.plugin.settings.owoJsonUrls);
         urls.splice(i, 1);
         this.plugin.settings.owoJsonUrls = urls.join(',');
         await this.plugin.saveSettings();
-        try {
-            const mgr = await this.plugin.getEmojiManagerForSettings();
-            await mgr.removeUrl(url);
-        } catch (e) { /* ignore */ }
+        try { await (await this.plugin.getEmojiManagerForSettings()).removeUrl(url); } catch {}
         new Notice(i18n.t('urlRemoved'));
         if (this.urlTextArea) this.urlTextArea.value = this.plugin.settings.owoJsonUrls;
-        this.renderPreviewList(container);
-    }
-
-    private async saveUrlsOrder(urls: string[], container: HTMLElement): Promise<void> {
-        this.plugin.settings.owoJsonUrls = urls.join(',');
-        await this.plugin.saveSettings();
-        // 同步更新 storage 中的 collections 顺序
-        try {
-            const mgr = await this.plugin.getEmojiManagerForSettings();
-            mgr.reorderByUrls(urls);
-        } catch (e) { /* ignore */ }
-        if (this.urlTextArea) this.urlTextArea.value = this.plugin.settings.owoJsonUrls;
-        this.renderPreviewList(container);
+        await this.renderPreviewList(container);
+        container.scrollTop = scrollTop;
     }
 
     /**
