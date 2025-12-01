@@ -14,6 +14,9 @@ Quick Insert
 
 ![Quick Insert](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-rzt22Jjs.gif)
 
+Pack Management Panel
+
+![Pack Mgmt](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/202512335-1186806.GIF)
 
 ## Features
 
@@ -32,8 +35,8 @@ Quick Insert
 
 ## Quick Start
 
-> [!important] 
-> You must configure emoji packs before use: The plugin requires emoji pack files to work properly. You can find your favorite emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/).
+<!-- > [!important] 
+> You must configure emoji packs before use: The plugin requires emoji pack files to work properly. You can find your favorite emoji packs at [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/). -->
 
 **Step 1: Add Emoji Packs**
 

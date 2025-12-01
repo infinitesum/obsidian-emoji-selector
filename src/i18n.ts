@@ -89,8 +89,6 @@ export interface I18nStrings {
     urlRemoved: string;
     urlPreview: string;
     emojiCount: string;
-    moveUp: string;
-    moveDown: string;
     remove: string;
     editRawConfig: string;
     editRawConfigDesc: string;
@@ -198,8 +196,6 @@ const EN_STRINGS: I18nStrings = {
     urlRemoved: 'Removed',
     urlPreview: 'Collections Preview',
     emojiCount: '{0} emojis',
-    moveUp: '↑',
-    moveDown: '↓',
     remove: '×',
     editRawConfig: 'Edit raw config',
     editRawConfigDesc: 'Manually edit the URL list',
@@ -307,8 +303,6 @@ const ZH_CN_STRINGS: I18nStrings = {
     urlRemoved: '已移除',
     urlPreview: '表情包预览',
     emojiCount: '{0} 个表情',
-    moveUp: '↑',
-    moveDown: '↓',
     remove: '×',
     editRawConfig: '编辑配置',
     editRawConfigDesc: '手动编辑 URL 列表',

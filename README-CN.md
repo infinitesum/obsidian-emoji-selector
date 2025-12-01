@@ -14,6 +14,9 @@
 
 ![快速插入](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/2025-08-10-rzt22Jjs.gif)
 
+表情包管理面板
+
+![表情包管理面板](https://io.pari.network/public.php/dav/files/8zCHa2az8HMJbmw/202512335-1186806.GIF)
 
 ## 功能特性
 
@@ -32,8 +35,8 @@
 
 ## 快速开始
 
-> [!important] 
-> 使用前必须配置表情包：插件需要表情包文件才能正常工作。可以在 [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/) 寻找您喜欢的表情包。
+<!-- > [!important] 
+> 使用前必须配置表情包：插件需要表情包文件才能正常工作。可以在 [https://emoticons.hzchu.top/](https://emoticons.hzchu.top/) 寻找您喜欢的表情包。 -->
 
 **第 1 步：添加表情包**
 
