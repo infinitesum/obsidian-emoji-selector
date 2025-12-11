@@ -82,7 +82,7 @@ export class EmojiPickerModal extends Modal {
         const searchContainer = contentEl.createDiv('emoji-search-container');
         this.searchInput = searchContainer.createEl('input', {
             type: 'text',
-            placeholder: this.plugin.settings.searchPlaceholder || i18n.t('searchPlaceholder'),
+            placeholder: i18n.t('searchPlaceholder'),
             cls: 'emoji-search-input'
         });
 

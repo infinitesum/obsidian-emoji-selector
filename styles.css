@@ -328,26 +328,24 @@
   text-decoration: underline;
 }
 
-/* Settings layout improvements */
-.setting-item-control textarea {
+.emoji-settings .setting-item-control textarea {
   width: 100%;
   min-height: 80px;
-  margin-top: 0.5rem;
+  /* margin-top: 0.5rem; */
 }
 
 /* Specific styling for multi-line input settings */
-.emoji-setting-multiline .setting-item-info {
+.emoji-settings .emoji-setting-multiline .setting-item-info {
   margin-bottom: 0.5rem;
 }
 
-.emoji-setting-multiline .setting-item-control {
+.emoji-settings .emoji-setting-multiline .setting-item-control {
   width: 100%;
-  margin-top: 0.5rem;
+  /* margin-top: 0.5rem; */
 }
 
-.emoji-setting-multiline .setting-item-control textarea {
-  width: 100%;
-  min-height: 80px;
+/* Only add resize capability for multiline textareas (inherits base styles above) */
+.emoji-settings .emoji-setting-multiline .setting-item-control textarea {
   resize: vertical;
 }
 
@@ -523,9 +521,6 @@
 }
 
 /* Raw editor toggle */
-.emoji-raw-editor {
-  margin-top: 4px;
-}
 
 .emoji-raw-editor.hidden {
   display: none;
@@ -534,5 +529,3 @@
 .emoji-duplicate-warning.mod-warning {
   color: var(--text-warning);
 }
-
-/* Keep existing styles minimal, let Obsidian handle most UI */

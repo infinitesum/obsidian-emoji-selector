@@ -22,6 +22,8 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
+        // Add a plugin-specific class to scope our settings CSS and avoid leaking styles
+        containerEl.addClass('emoji-settings');
         this.previewCache = null; // 每次打开设置页面时清空缓存，重新随机
 
         // Show loading message initially
@@ -98,7 +100,15 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
                 rel: 'noopener noreferrer'
             }
         });
-        madeByEl.appendText(' with ❤️');
+        madeByEl.appendText(' with ❤️ | ');
+        madeByEl.createEl('a', {
+            text: `v${this.plugin.manifest.version}`,
+            href: 'https://github.com/infinitesum/obsidian-emoji-selector',
+            attr: {
+                target: '_blank',
+                rel: 'noopener noreferrer'
+            }
+        });
 
         // Emoji size setting
         this.setDescWithCodeSupport(
@@ -110,19 +120,6 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             .setValue(this.plugin.settings.emojiSize)
             .onChange(async (value) => {
                 this.plugin.settings.emojiSize = value || '1.2em';
-                await this.plugin.saveSettings();
-            }));
-
-        // Search placeholder setting
-        this.setDescWithCodeSupport(
-            new Setting(containerEl)
-                .setName(i18n.t('searchPlaceholder')),
-            i18n.t('searchPlaceholderDesc')
-        ).addText(text => text
-            .setPlaceholder(i18n.t('searchPlaceholder'))
-            .setValue(this.plugin.settings.searchPlaceholder)
-            .onChange(async (value) => {
-                this.plugin.settings.searchPlaceholder = value || i18n.t('searchPlaceholder');
                 await this.plugin.saveSettings();
             }));
 
@@ -297,11 +294,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
             }));
 
         // Clear recent emojis button
-        const clearRecentEmojisSetting = new Setting(containerEl)
+        new Setting(containerEl)
             .setName(i18n.t('clearRecentEmojis'))
-            .setDesc(''); // Clear default description
-        this.createFormattedText(clearRecentEmojisSetting.descEl, i18n.t('clearRecentEmojisDesc'));
-        clearRecentEmojisSetting.addButton(button => button
+            .addButton(button => button
             .setButtonText(i18n.t('clearRecentEmojisButton'))
             .setWarning()
             .onClick(async () => {
@@ -525,9 +520,9 @@ export class EmojiSelectorSettingTab extends PluginSettingTab {
         // Raw textarea editor using Setting component
         const rawSetting = new Setting(editorContainer);
         rawSetting.settingEl.addClass('emoji-setting-multiline');
+        rawSetting.infoEl.remove(); // 移除空的 info 区域
         
-        const duplicateWarning = rawSetting.descEl;
-        duplicateWarning.addClass('emoji-duplicate-warning');
+        const duplicateWarning = editorContainer.createDiv({ cls: 'emoji-duplicate-warning' });
 
         rawSetting.addTextArea(text => {
             this.urlTextArea = text.inputEl;

@@ -88,8 +88,6 @@ export interface RecentEmojisData {
 export interface EmojiSelectorSettings {
     /** CSS height for emoji display (width is auto) */
     emojiSize: string;
-    /** Search input placeholder text */
-    searchPlaceholder: string;
     /** Additional CSS classes for styling */
     customCssClasses: string;
     /** URLs for owo.json files (comma-separated) */
@@ -129,7 +127,6 @@ export interface EmojiSelectorSettings {
  */
 export const DEFAULT_SETTINGS: EmojiSelectorSettings = {
     emojiSize: '2rem',
-    searchPlaceholder: '',
     customCssClasses: '',
     owoJsonUrls: 'https://emoticons.hzchu.top/json/owo/capoo.json,https://emoticons.hzchu.top/json/owo/Blob.json',
     rememberLastCollection: true,
