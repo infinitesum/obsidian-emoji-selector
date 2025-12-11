@@ -1,5 +1,4 @@
 import { Plugin, Editor, MarkdownView, Notice } from 'obsidian';
-import { EmojiPickerModal } from './src/emoji-picker-modal';
 import { EmojiItem, EmojiSelectorSettings, DEFAULT_SETTINGS } from './src/types';
 import { EmojiManager } from './src/emoji-manager';
 import { EmojiSelectorSettingTab } from './src/settings-tab';
@@ -10,10 +9,11 @@ import { perfMonitor } from './src/performance-monitor';
 import { logger, LogLevel } from './src/logger';
 
 export default class EmojiSelectorPlugin extends Plugin {
-	settings: EmojiSelectorSettings;
-	emojiManager: EmojiManager | null = null;
-	private emojiSuggest: EmojiSuggest | null = null;
-	private dataCache: Record<string, unknown> | null = null;
+        settings: EmojiSelectorSettings;
+        emojiManager: EmojiManager | null = null;
+        private emojiSuggest: EmojiSuggest | null = null;
+        private dataCache: Record<string, unknown> | null = null;
+        private emojiPickerModulePromise: Promise<typeof import('./src/emoji-picker-modal')> | null = null;
 
 	async onload() {
 		perfMonitor.start('plugin-onload');
@@ -247,17 +247,26 @@ export default class EmojiSelectorPlugin extends Plugin {
 	/**
 	 * Open the emoji picker modal
 	 */
-	private async openEmojiPicker(editor: Editor): Promise<void> {
-		// Get emoji manager (lazy initialization)
-		await this.getEmojiManager();
+        private async openEmojiPicker(editor: Editor): Promise<void> {
+                // Get emoji manager (lazy initialization)
+                await this.getEmojiManager();
 
-		const modal = new EmojiPickerModal(
-			this.app,
-			this,
-			(emoji: EmojiItem, isMultiSelectMode: boolean) => this.insertEmoji(editor, emoji, isMultiSelectMode)
-		);
-		modal.open();
-	}
+                const { EmojiPickerModal } = await this.loadEmojiPickerModal();
+
+                const modal = new EmojiPickerModal(
+                        this.app,
+                        this,
+                        (emoji: EmojiItem, isMultiSelectMode: boolean) => this.insertEmoji(editor, emoji, isMultiSelectMode)
+                );
+                modal.open();
+        }
+
+        private async loadEmojiPickerModal(): Promise<typeof import('./src/emoji-picker-modal')> {
+                if (!this.emojiPickerModulePromise) {
+                        this.emojiPickerModulePromise = import('./src/emoji-picker-modal');
+                }
+                return this.emojiPickerModulePromise;
+        }
 
 	/**
 	 * Insert selected emoji into the editor
